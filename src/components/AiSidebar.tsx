@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { Sparkles, Send, MessageCircle, X, Lock } from "lucide-react";
+import { Sparkles, Send, Lock } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { getAiEntitlement, consumeAiMessage } from "@/lib/ai.functions";
 
 export function AiSidebar() {
-  const [open, setOpen] = useState(false);
   const [entitlement, setEntitlement] = useState<{
     freeUsed: number;
     freeLimit: number;
@@ -45,20 +44,7 @@ export function AiSidebar() {
   }
 
   return (
-    <>
-      {/* Floating open button */}
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-30 rounded-full bg-primary text-primary-foreground h-14 w-14 flex items-center justify-center btn-glow shadow-lg hover:opacity-90"
-          aria-label="Open LTCme AI"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </button>
-      )}
-
-      {open && (
-        <aside className="fixed inset-y-0 right-0 z-30 w-full sm:w-96 bg-card/95 backdrop-blur-md border-l border-border flex flex-col">
+    <aside className="hidden md:flex fixed inset-y-0 right-0 z-30 w-[30%] min-w-[320px] bg-card/95 backdrop-blur-md border-l border-border flex-col">
           <header className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center">
@@ -69,9 +55,6 @@ export function AiSidebar() {
                 <div className="text-[11px] text-muted-foreground">Litecoin companion</div>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
-              <X className="h-5 w-5" />
-            </button>
           </header>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -138,8 +121,6 @@ export function AiSidebar() {
             )}
             <p className="text-[10px] text-muted-foreground text-center">Never share your seed phrase with anyone.</p>
           </div>
-        </aside>
-      )}
-    </>
+    </aside>
   );
 }
