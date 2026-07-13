@@ -92,31 +92,29 @@ function TxBuilderPage() {
   async function build() {
     setBusy(true);
     try {
-      const { bitcoin, ECPair } = await import("@/lib/ltc/wallet");
+      const { bitcoin, keyPairFromWif } = await import("@/lib/ltc/wallet");
       const { litecoinMainnet } = await import("@/lib/ltc/network");
-      const { Buffer } = await import("buffer");
       const psbt = new bitcoin.Psbt({ network: litecoinMainnet as any });
-      const signers: any[] = [];
+      const signers: Array<{ pub: Uint8Array; sign: (h: Uint8Array) => Uint8Array }> = [];
       for (const inp of inputs) {
         if (!inp.txid || !inp.wif || !inp.value) throw new Error("Each input needs txid, value, and WIF");
-        const kp = ECPair.fromWIF(inp.wif.trim(), litecoinMainnet as any);
-        const pub = Buffer.from(kp.publicKey);
-        const p = bitcoin.payments.p2wpkh({ pubkey: pub, network: litecoinMainnet as any });
+        const kp = keyPairFromWif(inp.wif.trim());
+        const p = bitcoin.payments.p2wpkh({ pubkey: kp.publicKey as unknown as Buffer, network: litecoinMainnet as any });
         psbt.addInput({
           hash: inp.txid.trim(),
           index: Number(inp.vout) || 0,
           witnessUtxo: { script: p.output!, value: Math.round(Number(inp.value) * 1e8) },
         });
-        signers.push(kp);
+        signers.push({ pub: kp.publicKey, sign: (h) => kp.sign(h) });
       }
       for (const out of outputs) {
         if (!out.address || !out.amount) throw new Error("Each output needs address + amount");
         psbt.addOutput({ address: out.address.trim(), value: Math.round(Number(out.amount) * 1e8) });
       }
-      signers.forEach((kp, i) => {
+      signers.forEach((s, i) => {
         psbt.signInput(i, {
-          publicKey: Buffer.from(kp.publicKey),
-          sign: (hash: any) => Buffer.from(kp.sign(hash)),
+          publicKey: s.pub as unknown as Buffer,
+          sign: (hash: Buffer) => s.sign(hash as unknown as Uint8Array) as unknown as Buffer,
         });
       });
       psbt.finalizeAllInputs();

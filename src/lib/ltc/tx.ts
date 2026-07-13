@@ -1,7 +1,7 @@
 // Build & sign a Litecoin transaction from a decrypted mnemonic (bech32 accounts).
-import { Buffer } from "@/lib/buffer-polyfill";
-import * as bip39 from "bip39";
-import { bitcoin, bip32, ECPair } from "./wallet";
+import * as scureBip39 from "@scure/bip39";
+import { HDKey } from "@scure/bip32";
+import { bitcoin, keyPairFromPrivate, type KeyPair } from "./wallet";
 import { litecoinMainnet, LTC } from "./network";
 import type { Utxo } from "./api";
 import { getRawTx, estimateFeeRate, broadcastTx } from "./api";
@@ -34,25 +34,30 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
     throw new Error("Only bech32 (ltc1...) sending is supported in v1.");
   }
   const feeRate = input.feeRate ?? (await estimateFeeRate());
-  const seed = bip39.mnemonicToSeedSync(input.mnemonic.trim());
-  const root = bip32.fromSeed(seed, litecoinMainnet as any);
+  const seed = scureBip39.mnemonicToSeedSync(input.mnemonic.trim());
+  const root = HDKey.fromMasterSeed(seed, {
+    private: litecoinMainnet.bip32.private,
+    public: litecoinMainnet.bip32.public,
+  });
   const account = input.account ?? 0;
   const scanDepth = input.scanDepth ?? 20;
 
-  // Build a lookup: address -> node
+  // Build a lookup: address -> KeyPair
   const branches = [
-    root.derivePath(`m/84'/${LTC.bip44CoinType}'/${account}'/0`),
-    root.derivePath(`m/84'/${LTC.bip44CoinType}'/${account}'/1`),
+    root.derive(`m/84'/${LTC.bip44CoinType}'/${account}'/0`),
+    root.derive(`m/84'/${LTC.bip44CoinType}'/${account}'/1`),
   ];
-  const addrToNode = new Map<string, any>();
+  const addrToKp = new Map<string, KeyPair>();
   for (let b = 0; b < 2; b++) {
     for (let i = 0; i < scanDepth; i++) {
-      const c = branches[b].derive(i);
+      const c = branches[b].deriveChild(i);
+      if (!c.privateKey || !c.publicKey) continue;
+      const kp = keyPairFromPrivate(c.privateKey, true);
       const p = bitcoin.payments.p2wpkh({
-        pubkey: Buffer.from(c.publicKey),
+        pubkey: kp.publicKey as unknown as Buffer,
         network: litecoinMainnet as any,
       });
-      if (p.address) addrToNode.set(p.address, c);
+      if (p.address) addrToKp.set(p.address, kp);
     }
   }
 
@@ -72,10 +77,10 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
 
   const psbt = new bitcoin.Psbt({ network: litecoinMainnet as any });
   for (const inp of inputs) {
-    const node = addrToNode.get(inp.address);
-    if (!node) throw new Error(`Missing key for UTXO address ${inp.address}`);
+    const kp = addrToKp.get(inp.address);
+    if (!kp) throw new Error(`Missing key for UTXO address ${inp.address}`);
     const p2wpkh = bitcoin.payments.p2wpkh({
-      pubkey: Buffer.from(node.publicKey),
+      pubkey: kp.publicKey as unknown as Buffer,
       network: litecoinMainnet as any,
     });
     psbt.addInput({
@@ -91,13 +96,10 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
     });
   }
   for (let i = 0; i < inputs.length; i++) {
-    const node = addrToNode.get(inputs[i].address);
-    const kp = ECPair.fromPrivateKey(Buffer.from(node.privateKey!), {
-      network: litecoinMainnet as any,
-    });
+    const kp = addrToKp.get(inputs[i].address)!;
     psbt.signInput(i, {
-      publicKey: Buffer.from(kp.publicKey),
-      sign: (hash: Buffer) => Buffer.from(kp.sign(hash)),
+      publicKey: kp.publicKey as unknown as Buffer,
+      sign: (hash: Buffer) => kp.sign(hash as unknown as Uint8Array) as unknown as Buffer,
     });
   }
   psbt.finalizeAllInputs();
