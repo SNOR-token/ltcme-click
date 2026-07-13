@@ -153,4 +153,13 @@ const css = `
   0%   { left: -40px; }
   100% { left: 105%; }
 }
+.ltc-big-ghost {
+  filter: drop-shadow(0 8px 24px oklch(0.78 0.14 230 / 0.55));
+  animation: ltcBigGhostBob 4.2s ease-in-out infinite;
+  margin-top: 8px;
+}
+@keyframes ltcBigGhostBob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-10px) rotate(2deg); }
+}
 `;
