@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { AiSidebar } from "@/components/AiSidebar";
-import { PacmanBanner, BigGhost } from "@/components/Pacman";
+import { PacmanBanner } from "@/components/Pacman";
 
 ensureBuffer();
 
@@ -130,7 +130,6 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <div className="md:pr-[30%]">
         <PacmanBanner compact />
-        <BigGhost />
         <Outlet />
       </div>
       <AiSidebar />
