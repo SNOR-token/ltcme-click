@@ -11,6 +11,12 @@ export const Route = createFileRoute("/_authenticated/wallets")({
   component: WalletsPage,
 });
 
+async function loadWalletHelpers() {
+  const { ensureBuffer } = await import("@/lib/buffer-polyfill");
+  ensureBuffer();
+  return import("@/lib/ltc/wallet");
+}
+
 function WalletsPage() {
   const [wallets, setWallets] = useState<StoredWallet[]>([]);
   const [balances, setBalances] = useState<Record<string, number>>({});
@@ -156,7 +162,7 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     (async () => {
-      const { generateMnemonic } = await import("@/lib/ltc/wallet");
+      const { generateMnemonic } = await loadWalletHelpers();
       setMnemonic(generateMnemonic(128));
     })();
   }, []);
@@ -167,7 +173,7 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
     if (password !== confirmPw) return toast.error("Passwords don't match");
     setSaving(true);
     try {
-      const { deriveFromMnemonic, newId } = await import("@/lib/ltc/wallet");
+      const { deriveFromMnemonic, newId } = await loadWalletHelpers();
       const { encryptString } = await import("@/lib/ltc/crypto");
       const derived = deriveFromMnemonic(mnemonic, "bech32", 5, 0);
       const secret = await encryptString(mnemonic, password);
@@ -263,7 +269,7 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
       const trimmed = raw.split(/\s+/).join(" ").toLowerCase();
       const words = trimmed.split(" ");
       const wordCount = words.length;
-      const { validateMnemonic, deriveFromMnemonic, addressFromWif, newId } = await import("@/lib/ltc/wallet");
+      const { validateMnemonic, deriveFromMnemonic, addressFromWif, newId } = await loadWalletHelpers();
       const { encryptString } = await import("@/lib/ltc/crypto");
 
       const looksLikeMnemonic = wordCount === 12 || wordCount === 15 || wordCount === 18 || wordCount === 21 || wordCount === 24;
@@ -361,7 +367,7 @@ function WatchDialog({ onClose }: { onClose: () => void }) {
   async function save() {
     setSaving(true);
     try {
-      const { validateAddress, newId } = await import("@/lib/ltc/wallet");
+      const { validateAddress, newId } = await loadWalletHelpers();
       const v = validateAddress(address);
       if (!v.valid) throw new Error("Invalid Litecoin address");
       upsertWallet({
