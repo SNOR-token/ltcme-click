@@ -61,8 +61,9 @@ export function deriveFromMnemonic(
   addressType: AddressType,
   count = 5,
   account = 0,
+  passphrase = "",
 ): DerivedAddress[] {
-  const seed = bip39.mnemonicToSeedSync(mnemonic.trim());
+  const seed = bip39.mnemonicToSeedSync(mnemonic.trim(), passphrase);
   const root = bip32.fromSeed(seed, litecoinMainnet as any);
   const purpose = purposeFor(addressType);
   const basePath = `m/${purpose}'/${LTC.bip44CoinType}'/${account}'/0`;
