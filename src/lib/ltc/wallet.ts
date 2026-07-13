@@ -1,16 +1,11 @@
 // Browser-only Litecoin wallet helpers. Import from client components only.
+import { Buffer } from "@/lib/buffer-polyfill";
 import * as bitcoin from "bitcoinjs-lib";
 import BIP32Factory from "bip32";
 import * as bip39 from "bip39";
 import ecc from "@bitcoinerlab/secp256k1";
 import { ECPairFactory } from "ecpair";
-import { Buffer } from "buffer";
 import { litecoinMainnet, LTC } from "./network";
-
-// Buffer polyfill for browser deps that expect a global Buffer.
-if (typeof (globalThis as any).Buffer === "undefined") {
-  (globalThis as any).Buffer = Buffer;
-}
 
 bitcoin.initEccLib(ecc as any);
 const bip32 = BIP32Factory(ecc as any);

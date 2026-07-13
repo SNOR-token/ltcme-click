@@ -1,6 +1,6 @@
 // Build & sign a Litecoin transaction from a decrypted mnemonic (bech32 accounts).
+import { Buffer } from "@/lib/buffer-polyfill";
 import * as bip39 from "bip39";
-import { Buffer } from "buffer";
 import { bitcoin, bip32, ECPair } from "./wallet";
 import { litecoinMainnet, LTC } from "./network";
 import type { Utxo } from "./api";
