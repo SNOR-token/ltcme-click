@@ -164,8 +164,8 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState<"generate" | "confirm">("generate");
   const [name, setName] = useState("My Litecoin Wallet");
   const [mnemonic, setMnemonic] = useState<string>("");
-  const [password, setPassword] = useState("");
-  const [confirmPw, setConfirmPw] = useState("");
+  const [bip39Passphrase, setBip39Passphrase] = useState("");
+  const [showBipPass, setShowBipPass] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -177,14 +177,11 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
 
   async function save() {
     if (!name.trim()) return toast.error("Name required");
-    if (password.length < 8) return toast.error("Password must be at least 8 characters");
-    if (password !== confirmPw) return toast.error("Passwords don't match");
     setSaving(true);
     try {
-      const { deriveFromMnemonic, newId } = await loadWalletHelpers();
-      const { encryptString } = await import("@/lib/ltc/crypto");
-      const derived = deriveFromMnemonic(mnemonic, "bech32", 5, 0);
-      const secret = await encryptString(mnemonic, password);
+      const { deriveAllStandards, newId } = await loadWalletHelpers();
+      const derived = deriveAllStandards(mnemonic, 3, 0, bip39Passphrase);
+      const secret = JSON.stringify({ mnemonic, passphrase: bip39Passphrase || "" });
       upsertWallet({
         meta: {
           id: newId(),
@@ -238,8 +235,21 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
       ) : (
         <div className="space-y-3">
           <Field label="Wallet name" value={name} onChange={setName} />
-          <Field label="Encryption password (min 8)" type="password" value={password} onChange={setPassword} />
-          <Field label="Confirm password" type="password" value={confirmPw} onChange={setConfirmPw} />
+          <button
+            type="button"
+            onClick={() => setShowBipPass((v) => !v)}
+            className="text-xs text-primary hover:underline"
+          >
+            {showBipPass ? "Hide" : "Add"} optional BIP39 passphrase (25th word)
+          </button>
+          {showBipPass && (
+            <Field
+              label="BIP39 passphrase (optional)"
+              type="password"
+              value={bip39Passphrase}
+              onChange={setBip39Passphrase}
+            />
+          )}
           <div className="flex justify-between pt-2">
             <button onClick={() => setStep("generate")} className="text-sm text-muted-foreground">← Back</button>
             <button onClick={save} disabled={saving} className="rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm btn-glow disabled:opacity-50">
@@ -257,14 +267,10 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
   const [phrase, setPhrase] = useState("");
   const [bip39Passphrase, setBip39Passphrase] = useState("");
   const [showBipPass, setShowBipPass] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPw, setConfirmPw] = useState("");
   const [saving, setSaving] = useState(false);
 
   async function save() {
     if (!name.trim()) return toast.error("Name required");
-    if (password.length < 8) return toast.error("Password must be at least 8 characters");
-    if (password !== confirmPw) return toast.error("Passwords don't match");
     const raw = phrase.trim();
     if (!raw) return toast.error("Enter a seed phrase or WIF");
     if (raw.length > 2000) {
@@ -277,16 +283,15 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
       const trimmed = raw.split(/\s+/).join(" ").toLowerCase();
       const words = trimmed.split(" ");
       const wordCount = words.length;
-      const { validateMnemonic, deriveFromMnemonic, addressFromWif, newId } = await loadWalletHelpers();
-      const { encryptString } = await import("@/lib/ltc/crypto");
+      const { validateMnemonic, deriveAllStandards, addressFromWif, newId } = await loadWalletHelpers();
 
       const looksLikeMnemonic = wordCount === 12 || wordCount === 15 || wordCount === 18 || wordCount === 21 || wordCount === 24;
       if (looksLikeMnemonic) {
         if (!validateMnemonic(trimmed)) throw new Error("Invalid mnemonic (checksum failed).");
-        const derived = deriveFromMnemonic(trimmed, "bech32", 5, 0, bip39Passphrase);
-        // Store phrase + passphrase together so we can rederive later.
-        const payload = JSON.stringify({ mnemonic: trimmed, passphrase: bip39Passphrase || "" });
-        const secret = await encryptString(payload, password);
+        // Derive BIP44 (L…), BIP49 (M…), BIP84 (ltc1…) so an imported seed
+        // surfaces every standard address the user might already have funds on.
+        const derived = deriveAllStandards(trimmed, 3, 0, bip39Passphrase);
+        const secret = JSON.stringify({ mnemonic: trimmed, passphrase: bip39Passphrase || "" });
         upsertWallet({
           meta: { id: newId(), name: name.trim(), kind: "hd", addressType: "bech32", createdAt: Date.now() },
           secret,
@@ -299,10 +304,9 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
           throw new Error("That doesn't look like a seed phrase (12/24 words) or a WIF key.");
         }
         const { address } = addressFromWif(wif, "bech32");
-        const secret = await encryptString(wif, password);
         upsertWallet({
           meta: { id: newId(), name: name.trim(), kind: "single", addressType: "bech32", createdAt: Date.now() },
-          secret,
+          secret: wif,
           addresses: [{ address }],
         });
       }
@@ -317,7 +321,7 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <ModalShell title="Import wallet" onClose={onClose}>
-      <p className="text-xs text-muted-foreground mb-3">Paste a 12/24-word seed phrase OR a WIF private key. Stored encrypted in this browser.</p>
+      <p className="text-xs text-muted-foreground mb-3">Paste a 12/24-word seed phrase OR a WIF private key. Stored locally in this browser only — never sent anywhere.</p>
       <Field label="Wallet name" value={name} onChange={setName} />
       <label className="text-xs text-muted-foreground mt-3 block">Seed phrase or WIF</label>
       <textarea
@@ -344,19 +348,10 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
               onChange={setBip39Passphrase}
             />
             <p className="mt-1 text-[11px] text-muted-foreground">
-              Only fill this if your original wallet was created with a BIP39 passphrase. This is different from the encryption password below.
+              Only fill this if your original wallet was created with a BIP39 passphrase.
             </p>
           </div>
         )}
-      </div>
-      <div className="mt-3 space-y-3">
-        <div>
-          <Field label="Encryption password (min 8)" type="password" value={password} onChange={setPassword} />
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            This password is used <strong>only inside this app</strong> to encrypt your key in this browser. It is not sent anywhere and cannot be recovered — write it down.
-          </p>
-        </div>
-        <Field label="Confirm password" type="password" value={confirmPw} onChange={setConfirmPw} />
       </div>
       <div className="flex justify-end mt-4">
         <button onClick={save} disabled={saving} className="rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm btn-glow disabled:opacity-50">
