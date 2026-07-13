@@ -6,6 +6,7 @@ import { litecoinMainnet, LTC } from "./network";
 import type { Utxo } from "./api";
 import { getRawTx, estimateFeeRate, broadcastTx } from "./api";
 import coinSelect from "coinselect";
+import { Buffer } from "buffer";
 
 export interface BuildInput {
   mnemonic: string;
@@ -54,7 +55,7 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
       if (!c.privateKey || !c.publicKey) continue;
       const kp = keyPairFromPrivate(c.privateKey, true);
       const p = bitcoin.payments.p2wpkh({
-        pubkey: kp.publicKey as unknown as Buffer,
+        pubkey: Buffer.from(kp.publicKey),
         network: litecoinMainnet as any,
       });
       if (p.address) addrToKp.set(p.address, kp);
@@ -80,7 +81,7 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
     const kp = addrToKp.get(inp.address);
     if (!kp) throw new Error(`Missing key for UTXO address ${inp.address}`);
     const p2wpkh = bitcoin.payments.p2wpkh({
-      pubkey: kp.publicKey as unknown as Buffer,
+      pubkey: Buffer.from(kp.publicKey),
       network: litecoinMainnet as any,
     });
     psbt.addInput({
@@ -98,8 +99,8 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
   for (let i = 0; i < inputs.length; i++) {
     const kp = addrToKp.get(inputs[i].address)!;
     psbt.signInput(i, {
-      publicKey: kp.publicKey as unknown as Buffer,
-      sign: (hash: Buffer) => kp.sign(hash as unknown as Uint8Array) as unknown as Buffer,
+      publicKey: Buffer.from(kp.publicKey),
+      sign: (hash: Buffer) => Buffer.from(kp.sign(hash)),
     });
   }
   psbt.finalizeAllInputs();

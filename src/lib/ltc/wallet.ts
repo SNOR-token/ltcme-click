@@ -9,6 +9,7 @@ import { HDKey } from "@scure/bip32";
 import { base58check } from "@scure/base";
 import { sha256 } from "@noble/hashes/sha2.js";
 import ecc from "@bitcoinerlab/secp256k1";
+import { Buffer } from "buffer";
 import { litecoinMainnet, LTC } from "./network";
 
 bitcoin.initEccLib(ecc as unknown as Parameters<typeof bitcoin.initEccLib>[0]);
@@ -112,8 +113,10 @@ export function deriveAllStandards(
 }
 
 export function addressFromPubkey(pubkey: Uint8Array, addressType: AddressType): string {
-  // bitcoinjs-lib v6 accepts Uint8Array at runtime; its d.ts still lists Buffer.
-  const pk = pubkey as unknown as Buffer;
+  // bitcoinjs-lib v6 validates payment pubkeys as real Buffer instances.
+  // HDKey/ecc return Uint8Array, so convert explicitly to avoid
+  // "Expected property pubkey of type ?isPoint, got Uint8Array" during import.
+  const pk = Buffer.from(pubkey);
   if (addressType === "bech32") {
     return bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any }).address!;
   }
