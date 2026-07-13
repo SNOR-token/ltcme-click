@@ -1,13 +1,16 @@
-// Encrypted browser storage for wallet keys.
-import type { Encrypted } from "./crypto";
+// Browser-local wallet storage (non-custodial, plaintext in localStorage).
+// The user is responsible for backing up their seed phrase. There is no
+// separate app password — the optional BIP39 passphrase (25th word) is the
+// only extra secret and is stored alongside the mnemonic.
 import type { AddressType, WalletMeta } from "./wallet";
 
 const KEY = "ltcme.wallets.v1";
 
 export interface StoredWallet {
   meta: WalletMeta;
-  // Encrypted mnemonic OR wif OR (for watch-only) plaintext xpub/address stored in meta
-  secret?: Encrypted;
+  // Plaintext secret. For HD wallets: JSON string {mnemonic, passphrase}.
+  // For single-key: WIF. Watch-only wallets have no secret.
+  secret?: string;
   addresses: { address: string; path?: string; index?: number }[];
 }
 

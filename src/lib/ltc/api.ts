@@ -1,8 +1,9 @@
-// Litecoin mainnet blockchain data via public APIs.
-// Primary: Blockchair (no key needed, generous free tier).
-// Docs: https://blockchair.com/api/docs
+// Litecoin mainnet blockchain data via the litecoinspace.org public REST API
+// (mempool.space-compatible schema). No key required, community-run mainnet
+// node — used for constant balance checks, UTXO fetches, and broadcasting.
+// Docs: https://litecoinspace.org/docs/api/rest
 
-const BC = "https://api.blockchair.com/litecoin";
+const LS = "https://litecoinspace.org/api";
 
 export interface Utxo {
   txid: string;
@@ -18,51 +19,63 @@ export interface AddressInfo {
   txCount: number;
 }
 
-async function bcFetch<T = any>(path: string): Promise<T> {
-  const res = await fetch(`${BC}${path}`);
-  if (!res.ok) throw new Error(`Blockchair ${res.status}`);
-  const j = await res.json();
-  if (j.context?.error) throw new Error(j.context.error);
-  return j;
+async function lsFetch<T = any>(path: string): Promise<T> {
+  const res = await fetch(`${LS}${path}`);
+  if (!res.ok) throw new Error(`litecoinspace ${res.status}`);
+  return (await res.json()) as T;
+}
+
+async function lsText(path: string): Promise<string> {
+  const res = await fetch(`${LS}${path}`);
+  if (!res.ok) throw new Error(`litecoinspace ${res.status}`);
+  return await res.text();
+}
+
+function balanceFromStats(d: any): number {
+  const c = d?.chain_stats;
+  const m = d?.mempool_stats;
+  const confirmed = (c?.funded_txo_sum ?? 0) - (c?.spent_txo_sum ?? 0);
+  const pending = (m?.funded_txo_sum ?? 0) - (m?.spent_txo_sum ?? 0);
+  return confirmed + pending;
 }
 
 export async function getAddressInfo(address: string): Promise<AddressInfo> {
-  const j = await bcFetch<any>(`/dashboards/address/${address}?limit=1`);
-  const d = j.data?.[address]?.address;
+  const d = await lsFetch<any>(`/address/${address}`);
   return {
     address,
-    balanceSats: d?.balance ?? 0,
-    txCount: d?.transaction_count ?? 0,
+    balanceSats: balanceFromStats(d),
+    txCount: (d?.chain_stats?.tx_count ?? 0) + (d?.mempool_stats?.tx_count ?? 0),
   };
 }
 
 export async function getBalances(addresses: string[]): Promise<Record<string, number>> {
   if (addresses.length === 0) return {};
-  const j = await bcFetch<any>(`/dashboards/addresses/${addresses.join(",")}`);
   const out: Record<string, number> = {};
-  const set = j.data?.addresses ?? {};
-  addresses.forEach((a) => {
-    out[a] = set[a]?.balance ?? 0;
-  });
+  await Promise.all(
+    addresses.map(async (a) => {
+      try {
+        const d = await lsFetch<any>(`/address/${a}`);
+        out[a] = balanceFromStats(d);
+      } catch {
+        out[a] = 0;
+      }
+    }),
+  );
   return out;
 }
 
 export async function getUtxos(address: string): Promise<Utxo[]> {
-  const j = await bcFetch<any>(`/outputs?q=recipient(${address}),is_spent(false)&limit=100`);
-  const rows = j.data ?? [];
+  const rows = await lsFetch<any[]>(`/address/${address}/utxo`);
   return rows.map((r: any) => ({
-    txid: r.transaction_hash,
-    vout: r.index,
+    txid: r.txid,
+    vout: r.vout,
     value: r.value,
-    script: r.script_hex,
     address,
   }));
 }
 
 export async function getRawTx(txid: string): Promise<string> {
-  const j = await bcFetch<any>(`/raw/transaction/${txid}`);
-  const d = j.data?.[txid];
-  return d?.raw_transaction ?? "";
+  return await lsText(`/tx/${txid}/hex`);
 }
 
 export interface TxSummary {
@@ -73,36 +86,35 @@ export interface TxSummary {
 }
 
 export async function getRecentTxs(address: string, limit = 15): Promise<TxSummary[]> {
-  const j = await bcFetch<any>(`/dashboards/address/${address}?limit=${limit}`);
-  const d = j.data?.[address];
-  const txs: string[] = d?.transactions ?? [];
-  return txs.map((txid) => ({
-    txid,
-    time: 0,
-    balanceChangeSats: 0,
-    confirmations: 0,
-  }));
+  try {
+    const rows = await lsFetch<any[]>(`/address/${address}/txs`);
+    return rows.slice(0, limit).map((t) => ({
+      txid: t.txid,
+      time: t.status?.block_time ?? 0,
+      balanceChangeSats: 0,
+      confirmations: t.status?.confirmed ? 1 : 0,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function estimateFeeRate(): Promise<number> {
-  // sats/vbyte
   try {
-    const j = await bcFetch<any>(`/stats`);
-    const rate = j.data?.suggested_transaction_fee_per_byte_sat;
+    const j = await lsFetch<any>(`/v1/fees/recommended`);
+    const rate = j?.halfHourFee ?? j?.hourFee ?? j?.fastestFee;
     if (typeof rate === "number" && rate > 0) return Math.max(1, Math.ceil(rate));
   } catch {}
   return 10;
 }
 
 export async function broadcastTx(rawHex: string): Promise<string> {
-  const res = await fetch(`${BC}/push/transaction`, {
+  const res = await fetch(`${LS}/tx`, {
     method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ data: rawHex }),
+    headers: { "content-type": "text/plain" },
+    body: rawHex,
   });
-  const j = await res.json();
-  if (!res.ok || j.context?.error) {
-    throw new Error(j.context?.error || `Broadcast failed (${res.status})`);
-  }
-  return j.data?.transaction_hash ?? "";
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `Broadcast failed (${res.status})`);
+  return text.trim();
 }

@@ -85,6 +85,32 @@ export function deriveFromMnemonic(
   return out;
 }
 
+export interface DerivedAddressTagged extends DerivedAddress {
+  addressType: AddressType;
+}
+
+// Derive addresses across all three standard Litecoin BIP levels:
+//   BIP44 → m/44'/2'/…  → legacy   L…
+//   BIP49 → m/49'/2'/…  → p2sh-segwit M…
+//   BIP84 → m/84'/2'/…  → native segwit ltc1…
+// This mirrors what Electrum-LTC / Litewallet / Trezor Suite do so an
+// imported seed surfaces every address a user might already have funds on.
+export function deriveAllStandards(
+  mnemonic: string,
+  countPerType = 3,
+  account = 0,
+  passphrase = "",
+): DerivedAddressTagged[] {
+  const types: AddressType[] = ["bech32", "p2sh", "legacy"];
+  const out: DerivedAddressTagged[] = [];
+  for (const t of types) {
+    for (const d of deriveFromMnemonic(mnemonic, t, countPerType, account, passphrase)) {
+      out.push({ ...d, addressType: t });
+    }
+  }
+  return out;
+}
+
 export function addressFromPubkey(pubkey: Uint8Array, addressType: AddressType): string {
   // bitcoinjs-lib v6 accepts Uint8Array at runtime; its d.ts still lists Buffer.
   const pk = pubkey as unknown as Buffer;

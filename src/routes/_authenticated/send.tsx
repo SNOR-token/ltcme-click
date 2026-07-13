@@ -21,7 +21,6 @@ function SendPage() {
 
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
-  const [password, setPassword] = useState("");
   const [feeRate, setFeeRate] = useState<number>(10);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<{ txid: string; feeSats: number; vbytes: number; rawHex: string } | null>(null);
@@ -35,7 +34,7 @@ function SendPage() {
   async function build() {
     if (!wallet) return;
     if (wallet.meta.kind === "watch") return toast.error("Watch-only wallet — no keys to sign with.");
-    if (!wallet.secret) return toast.error("Wallet has no encrypted secret.");
+    if (!wallet.secret) return toast.error("Wallet has no stored secret.");
     if (!to.trim()) return toast.error("Recipient required");
     const amt = Number(amount);
     if (!(amt > 0)) return toast.error("Amount required");
@@ -45,10 +44,17 @@ function SendPage() {
       const { validateAddress } = await import("@/lib/ltc/wallet");
       const v = validateAddress(to);
       if (!v.valid) throw new Error("Invalid Litecoin address");
-      const { decryptString } = await import("@/lib/ltc/crypto");
-      const mnemonic = await decryptString(wallet.secret, password).catch(() => {
-        throw new Error("Wrong password");
-      });
+      // Secret is plaintext: either JSON {mnemonic, passphrase} for HD wallets
+      // or a raw WIF string for single-key imports.
+      let mnemonic = wallet.secret;
+      try {
+        const parsed = JSON.parse(wallet.secret);
+        if (parsed && typeof parsed.mnemonic === "string") {
+          mnemonic = parsed.mnemonic;
+        }
+      } catch {
+        // Not JSON — treat wallet.secret as the raw mnemonic/WIF.
+      }
 
       // Fetch UTXOs for all wallet addresses
       const utxosByAddress: Record<string, Awaited<ReturnType<typeof getUtxos>>> = {};
@@ -84,7 +90,6 @@ function SendPage() {
       setPreview(null);
       setAmount("");
       setTo("");
-      setPassword("");
     } catch (e) {
       toast.error("Broadcast failed", { description: String((e as Error).message) });
     } finally {
@@ -129,11 +134,6 @@ function SendPage() {
             <input value={feeRate} onChange={(e) => setFeeRate(Number(e.target.value) || 1)} type="number" min={1} className="w-full mt-1 rounded-xl bg-input border border-border px-3 py-2 text-sm" />
           </label>
         </div>
-
-        <label className="block">
-          <span className="text-xs text-muted-foreground">Wallet password</span>
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="w-full mt-1 rounded-xl bg-input border border-border px-3 py-2 text-sm" />
-        </label>
 
         {!preview ? (
           <button onClick={build} disabled={busy} className="w-full rounded-full bg-primary text-primary-foreground px-5 py-3 text-sm font-medium btn-glow disabled:opacity-50 inline-flex items-center justify-center gap-2">
