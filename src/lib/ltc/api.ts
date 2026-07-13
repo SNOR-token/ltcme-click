@@ -118,3 +118,18 @@ export async function broadcastTx(rawHex: string): Promise<string> {
   if (!res.ok) throw new Error(text || `Broadcast failed (${res.status})`);
   return text.trim();
 }
+
+// LTC/USD spot price via CoinGecko public API. Used for the developer fee
+// USD floor and for LTC-denominated subscription pricing.
+export async function getLtcUsdPrice(): Promise<number> {
+  try {
+    const res = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=usd",
+    );
+    if (!res.ok) throw new Error(`price ${res.status}`);
+    const j = (await res.json()) as { litecoin?: { usd?: number } };
+    const p = j?.litecoin?.usd;
+    if (typeof p === "number" && p > 0) return p;
+  } catch {}
+  return 0;
+}
