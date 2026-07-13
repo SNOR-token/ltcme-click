@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
+import { AiSidebar } from "@/components/AiSidebar";
 
 ensureBuffer();
 
@@ -126,7 +127,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="md:pr-[30%]">
+        <Outlet />
+      </div>
+      <AiSidebar />
       <Toaster theme="dark" position="bottom-right" richColors />
     </QueryClientProvider>
   );
