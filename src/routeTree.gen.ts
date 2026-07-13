@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedWalletsRouteImport } from './routes/_authenticated/wallets'
+import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -39,16 +40,23 @@ const AuthenticatedWalletsRoute = AuthenticatedWalletsRouteImport.update({
   path: '/wallets',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedReceiveRoute = AuthenticatedReceiveRouteImport.update({
+  id: '/receive',
+  path: '/receive',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/receive': typeof AuthenticatedReceiveRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/receive': typeof AuthenticatedReceiveRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -57,19 +65,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/receive': typeof AuthenticatedReceiveRoute
   '/_authenticated/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/wallets' | '/api/chat'
+  fullPaths: '/' | '/auth' | '/receive' | '/wallets' | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/wallets' | '/api/chat'
+  to: '/' | '/auth' | '/receive' | '/wallets' | '/api/chat'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/receive'
     | '/_authenticated/wallets'
     | '/api/chat'
   fileRoutesById: FileRoutesById
@@ -118,14 +128,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWalletsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/receive': {
+      id: '/_authenticated/receive'
+      path: '/receive'
+      fullPath: '/receive'
+      preLoaderRoute: typeof AuthenticatedReceiveRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
   AuthenticatedWalletsRoute: typeof AuthenticatedWalletsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
   AuthenticatedWalletsRoute: AuthenticatedWalletsRoute,
 }
 
