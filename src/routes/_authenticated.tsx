@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
-import { Wallet, Send, Download, Wrench, Hammer, LogOut, CreditCard } from "lucide-react";
+import { Wallet, Send, Download, Wrench, Hammer, LogOut, CreditCard, Banknote } from "lucide-react";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
 });
@@ -77,6 +77,7 @@ function TopNav({ email }: { email: string | null }) {
     { to: "/wallets", label: "Wallet", icon: Wallet },
     { to: "/send", label: "Send", icon: Send },
     { to: "/receive", label: "Receive", icon: Download },
+    { to: "/buy", label: "Buy / Sell", icon: Banknote },
     { to: "/tx-builder", label: "TX Builder", icon: Hammer },
     { to: "/tools", label: "Tools", icon: Wrench },
     { to: "/pricing", label: "Plans", icon: CreditCard },
