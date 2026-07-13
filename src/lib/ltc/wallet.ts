@@ -4,7 +4,7 @@
 // "Cannot read properties of undefined (reading 'alloc')".
 import * as bitcoin from "bitcoinjs-lib";
 import * as scureBip39 from "@scure/bip39";
-import { wordlist } from "@scure/bip39/wordlists/english";
+import { wordlist } from "@scure/bip39/wordlists/english.js";
 import { HDKey } from "@scure/bip32";
 import { base58check } from "@scure/base";
 import { sha256 } from "@noble/hashes/sha2";
@@ -86,16 +86,18 @@ export function deriveFromMnemonic(
 }
 
 export function addressFromPubkey(pubkey: Uint8Array, addressType: AddressType): string {
+  // bitcoinjs-lib v6 accepts Uint8Array at runtime; its d.ts still lists Buffer.
+  const pk = pubkey as unknown as Buffer;
   if (addressType === "bech32") {
-    return bitcoin.payments.p2wpkh({ pubkey, network: litecoinMainnet as any }).address!;
+    return bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any }).address!;
   }
   if (addressType === "p2sh") {
     return bitcoin.payments.p2sh({
-      redeem: bitcoin.payments.p2wpkh({ pubkey, network: litecoinMainnet as any }),
+      redeem: bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any }),
       network: litecoinMainnet as any,
     }).address!;
   }
-  return bitcoin.payments.p2pkh({ pubkey, network: litecoinMainnet as any }).address!;
+  return bitcoin.payments.p2pkh({ pubkey: pk, network: litecoinMainnet as any }).address!;
 }
 
 export function addressFromWif(wif: string, addressType: AddressType): { address: string; pubkey: string } {
@@ -145,6 +147,38 @@ function bytesToHex(u: Uint8Array): string {
   let s = "";
   for (let i = 0; i < u.length; i++) s += u[i].toString(16).padStart(2, "0");
   return s;
+}
+
+// -------- KeyPair helpers (replacement for ECPair, no Buffer needed) --------
+export interface KeyPair {
+  privateKey: Uint8Array;
+  publicKey: Uint8Array;
+  compressed: boolean;
+  sign(hash: Uint8Array): Uint8Array;
+}
+
+export function keyPairFromPrivate(priv: Uint8Array, compressed = true): KeyPair {
+  const pub = ecc.pointFromScalar(priv, compressed);
+  if (!pub) throw new Error("Invalid private key");
+  const publicKey = pub instanceof Uint8Array ? pub : new Uint8Array(pub);
+  return {
+    privateKey: priv,
+    publicKey,
+    compressed,
+    sign(hash: Uint8Array) {
+      const sig = ecc.sign(hash, priv);
+      return sig instanceof Uint8Array ? sig : new Uint8Array(sig);
+    },
+  };
+}
+
+export function keyPairFromWif(wif: string): KeyPair {
+  const decoded = b58check.decode(wif.trim());
+  if (decoded[0] !== litecoinMainnet.wif) throw new Error("Not a Litecoin WIF key.");
+  if (decoded.length !== 34 && decoded.length !== 33) throw new Error("Invalid WIF length.");
+  const priv = decoded.slice(1, 33);
+  const compressed = decoded.length === 34 ? decoded[33] === 0x01 : false;
+  return keyPairFromPrivate(priv, compressed);
 }
 
 // Re-export helpers for tx builder
