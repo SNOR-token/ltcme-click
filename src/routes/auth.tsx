@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -63,9 +63,22 @@ function AuthPage() {
           <p className="mt-6 text-xs text-muted-foreground">
             Your Litecoin keys are generated in your browser and encrypted with a password you choose. LTCme never sees them.
           </p>
+          <p className="mt-4 text-[11px] text-muted-foreground">
+            By continuing you agree to our{" "}
+            <Link to="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+          </p>
         </div>
       </div>
       <PacmanBanner />
+      <footer className="px-6 py-4 text-[11px] text-muted-foreground flex items-center justify-between flex-wrap gap-2 border-t border-border/40">
+        <span>© 2026 LTCme.click</span>
+        <span className="flex items-center gap-4">
+          <Link to="/support" className="hover:text-foreground">Support</Link>
+          <Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-foreground">Terms of Service</Link>
+        </span>
+      </footer>
     </div>
   );
 }

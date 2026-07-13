@@ -46,9 +46,32 @@ function Shell() {
         <main className="flex-1 min-w-0">
           <Outlet />
         </main>
+        <LegalFooter />
       </div>
       <AiPanel />
     </div>
+  );
+}
+
+function LegalFooter() {
+  return (
+    <footer className="border-t border-border/60 bg-background/60 px-6 py-6 text-xs text-muted-foreground">
+      <div className="max-w-5xl mx-auto space-y-3">
+        <p>
+          <strong className="text-foreground">Disclaimer:</strong> LTCme.click is a non-custodial software tool provided "as is" without warranties of any kind. You alone control your seed phrase, private keys, and funds. LTCme.click accepts no liability for any loss, theft, damage, tax consequence, missed transaction, network failure, third-party service outage, user error, or any direct, indirect, incidental, consequential, or punitive damages arising from use of this site, the wallet, the AI assistant, or any linked service. Nothing here is financial, legal, tax, or investment advice. Litecoin transactions are irreversible. Use at your own risk. See our{" "}
+          <Link to="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
+          <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+        </p>
+        <div className="flex items-center justify-between flex-wrap gap-3 pt-2 border-t border-border/40">
+          <div>© 2026 LTCme.click. All rights reserved.</div>
+          <div className="flex items-center gap-4">
+            <Link to="/support" className="hover:text-foreground">Support</Link>
+            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+            <Link to="/terms" className="hover:text-foreground">Terms</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
 
