@@ -7,7 +7,7 @@ import * as scureBip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english.js";
 import { HDKey } from "@scure/bip32";
 import { base58check } from "@scure/base";
-import { sha256 } from "@noble/hashes/sha2";
+import { sha256 } from "@noble/hashes/sha2.js";
 import ecc from "@bitcoinerlab/secp256k1";
 import { litecoinMainnet, LTC } from "./network";
 
