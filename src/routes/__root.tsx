@@ -86,10 +86,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "LTCme.click — Litecoin's AI-powered self-custody wallet" },
       { name: "description", content: "LTCme.click is a non-custodial Litecoin wallet with a built-in AI companion. Import unlimited wallets, send and receive LTC, and get expert Litecoin help." },
       { name: "author", content: "LTCme.click" },
-      { property: "og:title", content: "LTCme.click — Litecoin AI Wallet" },
-      { property: "og:description", content: "Non-custodial Litecoin wallet with a built-in AI companion. Import wallets, send, receive, and learn LTC." },
+      { property: "og:title", content: "LTCme.click — Litecoin's AI-powered self-custody wallet" },
+      { property: "og:description", content: "LTCme.click is a non-custodial Litecoin wallet with a built-in AI companion. Import unlimited wallets, send and receive LTC, and get expert Litecoin help." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "LTCme.click — Litecoin's AI-powered self-custody wallet" },
+      { name: "twitter:description", content: "LTCme.click is a non-custodial Litecoin wallet with a built-in AI companion. Import unlimited wallets, send and receive LTC, and get expert Litecoin help." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/ZG6EFDxNFXRo8VbPnqg4k6HCJOB2/social-images/social-1783983560723-Inky_stock_art_sprite.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/ZG6EFDxNFXRo8VbPnqg4k6HCJOB2/social-images/social-1783983560723-Inky_stock_art_sprite.webp" },
     ],
     links: [
       {
