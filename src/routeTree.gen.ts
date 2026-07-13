@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedWalletsRouteImport } from './routes/_authenticated/wallets'
 import { Route as AuthenticatedTxBuilderRouteImport } from './routes/_authenticated/tx-builder'
+import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated/tools'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
 
@@ -47,6 +48,11 @@ const AuthenticatedTxBuilderRoute = AuthenticatedTxBuilderRouteImport.update({
   path: '/tx-builder',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedToolsRoute = AuthenticatedToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSendRoute = AuthenticatedSendRouteImport.update({
   id: '/send',
   path: '/send',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
+  '/tools': typeof AuthenticatedToolsRoute
   '/tx-builder': typeof AuthenticatedTxBuilderRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
+  '/tools': typeof AuthenticatedToolsRoute
   '/tx-builder': typeof AuthenticatedTxBuilderRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
   '/_authenticated/send': typeof AuthenticatedSendRoute
+  '/_authenticated/tools': typeof AuthenticatedToolsRoute
   '/_authenticated/tx-builder': typeof AuthenticatedTxBuilderRoute
   '/_authenticated/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/receive'
     | '/send'
+    | '/tools'
     | '/tx-builder'
     | '/wallets'
     | '/api/chat'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/receive'
     | '/send'
+    | '/tools'
     | '/tx-builder'
     | '/wallets'
     | '/api/chat'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/receive'
     | '/_authenticated/send'
+    | '/_authenticated/tools'
     | '/_authenticated/tx-builder'
     | '/_authenticated/wallets'
     | '/api/chat'
@@ -169,6 +181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTxBuilderRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/tools': {
+      id: '/_authenticated/tools'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof AuthenticatedToolsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/send': {
       id: '/_authenticated/send'
       path: '/send'
@@ -189,6 +208,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
+  AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
   AuthenticatedTxBuilderRoute: typeof AuthenticatedTxBuilderRoute
   AuthenticatedWalletsRoute: typeof AuthenticatedWalletsRoute
 }
@@ -196,6 +216,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
   AuthenticatedSendRoute: AuthenticatedSendRoute,
+  AuthenticatedToolsRoute: AuthenticatedToolsRoute,
   AuthenticatedTxBuilderRoute: AuthenticatedTxBuilderRoute,
   AuthenticatedWalletsRoute: AuthenticatedWalletsRoute,
 }
