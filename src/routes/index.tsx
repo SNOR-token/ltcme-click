@@ -4,19 +4,76 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   component: RootGate,
+  head: () => ({
+    meta: [
+      { title: "LTCme.click — AI-powered Litecoin self-custody wallet" },
+      {
+        name: "description",
+        content:
+          "LTCme.click is a non-custodial Litecoin wallet with a built-in AI companion. Import unlimited Litecoin wallets, send and receive LTC, buy or cash out to a debit card, and get expert Litecoin help.",
+      },
+      { property: "og:title", content: "LTCme.click — AI-powered Litecoin self-custody wallet" },
+      { property: "og:url", content: "https://ltcme.click/" },
+      {
+        property: "og:description",
+        content:
+          "Non-custodial Litecoin wallet with a built-in AI companion. Send, receive, buy and cash out LTC.",
+      },
+    ],
+    links: [{ rel: "canonical", href: "https://ltcme.click/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "LTCme.click",
+          url: "https://ltcme.click/",
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web",
+          description:
+            "Non-custodial Litecoin wallet with a built-in AI companion. Send, receive, buy, and cash out LTC.",
+        }),
+      },
+    ],
+  }),
 });
 
 function RootGate() {
   const navigate = useNavigate();
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      navigate({ to: data.session ? "/wallets" : "/auth", replace: true });
+      if (data.session) navigate({ to: "/wallets", replace: true });
     });
   }, [navigate]);
   return (
-    <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-      Loading LTCme.click…
-    </div>
+    <main className="min-h-screen px-6 py-16 max-w-3xl mx-auto text-foreground">
+      <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+        LTCme.click — AI-powered Litecoin self-custody wallet
+      </h1>
+      <p className="mt-6 text-lg text-muted-foreground">
+        LTCme.click is a non-custodial Litecoin wallet with a built-in AI
+        companion. Import unlimited Litecoin wallets, send and receive LTC on
+        mainnet, buy Litecoin with a card, cash out LTC to a debit card, and
+        get expert Litecoin help — all in one place.
+      </p>
+      <h2 className="mt-10 text-2xl font-semibold">What you can do on LTCme.click</h2>
+      <ul className="mt-4 space-y-2 text-muted-foreground list-disc pl-6">
+        <li>Create or import Litecoin wallets from a BIP39 seed phrase or WIF key.</li>
+        <li>Send and receive LTC on Litecoin mainnet with live fee estimates.</li>
+        <li>Buy Litecoin with a debit or credit card via trusted on-ramps.</li>
+        <li>Cash out Litecoin to a debit card through supported off-ramps.</li>
+        <li>Ask the built-in AI companion anything about Litecoin, wallets, or transactions.</li>
+      </ul>
+      <p className="mt-10">
+        <a
+          href="/auth"
+          className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        >
+          Sign in to open your Litecoin wallet
+        </a>
+      </p>
+    </main>
   );
 }
 
