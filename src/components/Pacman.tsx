@@ -44,6 +44,40 @@ export function PacmanBanner({ compact = false }: { compact?: boolean }) {
   );
 }
 
+/**
+ * Big floating baby-blue Pacman ghost. Rendered near the top of every page as
+ * a friendly mascot. Pure-CSS gentle bob animation; positioned to not block
+ * interaction with the page below it.
+ */
+export function BigGhost() {
+  return (
+    <div className="pointer-events-none relative w-full flex justify-center">
+      <svg
+        aria-hidden
+        viewBox="0 0 32 32"
+        className="ltc-big-ghost"
+        style={{ width: 96, height: 96 }}
+        fill="none"
+      >
+        <defs>
+          <linearGradient id="bigGhostFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="oklch(0.92 0.09 230)" />
+            <stop offset="100%" stopColor="oklch(0.78 0.14 230)" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M4 16a12 12 0 0124 0v12l-4-3-4 3-4-3-4 3-4-3-4 3V16z"
+          fill="url(#bigGhostFill)"
+        />
+        <ellipse cx="12" cy="15" rx="3" ry="3.4" fill="#0b1220" />
+        <ellipse cx="20" cy="15" rx="3" ry="3.4" fill="#0b1220" />
+        <circle cx="12.9" cy="15.6" r="1.15" fill="oklch(0.98 0.02 230)" />
+        <circle cx="20.9" cy="15.6" r="1.15" fill="oklch(0.98 0.02 230)" />
+      </svg>
+    </div>
+  );
+}
+
 function Ghost({
   color,
   delay,
@@ -118,5 +152,14 @@ const css = `
 @keyframes ltcGhostGo {
   0%   { left: -40px; }
   100% { left: 105%; }
+}
+.ltc-big-ghost {
+  filter: drop-shadow(0 8px 24px oklch(0.78 0.14 230 / 0.55));
+  animation: ltcBigGhostBob 4.2s ease-in-out infinite;
+  margin-top: 8px;
+}
+@keyframes ltcBigGhostBob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-10px) rotate(2deg); }
 }
 `;
