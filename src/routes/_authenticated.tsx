@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
 import { Wallet, Send, Download, Wrench, Hammer, LogOut, CreditCard } from "lucide-react";
-import { AiPanel } from "@/components/AiPanel";
-
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
 });
@@ -40,15 +38,12 @@ function Shell() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      <div className="flex-1 min-w-0 flex flex-col">
-        <TopNav email={email} />
-        <main className="flex-1 min-w-0">
-          <Outlet />
-        </main>
-        <LegalFooter />
-      </div>
-      <AiPanel />
+    <div className="min-h-screen flex flex-col">
+      <TopNav email={email} />
+      <main className="flex-1 min-w-0">
+        <Outlet />
+      </main>
+      <LegalFooter />
     </div>
   );
 }
