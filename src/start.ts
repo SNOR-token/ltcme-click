@@ -1,8 +1,10 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
-import "@/lib/buffer-polyfill";
+import { ensureBuffer } from "@/lib/buffer-polyfill";
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+
+ensureBuffer();
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
