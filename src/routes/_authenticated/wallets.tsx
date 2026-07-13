@@ -50,13 +50,21 @@ function WalletsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallets.length]);
 
+  // Constant balance polling via the mainnet public RPC (litecoinspace.org).
+  useEffect(() => {
+    if (wallets.length === 0) return;
+    const id = setInterval(refreshBalances, 30_000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallets.length]);
+
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">Your wallets</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Non-custodial. Keys encrypted with your password and stored in this browser only.
+            Non-custodial. Seed phrases stay in this browser only — back them up yourself.
           </p>
         </div>
         <button onClick={refreshBalances} disabled={refreshing} className="rounded-full border border-border bg-card/60 px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-card">
