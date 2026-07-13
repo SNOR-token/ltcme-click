@@ -24,7 +24,6 @@ function ToolsPage() {
       <MnemonicGenerator />
       <UnitConverter />
       <FeeEstimator />
-      <MessageSigner />
       <BroadcastRaw />
       <HexAscii />
     </div>
@@ -229,38 +228,6 @@ function FeeEstimator() {
         <div className="mt-3 text-sm">
           Estimated fee: <span className="font-mono">{totalSats.toLocaleString()} sats</span>{" "}
           <span className="text-muted-foreground">({formatLtc(totalSats)} LTC)</span>
-        </div>
-      )}
-    </section>
-  );
-}
-
-function MessageSigner() {
-  const [wif, setWif] = useState("");
-  const [msg, setMsg] = useState("");
-  const [sig, setSig] = useState("");
-  const [addr, setAddr] = useState("");
-  const [err, setErr] = useState<string | null>(null);
-
-  async function sign() {
-    setErr(null); setSig("");
-    try {
-      const { signMessage } = await import("@/lib/ltc/wallet");
-      const r = signMessage(wif.trim(), msg);
-      setSig(r.signature); setAddr(r.address);
-    } catch (e) { setErr(String((e as Error).message)); }
-  }
-  return (
-    <section className="card-glass rounded-2xl p-5">
-      <h2 className="font-semibold mb-3">Sign message (legacy L-address)</h2>
-      <input value={wif} onChange={(e) => setWif(e.target.value)} placeholder="WIF private key" className="w-full rounded-lg bg-input border border-border px-3 py-2 text-sm font-mono mb-2" />
-      <textarea value={msg} onChange={(e) => setMsg(e.target.value)} rows={2} placeholder="Message" className="w-full rounded-lg bg-input border border-border px-3 py-2 text-sm mb-2" />
-      <button onClick={sign} className="rounded-full bg-primary text-primary-foreground px-4 py-2 text-sm btn-glow">Sign</button>
-      {err && <p className="mt-3 text-sm text-destructive">{err}</p>}
-      {sig && (
-        <div className="mt-3 space-y-1 text-xs font-mono break-all">
-          <div><span className="text-muted-foreground">Address:</span> {addr}</div>
-          <div><span className="text-muted-foreground">Signature:</span> {sig}</div>
         </div>
       )}
     </section>
