@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /wallets
+Disallow: /send
+Disallow: /receive
+Disallow: /tx-builder
+Disallow: /tools
+Disallow: /ai
+
+Sitemap: https://lite-spark-wallet.lovable.app/sitemap.xml
