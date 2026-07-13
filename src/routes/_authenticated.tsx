@@ -40,7 +40,9 @@ function Shell() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <TopNav email={email} />
+      <TopNav />
+      <UserBar email={email} />
+      <BigGhost />
       <main className="flex-1 min-w-0">
         <Outlet />
       </main>
@@ -71,9 +73,8 @@ function LegalFooter() {
   );
 }
 
-function TopNav({ email }: { email: string | null }) {
+function TopNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const navigate = useNavigate();
   const tabs = [
     { to: "/wallets", label: "Wallet", icon: Wallet },
     { to: "/send", label: "Send", icon: Send },
@@ -85,12 +86,12 @@ function TopNav({ email }: { email: string | null }) {
   ] as const;
   return (
     <header className="sticky top-0 z-20 border-b border-border/60 bg-background/70 backdrop-blur-md">
-      <div className="flex items-center gap-4 px-4 md:px-6 h-14">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 md:px-6 py-2">
         <Link to="/wallets" className="flex items-center gap-2 shrink-0">
           <LogoMark />
           <span className="font-semibold tracking-tight hidden sm:inline">LTCme.click</span>
         </Link>
-        <nav className="flex-1 flex items-center gap-1 overflow-x-auto no-scrollbar">
+        <nav className="flex-1 flex items-center gap-1 flex-wrap">
           {tabs.map(({ to, label, icon: Icon }) => {
             const active = pathname.startsWith(to);
             return (
@@ -109,19 +110,31 @@ function TopNav({ email }: { email: string | null }) {
             );
           })}
         </nav>
-        <div className="hidden md:flex items-center gap-3 text-xs text-muted-foreground shrink-0">
-          <span className="max-w-[160px] truncate">{email}</span>
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              navigate({ to: "/auth" });
-            }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 hover:text-foreground hover:bg-card/60"
-          >
-            <LogOut className="h-3.5 w-3.5" /> Sign out
-          </button>
-        </div>
       </div>
     </header>
+  );
+}
+
+function UserBar({ email }: { email: string | null }) {
+  const navigate = useNavigate();
+  return (
+    <div className="px-4 md:px-6 pt-4">
+      <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+        <button
+          onClick={async () => {
+            await supabase.auth.signOut();
+            navigate({ to: "/auth" });
+          }}
+          className="inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-card/60 px-4 py-2 text-sm text-foreground hover:bg-card transition self-end sm:self-auto"
+        >
+          <LogOut className="h-3.5 w-3.5" /> Sign out
+        </button>
+        {email && (
+          <span className="text-xs text-muted-foreground text-right sm:text-left truncate max-w-[220px] self-end sm:self-auto">
+            {email}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
