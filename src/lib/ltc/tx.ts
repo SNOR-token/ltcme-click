@@ -16,6 +16,7 @@ export interface BuildInput {
   utxosByAddress: Record<string, Utxo[]>;
   toAddress: string;
   amountSats: number;
+  extraOutputs?: { address: string; value: number }[];
   feeRate?: number; // sats/vbyte
   changeAddress: string;
 }
@@ -69,6 +70,9 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
   }
 
   const targets = [{ address: input.toAddress, value: input.amountSats }];
+  for (const eo of input.extraOutputs ?? []) {
+    targets.push({ address: eo.address, value: eo.value });
+  }
   const { inputs, outputs, fee } = coinSelect(
     flatUtxos.map((u) => ({ ...u, txId: u.txid })),
     targets,
