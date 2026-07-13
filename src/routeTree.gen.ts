@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedWalletsRouteImport } from './routes/_authenticated/wallets'
+import { Route as AuthenticatedTxBuilderRouteImport } from './routes/_authenticated/tx-builder'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
 
@@ -41,6 +42,11 @@ const AuthenticatedWalletsRoute = AuthenticatedWalletsRouteImport.update({
   path: '/wallets',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTxBuilderRoute = AuthenticatedTxBuilderRouteImport.update({
+  id: '/tx-builder',
+  path: '/tx-builder',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSendRoute = AuthenticatedSendRouteImport.update({
   id: '/send',
   path: '/send',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
+  '/tx-builder': typeof AuthenticatedTxBuilderRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
+  '/tx-builder': typeof AuthenticatedTxBuilderRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -75,14 +83,29 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
   '/_authenticated/send': typeof AuthenticatedSendRoute
+  '/_authenticated/tx-builder': typeof AuthenticatedTxBuilderRoute
   '/_authenticated/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/receive' | '/send' | '/wallets' | '/api/chat'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/receive'
+    | '/send'
+    | '/tx-builder'
+    | '/wallets'
+    | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/receive' | '/send' | '/wallets' | '/api/chat'
+  to:
+    | '/'
+    | '/auth'
+    | '/receive'
+    | '/send'
+    | '/tx-builder'
+    | '/wallets'
+    | '/api/chat'
   id:
     | '__root__'
     | '/'
@@ -90,6 +113,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/receive'
     | '/_authenticated/send'
+    | '/_authenticated/tx-builder'
     | '/_authenticated/wallets'
     | '/api/chat'
   fileRoutesById: FileRoutesById
@@ -138,6 +162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWalletsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/tx-builder': {
+      id: '/_authenticated/tx-builder'
+      path: '/tx-builder'
+      fullPath: '/tx-builder'
+      preLoaderRoute: typeof AuthenticatedTxBuilderRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/send': {
       id: '/_authenticated/send'
       path: '/send'
@@ -158,12 +189,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
+  AuthenticatedTxBuilderRoute: typeof AuthenticatedTxBuilderRoute
   AuthenticatedWalletsRoute: typeof AuthenticatedWalletsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
   AuthenticatedSendRoute: AuthenticatedSendRoute,
+  AuthenticatedTxBuilderRoute: AuthenticatedTxBuilderRoute,
   AuthenticatedWalletsRoute: AuthenticatedWalletsRoute,
 }
 

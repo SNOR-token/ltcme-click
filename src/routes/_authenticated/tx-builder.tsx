@@ -138,7 +138,7 @@ function TxBuilderPage() {
     </div>
   );
 
-  function update<T>(setter: (v: T[]) => void, i: number, k: keyof T, v: string) {
-    setter((prev: any) => prev.map((r: any, j: number) => (j === i ? { ...r, [k]: v } : r)));
+  function update<T>(setter: React.Dispatch<React.SetStateAction<T[]>>, i: number, k: keyof T, v: string) {
+    setter((prev) => prev.map((r, j) => (j === i ? { ...r, [k]: v } : r)));
   }
 }
