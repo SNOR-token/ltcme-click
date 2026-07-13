@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
+import { BigGhost } from "@/components/Pacman";
 import { Wallet, Send, Download, Wrench, Hammer, LogOut, CreditCard, Banknote } from "lucide-react";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
