@@ -3,9 +3,15 @@ import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { AlertTriangle, ArrowRight, Loader2 } from "lucide-react";
 import { loadStore } from "@/lib/ltc/storage";
-import { getUtxos, estimateFeeRate, broadcastTx } from "@/lib/ltc/api";
-import { formatLtc, toSatoshis } from "@/lib/ltc/network";
+import { getUtxos, estimateFeeRate, broadcastTx, getLtcUsdPrice } from "@/lib/ltc/api";
+import { formatLtc, toSatoshis, fromSatoshis } from "@/lib/ltc/network";
 import { toast } from "sonner";
+
+// Developer fee: 1% of every send, with a $0.50 USD minimum. Sent to the
+// project developer's Litecoin address. Disclosed in-UI before broadcast.
+const DEV_FEE_ADDRESS = "MLaCqgY8ZQUXn9hThwZoU5ohFxGuwfCug8";
+const DEV_FEE_RATE = 0.01; // 1%
+const DEV_FEE_MIN_USD = 0.5; // $0.50 floor
 
 export const Route = createFileRoute("/_authenticated/send")({
   head: () => ({ meta: [{ title: "Send LTC — LTCme.click" }] }),
@@ -23,21 +29,29 @@ function SendPage() {
   const [amount, setAmount] = useState("");
   const [feeRate, setFeeRate] = useState<number>(10);
   const [busy, setBusy] = useState(false);
-  const [preview, setPreview] = useState<{ txid: string; feeSats: number; vbytes: number; rawHex: string } | null>(null);
+  const [ltcUsd, setLtcUsd] = useState<number>(0);
+  const [preview, setPreview] = useState<{ txid: string; feeSats: number; vbytes: number; rawHex: string; devFeeSats: number } | null>(null);
 
   useEffect(() => {
     estimateFeeRate().then(setFeeRate).catch(() => {});
+    getLtcUsdPrice().then(setLtcUsd).catch(() => {});
   }, []);
 
   if (wallets.length === 0) return <div className="p-10 text-muted-foreground">No wallets. Create one first.</div>;
+
+  const amt = Number(amount);
+  const amountSats = amt > 0 ? toSatoshis(amt) : 0;
+  const onePctSats = Math.ceil(amountSats * DEV_FEE_RATE);
+  const minFloorSats = ltcUsd > 0 ? Math.ceil((DEV_FEE_MIN_USD / ltcUsd) * 1e8) : 0;
+  const devFeeSats = amountSats > 0 ? Math.max(onePctSats, minFloorSats) : 0;
 
   async function build() {
     if (!wallet) return;
     if (wallet.meta.kind === "watch") return toast.error("Watch-only wallet — no keys to sign with.");
     if (!wallet.secret) return toast.error("Wallet has no stored secret.");
     if (!to.trim()) return toast.error("Recipient required");
-    const amt = Number(amount);
     if (!(amt > 0)) return toast.error("Amount required");
+    if (devFeeSats <= 0) return toast.error("Couldn't compute developer fee — LTC price unavailable, try again.");
     setBusy(true);
     setPreview(null);
     try {
@@ -69,11 +83,12 @@ function SendPage() {
         addressType: "bech32",
         utxosByAddress,
         toAddress: to.trim(),
-        amountSats: toSatoshis(amt),
+        amountSats,
+        extraOutputs: [{ address: DEV_FEE_ADDRESS, value: devFeeSats }],
         feeRate,
         changeAddress,
       });
-      setPreview(result);
+      setPreview({ ...result, devFeeSats });
     } catch (e) {
       toast.error("Couldn't build tx", { description: String((e as Error).message) });
     } finally {
@@ -135,6 +150,23 @@ function SendPage() {
           </label>
         </div>
 
+        <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground space-y-1">
+          <div className="font-medium text-foreground">Developer fee — 1% (min $0.50)</div>
+          <div>
+            A 1% developer fee (minimum $0.50 USD equivalent) is added as a
+            separate output to <span className="font-mono">{DEV_FEE_ADDRESS.slice(0, 10)}…{DEV_FEE_ADDRESS.slice(-6)}</span>.
+            This keeps LTCme.click free to use.
+          </div>
+          {amountSats > 0 && (
+            <div className="flex justify-between pt-1">
+              <span>Estimated dev fee</span>
+              <span className="text-foreground">
+                {formatLtc(devFeeSats)} LTC{ltcUsd > 0 ? ` (~$${(fromSatoshis(devFeeSats) * ltcUsd).toFixed(2)})` : ""}
+              </span>
+            </div>
+          )}
+        </div>
+
         {!preview ? (
           <button onClick={build} disabled={busy} className="w-full rounded-full bg-primary text-primary-foreground px-5 py-3 text-sm font-medium btn-glow disabled:opacity-50 inline-flex items-center justify-center gap-2">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
@@ -144,7 +176,8 @@ function SendPage() {
           <div className="border-t border-border pt-4 space-y-3">
             <div className="text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">TXID (pre-broadcast)</span><span className="font-mono text-xs">{preview.txid.slice(0, 12)}…</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Fee</span><span>{formatLtc(preview.feeSats)} LTC ({preview.feeSats} sats)</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Network fee</span><span>{formatLtc(preview.feeSats)} LTC ({preview.feeSats} sats)</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Developer fee (1%)</span><span>{formatLtc(preview.devFeeSats)} LTC</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Size</span><span>{preview.vbytes} vB</span></div>
             </div>
             <div className="flex gap-2">
