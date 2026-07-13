@@ -119,18 +119,18 @@ function UserBar({ email }: { email: string | null }) {
   const navigate = useNavigate();
   return (
     <div className="px-4 md:px-6 pt-4">
-      <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+      <div className="max-w-5xl mx-auto flex flex-col items-end gap-1">
         <button
           onClick={async () => {
             await supabase.auth.signOut();
             navigate({ to: "/auth" });
           }}
-          className="inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-card/60 px-4 py-2 text-sm text-foreground hover:bg-card transition self-end sm:self-auto"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-4 py-2 text-sm text-foreground hover:bg-card transition"
         >
           <LogOut className="h-3.5 w-3.5" /> Sign out
         </button>
         {email && (
-          <span className="text-xs text-muted-foreground text-right sm:text-left truncate max-w-[220px] self-end sm:self-auto">
+          <span className="text-xs text-muted-foreground truncate max-w-[220px]">
             {email}
           </span>
         )}
