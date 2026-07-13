@@ -1,99 +1,21 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Wallet, Sparkles, Shield, Send, Wrench, ArrowRight, Zap } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
-  component: Landing,
+  component: RootGate,
 });
 
-function Landing() {
+function RootGate() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      navigate({ to: data.session ? "/wallets" : "/auth", replace: true });
+    });
+  }, [navigate]);
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-border/60 backdrop-blur-md sticky top-0 z-20 bg-background/40">
-        <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <LogoMark />
-            <span className="font-semibold tracking-tight">LTCme.click</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#features" className="hover:text-foreground">Features</a>
-            <a href="#security" className="hover:text-foreground">Security</a>
-            <Link to="/pricing" className="hover:text-foreground">Pricing</Link>
-          </nav>
-          <Link
-            to="/auth"
-            className="rounded-full bg-primary text-primary-foreground px-4 py-2 text-sm font-medium btn-glow hover:opacity-90 transition"
-          >
-            Sign in
-          </Link>
-        </div>
-      </header>
-
-      <section className="mx-auto max-w-6xl px-6 pt-20 pb-24 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary mb-6">
-          <Sparkles className="h-3.5 w-3.5" />
-          Litecoin's first AI-powered wallet
-        </div>
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-          <span className="gradient-text">Your Litecoin,</span>
-          <br />
-          made effortless.
-        </h1>
-        <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Non-custodial. Multi-wallet. Built-in AI companion that actually knows Litecoin.
-          Send, receive, and manage LTC on mainnet — keys never leave your device.
-        </p>
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <Link
-            to="/auth"
-            className="rounded-full bg-primary text-primary-foreground px-6 py-3 font-medium btn-glow hover:opacity-90 transition inline-flex items-center gap-2"
-          >
-            Open wallet <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            to="/pricing"
-            className="rounded-full border border-border bg-card/60 px-6 py-3 font-medium hover:bg-card transition"
-          >
-            See AI plans
-          </Link>
-        </div>
-      </section>
-
-      <section id="features" className="mx-auto max-w-6xl px-6 pb-24">
-        <div className="grid md:grid-cols-3 gap-4">
-          <Feature icon={<Wallet />} title="Multi-wallet import" body="Generate a fresh seed or import unlimited wallets — mnemonic, WIF, or watch-only xpub." />
-          <Feature icon={<Shield />} title="Non-custodial" body="Keys are encrypted with your password and stored in your browser. We never see them." />
-          <Feature icon={<Sparkles />} title="LTCme AI" body="Ask a Litecoin-expert AI anything about LTC — protocol, MWEB, addresses, fees, safety." />
-          <Feature icon={<Send />} title="Send & receive" body="Live balances, mempool-aware fees, and clean SegWit (ltc1...) transactions on mainnet." />
-          <Feature icon={<Wrench />} title="Power tools" body="TX builder, address validator, WIF → address, mnemonic derivation, message signing." />
-          <Feature icon={<Zap />} title="Fast & light" body="No accounts to sync, no downloads. Open the page, unlock, done." />
-        </div>
-      </section>
-
-      <section id="security" className="mx-auto max-w-4xl px-6 pb-24 text-center">
-        <h2 className="text-3xl font-bold">Mainnet-ready. Beta mindset.</h2>
-        <p className="mt-4 text-muted-foreground">
-          LTCme.click uses BIP39 / BIP84 with Litecoin mainnet parameters and AES-GCM
-          password encryption via WebCrypto. Your seed phrase and private keys are
-          derived and signed entirely in your browser. Start with small amounts,
-          always back up your recovery phrase, and never share it — not even with the AI.
-        </p>
-      </section>
-
-      <footer className="border-t border-border/60 py-8 text-center text-sm text-muted-foreground">
-        LTCme.click — not affiliated with the Litecoin Foundation. Use at your own risk.
-      </footer>
-    </div>
-  );
-}
-
-function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
-  return (
-    <div className="card-glass rounded-2xl p-6">
-      <div className="h-10 w-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center mb-4">
-        {icon}
-      </div>
-      <h3 className="font-semibold">{title}</h3>
-      <p className="mt-2 text-sm text-muted-foreground">{body}</p>
+    <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+      Loading LTCme.click…
     </div>
   );
 }
