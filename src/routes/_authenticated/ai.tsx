@@ -8,7 +8,15 @@ import { getAiEntitlement, consumeAiMessage } from "@/lib/ai.functions";
 import { PlansInline } from "@/components/PlansInline";
 
 export const Route = createFileRoute("/_authenticated/ai")({
-  head: () => ({ meta: [{ title: "LTCme AI — LTCme.click" }] }),
+  head: () => ({
+    meta: [
+      { title: "LTCme AI — LTCme.click" },
+      { name: "description", content: "Chat with LTCme AI, a built-in Litecoin expert. Ask about transactions, fees, self-custody, and Litecoin best practices." },
+      { property: "og:title", content: "LTCme AI — Litecoin expert chat" },
+      { property: "og:description", content: "Chat with LTCme AI, a built-in Litecoin expert. Ask about transactions, fees, self-custody, and Litecoin best practices." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: AiPage,
 });
 
