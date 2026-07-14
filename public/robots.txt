@@ -7,4 +7,4 @@ Disallow: /tx-builder
 Disallow: /tools
 Disallow: /ai
 
-Sitemap: https://lite-spark-wallet.lovable.app/sitemap.xml
+Sitemap: https://ltcme.click/sitemap.xml
