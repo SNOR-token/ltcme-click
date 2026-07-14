@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { Sparkles, Send, Lock, ChevronRight, ChevronLeft } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Sparkles, Send, ChevronRight, ChevronLeft } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getAiEntitlement, consumeAiMessage } from "@/lib/ai.functions";
+import { PlansInline } from "@/components/PlansInline";
 
 /**
  * Persistent right-column LTCme AI panel.
@@ -123,21 +123,11 @@ export function AiPanel() {
 
       <div className="border-t border-border/60 p-3 space-y-2">
         {entitlement && !entitlement.hasActiveSub && (
-          <div className="text-[11px] text-muted-foreground flex items-center justify-between">
-            <span>
-              {Math.max(0, entitlement.freeLimit - entitlement.freeUsed)} of {entitlement.freeLimit} free messages left
-            </span>
-            <Link to="/pricing" className="text-primary hover:underline">Upgrade</Link>
+          <div className="text-[11px] text-muted-foreground">
+            {Math.max(0, entitlement.freeLimit - entitlement.freeUsed)} of {entitlement.freeLimit} free messages left
           </div>
         )}
-        {entitlement && !entitlement.canSend && !entitlement.hasActiveSub ? (
-          <Link
-            to="/pricing"
-            className="w-full flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-2.5 text-sm font-medium btn-glow"
-          >
-            <Lock className="h-4 w-4" /> Unlock unlimited AI — from $4.99
-          </Link>
-        ) : (
+        {!(entitlement && !entitlement.canSend && !entitlement.hasActiveSub) && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -162,6 +152,7 @@ export function AiPanel() {
             </button>
           </form>
         )}
+        {entitlement && !entitlement.hasActiveSub && <PlansInline compact />}
         <p className="text-[10px] text-muted-foreground text-center">Never share your seed phrase.</p>
       </div>
     </aside>
