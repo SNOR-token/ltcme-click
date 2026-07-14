@@ -55,7 +55,7 @@ function AuthPage() {
             <LogoMark size={56} />
           </div>
           <h1 className="text-3xl font-bold">
-            <span className="gradient-text">LTCme.click</span>
+            <span className="gradient-text">LTCme.click — AI-powered Litecoin wallet</span>
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Litecoin's AI-powered self-custody wallet.
