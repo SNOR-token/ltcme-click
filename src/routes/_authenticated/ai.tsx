@@ -1,10 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { Sparkles, Send, Loader2, Lock } from "lucide-react";
+import { Sparkles, Send, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getAiEntitlement, consumeAiMessage } from "@/lib/ai.functions";
+import { PlansInline } from "@/components/PlansInline";
 
 export const Route = createFileRoute("/_authenticated/ai")({
   head: () => ({ meta: [{ title: "LTCme AI — LTCme.click" }] }),
@@ -74,12 +75,8 @@ function AiPage() {
         ))}
       </div>
 
-      <div className="p-4 border-t border-border/60">
-        {entitlement && !entitlement.canSend ? (
-          <Link to="/pricing" className="w-full flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-3 text-sm font-medium btn-glow">
-            <Lock className="h-4 w-4" /> You've used your 5 free messages — unlock unlimited from $4.99
-          </Link>
-        ) : (
+      <div className="p-4 border-t border-border/60 space-y-3">
+        {!(entitlement && !entitlement.canSend && !entitlement.hasActiveSub) && (
           <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="flex gap-2">
             <input value={input} onChange={(e) => setInput(e.target.value)} disabled={busy} placeholder="Ask LTCme AI…" className="flex-1 rounded-full bg-input border border-border px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
             <button type="submit" disabled={busy || !input.trim()} className="rounded-full bg-primary text-primary-foreground h-11 w-11 flex items-center justify-center disabled:opacity-50">
@@ -87,6 +84,7 @@ function AiPage() {
             </button>
           </form>
         )}
+        {entitlement && !entitlement.hasActiveSub && <PlansInline />}
       </div>
     </div>
   );
