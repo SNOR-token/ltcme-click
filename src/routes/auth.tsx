@@ -6,7 +6,16 @@ import { LogoMark } from "./index";
 import { PacmanBanner } from "@/components/Pacman";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — LTCme.click" }] }),
+  head: () => ({
+    meta: [
+      { title: "Sign in — LTCme.click AI-powered Litecoin wallet" },
+      { name: "description", content: "Sign in to LTCme.click to manage your non-custodial Litecoin wallet and chat with the built-in AI companion." },
+      { property: "og:title", content: "Sign in — LTCme.click AI-powered Litecoin wallet" },
+      { property: "og:description", content: "Sign in to LTCme.click to manage your non-custodial Litecoin wallet and chat with the built-in AI companion." },
+      { property: "og:url", content: "https://ltcme.click/auth" },
+    ],
+    links: [{ rel: "canonical", href: "https://ltcme.click/auth" }],
+  }),
   component: AuthPage,
 });
 
