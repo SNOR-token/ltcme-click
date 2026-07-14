@@ -175,12 +175,26 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
   const [bip39Passphrase, setBip39Passphrase] = useState("");
   const [showBipPass, setShowBipPass] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+
+  async function regenerate() {
+    setGenError(null);
+    setMnemonic("");
+    try {
+      const { generateMnemonic } = await loadWalletHelpers();
+      const m = generateMnemonic(128);
+      if (!m || m.split(" ").filter(Boolean).length !== 12) {
+        throw new Error("Generator returned an invalid phrase.");
+      }
+      setMnemonic(m);
+    } catch (e) {
+      setGenError((e as Error).message || "Failed to generate seed phrase.");
+    }
+  }
 
   useEffect(() => {
-    (async () => {
-      const { generateMnemonic } = await loadWalletHelpers();
-      setMnemonic(generateMnemonic(128));
-    })();
+    regenerate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function save() {
@@ -217,27 +231,53 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
           <p className="text-sm text-muted-foreground mb-3">
             Write these 12 words down on paper. Anyone with them can spend your LTC. LTCme never sees or stores them.
           </p>
-          <div className="grid grid-cols-3 gap-2 mb-4 bg-muted/50 p-4 rounded-xl">
-            {mnemonic.split(" ").map((w, i) => (
-              <div key={i} className="text-sm">
-                <span className="text-muted-foreground text-xs mr-1">{i + 1}.</span>
-                {w}
+          <div className="grid grid-cols-3 gap-2 mb-4 bg-muted/50 p-4 rounded-xl min-h-[8rem]">
+            {genError ? (
+              <div className="col-span-3 text-sm text-destructive">
+                {genError}
               </div>
-            ))}
+            ) : mnemonic ? (
+              mnemonic.split(" ").map((w, i) => (
+                <div key={i} className="text-sm">
+                  <span className="text-muted-foreground text-xs mr-1">{i + 1}.</span>
+                  {w}
+                </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-sm text-muted-foreground">
+                Generating your seed phrase…
+              </div>
+            )}
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center gap-2">
             <button
+              type="button"
               onClick={() => {
+                if (!mnemonic) return;
                 navigator.clipboard.writeText(mnemonic);
                 toast.success("Copied to clipboard");
               }}
-              className="text-sm text-primary inline-flex items-center gap-1"
+              disabled={!mnemonic}
+              className="text-sm text-primary inline-flex items-center gap-1 disabled:opacity-40"
             >
               <Copy className="h-3.5 w-3.5" /> Copy
             </button>
-            <button onClick={() => setStep("confirm")} className="rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm btn-glow">
-              I've written it down →
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={regenerate}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Regenerate
+              </button>
+              <button
+                onClick={() => setStep("confirm")}
+                disabled={!mnemonic}
+                className="rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm btn-glow disabled:opacity-40"
+              >
+                I've written it down →
+              </button>
+            </div>
           </div>
         </>
       ) : (
