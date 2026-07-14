@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "LTCme.click is a non-custodial Litecoin wallet with a built-in AI companion. Import unlimited Litecoin wallets, send and receive LTC, buy or cash out to a debit card, and get expert Litecoin help.",
+          "Non-custodial Litecoin wallet with a built-in AI companion. Send, receive, buy, and cash out LTC easily.",
       },
       { property: "og:title", content: "LTCme.click — AI-powered Litecoin self-custody wallet" },
       { property: "og:url", content: "https://ltcme.click/" },
