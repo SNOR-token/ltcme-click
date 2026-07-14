@@ -2,6 +2,9 @@
 // (@scure/bip39 + @scure/bip32) so we never touch the Node `Buffer` global
 // at import time — that's what was crashing wallet import with
 // "Cannot read properties of undefined (reading 'alloc')".
+// Ensure Buffer is on globalThis BEFORE bitcoinjs-lib evaluates its module
+// body (some of its deps do `Buffer.alloc(...)` at import time).
+import "@/lib/buffer-polyfill";
 import * as bitcoin from "bitcoinjs-lib";
 import * as scureBip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english.js";
