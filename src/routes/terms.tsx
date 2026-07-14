@@ -7,7 +7,9 @@ export const Route = createFileRoute("/terms")({
       { name: "description", content: "Terms of Service for LTCme.click, a non-custodial Litecoin wallet." },
       { property: "og:title", content: "Terms of Service — LTCme.click" },
       { property: "og:description", content: "Terms of Service for LTCme.click, a non-custodial Litecoin wallet." },
+      { property: "og:url", content: "https://ltcme.click/terms" },
     ],
+    links: [{ rel: "canonical", href: "https://ltcme.click/terms" }],
   }),
   component: TermsPage,
 });

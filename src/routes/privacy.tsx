@@ -7,7 +7,9 @@ export const Route = createFileRoute("/privacy")({
       { name: "description", content: "How LTCme.click handles data. Keys are generated and encrypted in your browser." },
       { property: "og:title", content: "Privacy Policy — LTCme.click" },
       { property: "og:description", content: "How LTCme.click handles data. Keys are generated and encrypted in your browser." },
+      { property: "og:url", content: "https://ltcme.click/privacy" },
     ],
+    links: [{ rel: "canonical", href: "https://ltcme.click/privacy" }],
   }),
   component: PrivacyPage,
 });
