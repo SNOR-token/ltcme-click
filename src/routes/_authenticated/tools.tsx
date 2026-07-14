@@ -6,7 +6,15 @@ import { estimateFeeRate, broadcastTx, getAddressInfo } from "@/lib/ltc/api";
 import { formatLtc } from "@/lib/ltc/network";
 
 export const Route = createFileRoute("/_authenticated/tools")({
-  head: () => ({ meta: [{ title: "Tools — LTCme.click" }] }),
+  head: () => ({
+    meta: [
+      { title: "Tools — LTCme.click" },
+      { name: "description", content: "Client-side Litecoin utilities: address validation, WIF-to-address, mnemonic tools, unit converter — all run in your browser." },
+      { property: "og:title", content: "Litecoin Tools — LTCme.click" },
+      { property: "og:description", content: "Client-side Litecoin utilities: address validation, WIF-to-address, mnemonic tools, unit converter — all run in your browser." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: ToolsPage,
 });
 

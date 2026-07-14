@@ -8,6 +8,9 @@ export const Route = createFileRoute("/_authenticated/buy")({
     meta: [
       { title: "Buy & Sell Litecoin — LTCme.click" },
       { name: "description", content: "Buy Litecoin with card or bank, and cash out LTC to a debit card, through vetted third-party on/off-ramps." },
+      { property: "og:title", content: "Buy & Sell Litecoin — LTCme.click" },
+      { property: "og:description", content: "Buy Litecoin with card or bank, and cash out LTC to a debit card, through vetted third-party on/off-ramps." },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: BuyPage,

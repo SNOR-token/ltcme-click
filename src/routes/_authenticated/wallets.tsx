@@ -7,7 +7,15 @@ import { getBalances } from "@/lib/ltc/api";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/wallets")({
-  head: () => ({ meta: [{ title: "Wallets — LTCme.click" }] }),
+  head: () => ({
+    meta: [
+      { title: "Wallets — LTCme.click" },
+      { name: "description", content: "Manage your non-custodial Litecoin wallets. Create, import, and view balances — keys stay encrypted in your browser." },
+      { property: "og:title", content: "Wallets — LTCme.click" },
+      { property: "og:description", content: "Manage your non-custodial Litecoin wallets. Create, import, and view balances — keys stay encrypted in your browser." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: WalletsPage,
 });
 
