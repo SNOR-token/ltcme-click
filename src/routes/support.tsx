@@ -7,6 +7,39 @@ export const Route = createFileRoute("/support")({
       { name: "description", content: "Get help with LTCme.click. Read our self-custody safety guide and contact us." },
       { property: "og:title", content: "Support — LTCme.click" },
       { property: "og:description", content: "Get help with LTCme.click. Read our self-custody safety guide and contact us." },
+      { property: "og:url", content: "https://ltcme.click/support" },
+    ],
+    links: [{ rel: "canonical", href: "https://ltcme.click/support" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "I lost my seed phrase.",
+              acceptedAnswer: { "@type": "Answer", text: "There is nothing we can do. Your funds are only recoverable with the 12/24-word seed you were shown at wallet creation." },
+            },
+            {
+              "@type": "Question",
+              name: "I forgot my encryption password.",
+              acceptedAnswer: { "@type": "Answer", text: "Remove the wallet from this browser and re-import it from your seed phrase to set a new password." },
+            },
+            {
+              "@type": "Question",
+              name: "My import fails.",
+              acceptedAnswer: { "@type": "Answer", text: "Make sure the input contains only your 12/24-word seed phrase (separated by single spaces) or a single WIF key. If your original wallet used a BIP39 passphrase, click 'Add optional BIP39 passphrase' during import." },
+            },
+            {
+              "@type": "Question",
+              name: "A transaction is stuck.",
+              acceptedAnswer: { "@type": "Answer", text: "Wait for network confirmation. If fees are too low, you may need to wait for congestion to clear. We cannot cancel broadcast transactions." },
+            },
+          ],
+        }),
+      },
     ],
   }),
   component: SupportPage,
