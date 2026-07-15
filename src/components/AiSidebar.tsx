@@ -5,6 +5,7 @@ import { Sparkles, Send } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getAiEntitlement, consumeAiMessage } from "@/lib/ai.functions";
 import { PlansInline } from "@/components/PlansInline";
+import { supabase } from "@/integrations/supabase/client";
 
 export function AiSidebar() {
   const [entitlement, setEntitlement] = useState<{
@@ -25,7 +26,26 @@ export function AiSidebar() {
   });
 
   useEffect(() => {
-    refresh().then(setEntitlement).catch(() => {});
+    let cancelled = false;
+    async function load() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) return; // don't call protected fn while signed out
+      try {
+        const r = await refresh();
+        if (!cancelled) setEntitlement(r);
+      } catch {
+        /* ignore */
+      }
+    }
+    load();
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") load();
+      if (event === "SIGNED_OUT") setEntitlement(null);
+    });
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
   }, [refresh]);
 
   const busy = status === "submitted" || status === "streaming";
