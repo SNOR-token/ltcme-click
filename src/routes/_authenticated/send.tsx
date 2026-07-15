@@ -60,11 +60,13 @@ function SendPage() {
       if (!v.valid) throw new Error("Invalid Litecoin address");
       // Secret is plaintext: either JSON {mnemonic, passphrase} for HD wallets
       // or a raw WIF string for single-key imports.
-      let mnemonic = wallet.secret;
+      let secret = wallet.secret;
+      let passphrase = "";
       try {
         const parsed = JSON.parse(wallet.secret);
         if (parsed && typeof parsed.mnemonic === "string") {
-          mnemonic = parsed.mnemonic;
+          secret = parsed.mnemonic;
+          if (typeof parsed.passphrase === "string") passphrase = parsed.passphrase;
         }
       } catch {
         // Not JSON — treat wallet.secret as the raw mnemonic/WIF.
@@ -79,8 +81,8 @@ function SendPage() {
       const changeAddress = wallet.addresses[0].address;
       const { buildAndSignTx } = await import("@/lib/ltc/tx");
       const result = await buildAndSignTx({
-        mnemonic,
-        addressType: "bech32",
+        secret,
+        passphrase,
         utxosByAddress,
         toAddress: to.trim(),
         amountSats,
