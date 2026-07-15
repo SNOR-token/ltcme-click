@@ -1,7 +1,7 @@
 // Build & sign a Litecoin transaction from a decrypted mnemonic (bech32 accounts).
 import * as scureBip39 from "@scure/bip39";
 import { HDKey } from "@scure/bip32";
-import { bitcoin, keyPairFromPrivate, type KeyPair } from "./wallet";
+import { bitcoin, keyPairFromPrivate, keyPairFromWif, validateMnemonic, type KeyPair, type AddressType } from "./wallet";
 import { litecoinMainnet, LTC } from "./network";
 import type { Utxo } from "./api";
 import { getRawTx, estimateFeeRate, broadcastTx } from "./api";
@@ -9,8 +9,9 @@ import coinSelect from "coinselect";
 import { Buffer } from "buffer";
 
 export interface BuildInput {
-  mnemonic: string;
-  addressType: "bech32" | "legacy" | "p2sh";
+  // For HD wallets: BIP39 mnemonic. For single-key wallets: raw WIF string.
+  secret: string;
+  passphrase?: string;
   account?: number;
   scanDepth?: number; // how many receive & change addresses to scan for UTXOs
   utxosByAddress: Record<string, Utxo[]>;
@@ -28,39 +29,68 @@ export interface BuildResult {
   vbytes: number;
 }
 
+interface AddrEntry {
+  kp: KeyPair;
+  type: AddressType;
+}
+
+function registerKp(map: Map<string, AddrEntry>, kp: KeyPair, type: AddressType) {
+  const pk = Buffer.from(kp.publicKey);
+  if (type === "bech32") {
+    const p = bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any });
+    if (p.address) map.set(p.address, { kp, type });
+  } else if (type === "p2sh") {
+    const p = bitcoin.payments.p2sh({
+      redeem: bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any }),
+      network: litecoinMainnet as any,
+    });
+    if (p.address) map.set(p.address, { kp, type });
+  } else {
+    const p = bitcoin.payments.p2pkh({ pubkey: pk, network: litecoinMainnet as any });
+    if (p.address) map.set(p.address, { kp, type });
+  }
+}
+
 /**
- * Build & sign a P2WPKH (bech32) tx from mnemonic. Only bech32 supported in v1.
+ * Build & sign a Litecoin tx. Supports bech32 (BIP84), p2sh-segwit (BIP49),
+ * and legacy (BIP44) inputs derived from an HD mnemonic, or a single WIF key
+ * (which can spend from any of its three address forms).
  */
 export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
-  if (input.addressType !== "bech32") {
-    throw new Error("Only bech32 (ltc1...) sending is supported in v1.");
-  }
   const feeRate = input.feeRate ?? (await estimateFeeRate());
-  const seed = scureBip39.mnemonicToSeedSync(input.mnemonic.trim());
-  const root = HDKey.fromMasterSeed(seed, {
-    private: litecoinMainnet.bip32.private,
-    public: litecoinMainnet.bip32.public,
-  });
   const account = input.account ?? 0;
   const scanDepth = input.scanDepth ?? 20;
+  const addrToKp = new Map<string, AddrEntry>();
+  const secret = input.secret.trim();
 
-  // Build a lookup: address -> KeyPair
-  const branches = [
-    root.derive(`m/84'/${LTC.bip44CoinType}'/${account}'/0`),
-    root.derive(`m/84'/${LTC.bip44CoinType}'/${account}'/1`),
-  ];
-  const addrToKp = new Map<string, KeyPair>();
-  for (let b = 0; b < 2; b++) {
-    for (let i = 0; i < scanDepth; i++) {
-      const c = branches[b].deriveChild(i);
-      if (!c.privateKey || !c.publicKey) continue;
-      const kp = keyPairFromPrivate(c.privateKey, true);
-      const p = bitcoin.payments.p2wpkh({
-        pubkey: Buffer.from(kp.publicKey),
-        network: litecoinMainnet as any,
-      });
-      if (p.address) addrToKp.set(p.address, kp);
+  if (validateMnemonic(secret)) {
+    const seed = scureBip39.mnemonicToSeedSync(secret, input.passphrase ?? "");
+    const root = HDKey.fromMasterSeed(seed, {
+      private: litecoinMainnet.bip32.private,
+      public: litecoinMainnet.bip32.public,
+    });
+    const specs: { purpose: number; type: AddressType }[] = [
+      { purpose: 84, type: "bech32" },
+      { purpose: 49, type: "p2sh" },
+      { purpose: 44, type: "legacy" },
+    ];
+    for (const { purpose, type } of specs) {
+      for (const change of [0, 1]) {
+        const branch = root.derive(`m/${purpose}'/${LTC.bip44CoinType}'/${account}'/${change}`);
+        for (let i = 0; i < scanDepth; i++) {
+          const c = branch.deriveChild(i);
+          if (!c.privateKey || !c.publicKey) continue;
+          const kp = keyPairFromPrivate(c.privateKey, true);
+          registerKp(addrToKp, kp, type);
+        }
+      }
     }
+  } else {
+    // Single-key WIF import — register all three address forms.
+    const kp = keyPairFromWif(secret);
+    registerKp(addrToKp, kp, "bech32");
+    registerKp(addrToKp, kp, "p2sh");
+    registerKp(addrToKp, kp, "legacy");
   }
 
   // Flatten UTXOs, tagging with values
@@ -82,17 +112,34 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
 
   const psbt = new bitcoin.Psbt({ network: litecoinMainnet as any });
   for (const inp of inputs) {
-    const kp = addrToKp.get(inp.address);
-    if (!kp) throw new Error(`Missing key for UTXO address ${inp.address}`);
-    const p2wpkh = bitcoin.payments.p2wpkh({
-      pubkey: Buffer.from(kp.publicKey),
-      network: litecoinMainnet as any,
-    });
-    psbt.addInput({
-      hash: inp.txid,
-      index: inp.vout,
-      witnessUtxo: { script: p2wpkh.output!, value: inp.value },
-    });
+    const entry = addrToKp.get(inp.address);
+    if (!entry) throw new Error(`Missing key for UTXO address ${inp.address}`);
+    const pk = Buffer.from(entry.kp.publicKey);
+    if (entry.type === "bech32") {
+      const p2wpkh = bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any });
+      psbt.addInput({
+        hash: inp.txid,
+        index: inp.vout,
+        witnessUtxo: { script: p2wpkh.output!, value: inp.value },
+      });
+    } else if (entry.type === "p2sh") {
+      const p2wpkh = bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any });
+      const p2sh = bitcoin.payments.p2sh({ redeem: p2wpkh, network: litecoinMainnet as any });
+      psbt.addInput({
+        hash: inp.txid,
+        index: inp.vout,
+        witnessUtxo: { script: p2sh.output!, value: inp.value },
+        redeemScript: p2wpkh.output!,
+      });
+    } else {
+      // Legacy p2pkh requires the full previous transaction.
+      const rawHex = await getRawTx(inp.txid);
+      psbt.addInput({
+        hash: inp.txid,
+        index: inp.vout,
+        nonWitnessUtxo: Buffer.from(rawHex, "hex"),
+      });
+    }
   }
   for (const out of outputs) {
     psbt.addOutput({
@@ -101,10 +148,10 @@ export async function buildAndSignTx(input: BuildInput): Promise<BuildResult> {
     });
   }
   for (let i = 0; i < inputs.length; i++) {
-    const kp = addrToKp.get(inputs[i].address)!;
+    const entry = addrToKp.get(inputs[i].address)!;
     psbt.signInput(i, {
-      publicKey: Buffer.from(kp.publicKey),
-      sign: (hash: Buffer) => Buffer.from(kp.sign(hash)),
+      publicKey: Buffer.from(entry.kp.publicKey),
+      sign: (hash: Buffer) => Buffer.from(entry.kp.sign(hash)),
     });
   }
   psbt.finalizeAllInputs();
