@@ -25,7 +25,7 @@ function PrivacyPage() {
         <div className="mt-8 space-y-5 text-sm leading-relaxed text-muted-foreground">
           <h2 className="text-foreground text-lg font-semibold">Your keys never leave your browser.</h2>
           <p>
-            Your seed phrase and private keys are generated on your device, encrypted with a password you choose, and stored in this browser's local storage. LTCme.click does not receive, store, or have the ability to recover them.
+            Your seed phrase and private keys are generated on your device and stored in this browser's local storage. They are not encrypted at rest by the app — anyone with access to this browser profile can read them, so use a device you trust and back up your seed phrase yourself. You may optionally add a BIP39 passphrase (25th word) as an extra secret. LTCme.click does not receive, store, or have the ability to recover your keys.
           </p>
 
           <h2 className="text-foreground text-lg font-semibold">Account data.</h2>
@@ -45,7 +45,7 @@ function PrivacyPage() {
 
           <h2 className="text-foreground text-lg font-semibold">Cookies & analytics.</h2>
           <p>
-            We use only the cookies and local storage required for the app to function (auth session and encrypted wallet storage). We do not use advertising trackers.
+            We use only the cookies and local storage required for the app to function (auth session and local wallet storage). We do not use advertising trackers.
           </p>
 
           <h2 className="text-foreground text-lg font-semibold">Payments.</h2>
