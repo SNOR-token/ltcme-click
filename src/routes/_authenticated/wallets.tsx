@@ -5,6 +5,8 @@ import { formatLtc } from "@/lib/ltc/network";
 import { loadStore, upsertWallet, removeWallet, type StoredWallet } from "@/lib/ltc/storage";
 import { getBalances } from "@/lib/ltc/api";
 import { toast } from "sonner";
+import "@/lib/buffer-polyfill";
+import * as walletLib from "@/lib/ltc/wallet";
 
 export const Route = createFileRoute("/_authenticated/wallets")({
   head: () => ({
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/wallets")({
 async function loadWalletHelpers() {
   const { ensureBuffer } = await import("@/lib/buffer-polyfill");
   ensureBuffer();
-  return import("@/lib/ltc/wallet");
+  return walletLib;
 }
 
 function WalletsPage() {
