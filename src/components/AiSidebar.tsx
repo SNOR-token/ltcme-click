@@ -18,7 +18,17 @@ export function AiSidebar() {
   const consume = useServerFn(consumeAiMessage);
 
   const [input, setInput] = useState("");
-  const transport = useRef(new DefaultChatTransport({ api: "/api/chat" }));
+  const transport = useRef(
+    new DefaultChatTransport({
+      api: "/api/chat",
+      headers: async () => {
+        const { data } = await supabase.auth.getSession();
+        return data.session
+          ? { Authorization: `Bearer ${data.session.access_token}` }
+          : {};
+      },
+    }),
+  );
   const { messages, sendMessage, status } = useChat({
     id: "sidebar-chat",
     transport: transport.current,
