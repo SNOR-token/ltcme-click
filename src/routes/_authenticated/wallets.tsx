@@ -190,7 +190,8 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
       }
       setMnemonic(m);
     } catch (e) {
-      setGenError((e as Error).message || "Failed to generate seed phrase.");
+      console.error("[wallet] regenerate failed", e);
+      setGenError((e as Error)?.message || String(e) || "Failed to generate seed phrase.");
     }
   }
 
