@@ -1,12 +1,17 @@
 // Build & sign a Litecoin transaction from a decrypted mnemonic (bech32 accounts).
+import "@/lib/buffer-polyfill";
 import * as scureBip39 from "@scure/bip39";
 import { HDKey } from "@scure/bip32";
-import { bitcoin, keyPairFromPrivate, keyPairFromWif, validateMnemonic, type KeyPair, type AddressType } from "./wallet";
+import * as bitcoin from "bitcoinjs-lib";
+import { keyPairFromPrivate, keyPairFromWif, validateMnemonic, type KeyPair, type AddressType } from "./wallet";
 import { litecoinMainnet, LTC } from "./network";
 import type { Utxo } from "./api";
 import { getRawTx, estimateFeeRate, broadcastTx } from "./api";
 import coinSelect from "coinselect";
 import { Buffer } from "buffer";
+import ecc from "@bitcoinerlab/secp256k1";
+
+bitcoin.initEccLib(ecc as unknown as Parameters<typeof bitcoin.initEccLib>[0]);
 
 export interface BuildInput {
   // For HD wallets: BIP39 mnemonic. For single-key wallets: raw WIF string.

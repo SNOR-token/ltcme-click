@@ -1,21 +1,15 @@
-// Browser-only Litecoin wallet helpers. Uses pure Uint8Array libraries
-// (@scure/bip39 + @scure/bip32) so we never touch the Node `Buffer` global
-// at import time — that's what was crashing wallet import with
-// "Cannot read properties of undefined (reading 'alloc')".
-// Ensure Buffer is on globalThis BEFORE bitcoinjs-lib evaluates its module
-// body (some of its deps do `Buffer.alloc(...)` at import time).
-import "@/lib/buffer-polyfill";
-import * as bitcoin from "bitcoinjs-lib";
+// Browser-only Litecoin wallet helpers. Keep this module free of bitcoinjs-lib
+// and Node Buffer imports so Create/Import can never trip Buffer.alloc during
+// route evaluation. Transaction signing imports bitcoinjs only on the Send page.
 import * as scureBip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english.js";
 import { HDKey } from "@scure/bip32";
-import { base58check } from "@scure/base";
+import { base58check, bech32 } from "@scure/base";
 import { sha256 } from "@noble/hashes/sha2.js";
+import { ripemd160 } from "@noble/hashes/legacy.js";
 import ecc from "@bitcoinerlab/secp256k1";
-import { Buffer } from "buffer";
 import { litecoinMainnet, LTC } from "./network";
 
-bitcoin.initEccLib(ecc as unknown as Parameters<typeof bitcoin.initEccLib>[0]);
 const b58check = base58check(sha256);
 
 export type AddressType = "bech32" | "legacy" | "p2sh";
@@ -116,20 +110,15 @@ export function deriveAllStandards(
 }
 
 export function addressFromPubkey(pubkey: Uint8Array, addressType: AddressType): string {
-  // bitcoinjs-lib v6 validates payment pubkeys as real Buffer instances.
-  // HDKey/ecc return Uint8Array, so convert explicitly to avoid
-  // "Expected property pubkey of type ?isPoint, got Uint8Array" during import.
-  const pk = Buffer.from(pubkey);
+  const pubkeyHash = hash160(pubkey);
   if (addressType === "bech32") {
-    return bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any }).address!;
+    return bech32.encode(litecoinMainnet.bech32, [0, ...bech32.toWords(pubkeyHash)]);
   }
   if (addressType === "p2sh") {
-    return bitcoin.payments.p2sh({
-      redeem: bitcoin.payments.p2wpkh({ pubkey: pk, network: litecoinMainnet as any }),
-      network: litecoinMainnet as any,
-    }).address!;
+    const redeemScript = concatBytes(Uint8Array.of(0x00, 0x14), pubkeyHash);
+    return b58check.encode(concatBytes(Uint8Array.of(litecoinMainnet.scriptHash), hash160(redeemScript)));
   }
-  return bitcoin.payments.p2pkh({ pubkey: pk, network: litecoinMainnet as any }).address!;
+  return b58check.encode(concatBytes(Uint8Array.of(litecoinMainnet.pubKeyHash), pubkeyHash));
 }
 
 export function addressFromWif(wif: string, addressType: AddressType): { address: string; pubkey: string } {
@@ -153,17 +142,22 @@ export function addressFromWif(wif: string, addressType: AddressType): { address
 export function validateAddress(addr: string): { valid: boolean; type?: AddressType } {
   try {
     const s = addr.trim();
-    if (s.startsWith("ltc1")) {
-      bitcoin.address.toOutputScript(s, litecoinMainnet as any);
-      return { valid: true, type: "bech32" };
+    if (s.toLowerCase().startsWith(`${litecoinMainnet.bech32}1`)) {
+      const decoded = bech32.decode(s.toLowerCase());
+      const [version, ...programWords] = decoded.words;
+      const program = bech32.fromWords(programWords);
+      if (decoded.prefix === litecoinMainnet.bech32 && version === 0 && (program.length === 20 || program.length === 32)) {
+        return { valid: true, type: "bech32" };
+      }
+      return { valid: false };
     }
-    if (s.startsWith("M") || s.startsWith("3")) {
-      bitcoin.address.toOutputScript(s, litecoinMainnet as any);
-      return { valid: true, type: "p2sh" };
-    }
-    if (s.startsWith("L")) {
-      bitcoin.address.toOutputScript(s, litecoinMainnet as any);
+    const decoded = b58check.decode(s);
+    if (decoded.length !== 21) return { valid: false };
+    if (decoded[0] === litecoinMainnet.pubKeyHash) {
       return { valid: true, type: "legacy" };
+    }
+    if (decoded[0] === litecoinMainnet.scriptHash || decoded[0] === 0x05) {
+      return { valid: true, type: "p2sh" };
     }
     return { valid: false };
   } catch {
@@ -179,6 +173,21 @@ function bytesToHex(u: Uint8Array): string {
   let s = "";
   for (let i = 0; i < u.length; i++) s += u[i].toString(16).padStart(2, "0");
   return s;
+}
+
+function hash160(bytes: Uint8Array): Uint8Array {
+  return ripemd160(sha256(bytes));
+}
+
+function concatBytes(...chunks: Uint8Array[]): Uint8Array {
+  const length = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+  const out = new Uint8Array(length);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return out;
 }
 
 // -------- KeyPair helpers (replacement for ECPair, no Buffer needed) --------
@@ -213,5 +222,5 @@ export function keyPairFromWif(wif: string): KeyPair {
   return keyPairFromPrivate(priv, compressed);
 }
 
-// Re-export helpers for tx builder
-export { bitcoin, HDKey, scureBip39 };
+// Re-export helpers for transaction/signing modules.
+export { HDKey, scureBip39 };

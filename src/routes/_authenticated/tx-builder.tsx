@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Plus, X, Hammer, Copy, FlaskConical } from "lucide-react";
 import { toast } from "sonner";
 import { broadcastTx } from "@/lib/ltc/api";
+import { ensureBuffer } from "@/lib/buffer-polyfill";
 
 export const Route = createFileRoute("/_authenticated/tx-builder")({
   head: () => ({ meta: [{ title: "TX Builder — LTCme.click" }] }),
@@ -92,8 +93,14 @@ function TxBuilderPage() {
   async function build() {
     setBusy(true);
     try {
-      const { bitcoin, keyPairFromWif } = await import("@/lib/ltc/wallet");
+      ensureBuffer();
+      const [bitcoin, { keyPairFromWif }, { default: ecc }] = await Promise.all([
+        import("bitcoinjs-lib"),
+        import("@/lib/ltc/wallet"),
+        import("@bitcoinerlab/secp256k1"),
+      ]);
       const { litecoinMainnet } = await import("@/lib/ltc/network");
+      bitcoin.initEccLib(ecc as unknown as Parameters<typeof bitcoin.initEccLib>[0]);
       const psbt = new bitcoin.Psbt({ network: litecoinMainnet as any });
       const signers: Array<{ pub: Uint8Array; sign: (h: Uint8Array) => Uint8Array }> = [];
       for (const inp of inputs) {
