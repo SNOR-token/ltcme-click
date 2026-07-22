@@ -115,7 +115,7 @@ function RootGate() {
           </button>
           {err && <p className="mt-4 text-sm text-destructive">{err}</p>}
           <p className="mt-5 text-xs text-muted-foreground">
-            Your Litecoin keys are generated in your browser and encrypted with a password you choose. LTCme never sees them.
+            Your Litecoin keys are generated in your browser and stored locally on this device only. LTCme never sees them — back up your seed phrase yourself. Optionally protect your seed with a BIP39 passphrase (25th word).
           </p>
           <p className="mt-3 text-[11px] text-muted-foreground">
             By continuing you agree to our{" "}
