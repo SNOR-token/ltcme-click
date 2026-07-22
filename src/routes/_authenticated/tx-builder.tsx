@@ -94,12 +94,13 @@ function TxBuilderPage() {
     setBusy(true);
     try {
       ensureBuffer();
-      const [bitcoin, { keyPairFromWif }] = await Promise.all([
+      const [bitcoin, { keyPairFromWif }, { default: ecc }] = await Promise.all([
         import("bitcoinjs-lib"),
         import("@/lib/ltc/wallet"),
+        import("@bitcoinerlab/secp256k1"),
       ]);
       const { litecoinMainnet } = await import("@/lib/ltc/network");
-      bitcoin.initEccLib({} as Parameters<typeof bitcoin.initEccLib>[0]);
+      bitcoin.initEccLib(ecc as unknown as Parameters<typeof bitcoin.initEccLib>[0]);
       const psbt = new bitcoin.Psbt({ network: litecoinMainnet as any });
       const signers: Array<{ pub: Uint8Array; sign: (h: Uint8Array) => Uint8Array }> = [];
       for (const inp of inputs) {

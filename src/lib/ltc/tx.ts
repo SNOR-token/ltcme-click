@@ -9,8 +9,9 @@ import type { Utxo } from "./api";
 import { getRawTx, estimateFeeRate, broadcastTx } from "./api";
 import coinSelect from "coinselect";
 import { Buffer } from "buffer";
+import ecc from "@bitcoinerlab/secp256k1";
 
-bitcoin.initEccLib({} as Parameters<typeof bitcoin.initEccLib>[0]);
+bitcoin.initEccLib(ecc as unknown as Parameters<typeof bitcoin.initEccLib>[0]);
 
 export interface BuildInput {
   // For HD wallets: BIP39 mnemonic. For single-key wallets: raw WIF string.
