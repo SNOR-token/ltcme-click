@@ -21,11 +21,11 @@ export function AiSidebar() {
   const transport = useRef(
     new DefaultChatTransport({
       api: "/api/chat",
-      headers: async () => {
+      headers: async (): Promise<Record<string, string>> => {
         const { data } = await supabase.auth.getSession();
-        return data.session
-          ? { Authorization: `Bearer ${data.session.access_token}` }
-          : {};
+        const headers: Record<string, string> = {};
+        if (data.session) headers.Authorization = `Bearer ${data.session.access_token}`;
+        return headers;
       },
     }),
   );
