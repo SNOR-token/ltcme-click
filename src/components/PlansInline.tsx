@@ -38,10 +38,11 @@ export function PlansInline({ compact = false }: { compact?: boolean }) {
       )}
       <div className="flex items-center gap-2 text-xs text-primary">
         <Sparkles className="h-3.5 w-3.5" />
-        <span className="font-medium">Unlock unlimited LTCme AI</span>
+        <span className="font-medium">Unlock Quantum Guard Pro</span>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Wallet features stay free. Pay by card or with Litecoin.
+        Your free wallet stays fully operational — monitoring, AI analysis, alerts, reports and the PQ Lab are Pro.
+        Free on testnet. Pay by card or with Litecoin.
       </p>
       <div className={compact ? "grid grid-cols-3 gap-1.5" : "grid grid-cols-1 sm:grid-cols-3 gap-2"}>
         {PLANS.map((p) => {

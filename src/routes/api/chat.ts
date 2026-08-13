@@ -2,6 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { createClient } from "@supabase/supabase-js";
+import {
+  AGENT_SAFETY_PROMPT,
+  containsSecretMaterial,
+  SECRET_REFUSAL,
+} from "@/lib/agent-safety";
 
 const SYSTEM = `You are LTCme AI — a friendly, expert Litecoin (LTC) companion for the LTCme.click wallet.
 
@@ -19,6 +24,14 @@ Rules:
 - Prefer LTC-first answers. If asked about BTC, answer briefly and relate to LTC.
 - Be concise. Use markdown, code blocks for addresses/commands.
 - If asked something outside Litecoin/crypto scope, give a short answer and steer back to LTC.`;
+
+const FULL_SYSTEM = `${SYSTEM}\n\n${AGENT_SAFETY_PROMPT}`;
+
+function messageText(m: UIMessage): string {
+  return (m.parts ?? [])
+    .map((p: any) => (p?.type === "text" ? String(p.text ?? "") : ""))
+    .join(" ");
+}
 
 export const Route = createFileRoute("/api/chat")({
   server: {
@@ -46,6 +59,13 @@ export const Route = createFileRoute("/api/chat")({
 
         const body = (await request.json()) as { messages?: UIMessage[] };
         if (!Array.isArray(body.messages)) return new Response("bad request", { status: 400 });
+
+        // Deterministic agent-safety gate: refuse before the model ever sees
+        // anything resembling a recovery phrase, private key or password.
+        const latest = body.messages[body.messages.length - 1];
+        if (latest && latest.role === "user" && containsSecretMaterial(messageText(latest))) {
+          return new Response(SECRET_REFUSAL, { status: 422 });
+        }
 
         // AuthZ / quota: atomically enforce free-message limit + subscription
         // before streaming a paid model response.
@@ -92,7 +112,7 @@ export const Route = createFileRoute("/api/chat")({
         const model = gateway("google/gemini-2.5-flash");
         const result = streamText({
           model,
-          system: SYSTEM,
+          system: FULL_SYSTEM,
           messages: await convertToModelMessages(body.messages),
         });
         return result.toUIMessageStreamResponse({ originalMessages: body.messages });
