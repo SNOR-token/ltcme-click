@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Lock, ShieldCheck, FlaskConical } from "lucide-react";
-import { useNetworkMode, TESTNET_NOTICE } from "@/lib/ltc/network-mode";
+import { useNetworkMode, setNetworkMode, TESTNET_NOTICE } from "@/lib/ltc/network-mode";
 import { PRO_EXPIRED_MESSAGE, type ProState } from "@/lib/pro";
 
 export function TestnetBanner() {
@@ -95,7 +95,7 @@ export function ProLock({
           Upgrade to Quantum Guard Pro
         </Link>
         <button
-          onClick={() => window.dispatchEvent(new Event("ltcme:try-testnet"))}
+          onClick={() => setNetworkMode("testnet")}
           className="rounded-lg border border-primary/40 px-3 py-2 text-xs hover:bg-primary/10"
         >
           Try it free on testnet
