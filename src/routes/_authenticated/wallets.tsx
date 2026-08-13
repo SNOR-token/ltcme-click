@@ -494,3 +494,28 @@ function Field({
     </label>
   );
 }
+function QuickLink({
+  to,
+  icon,
+  label,
+  primary,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  primary?: boolean;
+}) {
+  return (
+    <Link
+      to={to}
+      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
+        primary
+          ? "bg-primary text-primary-foreground btn-glow hover:opacity-90"
+          : "border border-border bg-card/60 hover:bg-card"
+      }`}
+    >
+      {icon}
+      {label}
+    </Link>
+  );
+}
