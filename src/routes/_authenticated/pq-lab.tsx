@@ -48,7 +48,9 @@ function PqLabPage() {
       <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 flex gap-3">
         <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
         <div className="text-sm space-y-1">
-          <p className="font-semibold">Litecoin mainnet transactions are not post-quantum protected.</p>
+          <p className="font-semibold">
+            PQ Lab is experimental. Litecoin mainnet does not currently support post-quantum transaction signatures.
+          </p>
           <p className="text-muted-foreground text-xs">{PQ_DISCLAIMER}</p>
           <p className="text-muted-foreground text-xs">
             Nothing generated here is ever attached to a Litecoin transaction or used to create nonstandard outputs.
