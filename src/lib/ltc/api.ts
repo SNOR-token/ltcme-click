@@ -3,7 +3,9 @@
 // node — used for constant balance checks, UTXO fetches, and broadcasting.
 // Docs: https://litecoinspace.org/docs/api/rest
 
-const LS = "https://litecoinspace.org/api";
+import { apiBase } from "./network-mode";
+
+const LS = () => apiBase();
 
 export interface Utxo {
   txid: string;
@@ -20,13 +22,13 @@ export interface AddressInfo {
 }
 
 async function lsFetch<T = any>(path: string): Promise<T> {
-  const res = await fetch(`${LS}${path}`);
+  const res = await fetch(`${LS()}${path}`);
   if (!res.ok) throw new Error(`litecoinspace ${res.status}`);
   return (await res.json()) as T;
 }
 
 async function lsText(path: string): Promise<string> {
-  const res = await fetch(`${LS}${path}`);
+  const res = await fetch(`${LS()}${path}`);
   if (!res.ok) throw new Error(`litecoinspace ${res.status}`);
   return await res.text();
 }
@@ -109,7 +111,7 @@ export async function estimateFeeRate(): Promise<number> {
 }
 
 export async function broadcastTx(rawHex: string): Promise<string> {
-  const res = await fetch(`${LS}/tx`, {
+  const res = await fetch(`${LS()}/tx`, {
     method: "POST",
     headers: { "content-type": "text/plain" },
     body: rawHex,
