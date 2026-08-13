@@ -22,7 +22,9 @@ import { Route as AuthenticatedVaultsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedTxBuilderRouteImport } from './routes/_authenticated/tx-builder'
 import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated/tools'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
+import { Route as AuthenticatedPqLabRouteImport } from './routes/_authenticated/pq-lab'
 import { Route as AuthenticatedGuardRouteImport } from './routes/_authenticated/guard'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
@@ -92,9 +94,19 @@ const AuthenticatedSendRoute = AuthenticatedSendRouteImport.update({
   path: '/send',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedReceiveRoute = AuthenticatedReceiveRouteImport.update({
   id: '/receive',
   path: '/receive',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPqLabRoute = AuthenticatedPqLabRouteImport.update({
+  id: '/pq-lab',
+  path: '/pq-lab',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedGuardRoute = AuthenticatedGuardRouteImport.update({
@@ -129,7 +141,9 @@ export interface FileRoutesByFullPath {
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
   '/guard': typeof AuthenticatedGuardRoute
+  '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
   '/tx-builder': typeof AuthenticatedTxBuilderRoute
@@ -148,7 +162,9 @@ export interface FileRoutesByTo {
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
   '/guard': typeof AuthenticatedGuardRoute
+  '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
   '/tx-builder': typeof AuthenticatedTxBuilderRoute
@@ -169,7 +185,9 @@ export interface FileRoutesById {
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
   '/_authenticated/guard': typeof AuthenticatedGuardRoute
+  '/_authenticated/pq-lab': typeof AuthenticatedPqLabRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/send': typeof AuthenticatedSendRoute
   '/_authenticated/tools': typeof AuthenticatedToolsRoute
   '/_authenticated/tx-builder': typeof AuthenticatedTxBuilderRoute
@@ -190,7 +208,9 @@ export interface FileRouteTypes {
     | '/ai'
     | '/buy'
     | '/guard'
+    | '/pq-lab'
     | '/receive'
+    | '/reports'
     | '/send'
     | '/tools'
     | '/tx-builder'
@@ -209,7 +229,9 @@ export interface FileRouteTypes {
     | '/ai'
     | '/buy'
     | '/guard'
+    | '/pq-lab'
     | '/receive'
+    | '/reports'
     | '/send'
     | '/tools'
     | '/tx-builder'
@@ -229,7 +251,9 @@ export interface FileRouteTypes {
     | '/_authenticated/ai'
     | '/_authenticated/buy'
     | '/_authenticated/guard'
+    | '/_authenticated/pq-lab'
     | '/_authenticated/receive'
+    | '/_authenticated/reports'
     | '/_authenticated/send'
     | '/_authenticated/tools'
     | '/_authenticated/tx-builder'
@@ -344,11 +368,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSendRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/receive': {
       id: '/_authenticated/receive'
       path: '/receive'
       fullPath: '/receive'
       preLoaderRoute: typeof AuthenticatedReceiveRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pq-lab': {
+      id: '/_authenticated/pq-lab'
+      path: '/pq-lab'
+      fullPath: '/pq-lab'
+      preLoaderRoute: typeof AuthenticatedPqLabRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/guard': {
@@ -386,7 +424,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
   AuthenticatedGuardRoute: typeof AuthenticatedGuardRoute
+  AuthenticatedPqLabRoute: typeof AuthenticatedPqLabRoute
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
   AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
   AuthenticatedTxBuilderRoute: typeof AuthenticatedTxBuilderRoute
@@ -398,7 +438,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
   AuthenticatedGuardRoute: AuthenticatedGuardRoute,
+  AuthenticatedPqLabRoute: AuthenticatedPqLabRoute,
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSendRoute: AuthenticatedSendRoute,
   AuthenticatedToolsRoute: AuthenticatedToolsRoute,
   AuthenticatedTxBuilderRoute: AuthenticatedTxBuilderRoute,
