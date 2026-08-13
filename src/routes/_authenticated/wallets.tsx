@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, KeyRound, Eye, Trash2, Copy, Wallet as WalletIcon, RefreshCw } from "lucide-react";
+import { Plus, KeyRound, Eye, Trash2, Copy, Wallet as WalletIcon, RefreshCw, Send, Download, Bot, Sprout, Shield } from "lucide-react";
 import { formatLtc } from "@/lib/ltc/network";
 import { loadStore, upsertWallet, removeWallet, type StoredWallet } from "@/lib/ltc/storage";
 import { getBalances } from "@/lib/ltc/api";
@@ -68,7 +68,7 @@ function WalletsPage() {
     <div className="p-6 md:p-10 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Your wallets</h1>
+          <h1 className="text-3xl font-bold">Your Litecoin</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Non-custodial. Seed phrases stay in this browser only — back them up yourself.
           </p>
@@ -77,6 +77,27 @@ function WalletsPage() {
           <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /> Refresh
         </button>
       </div>
+
+      <section className="card-glass rounded-3xl p-6 mb-6">
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Total balance</div>
+        <div className="text-4xl font-bold mt-1">
+          {formatLtc(
+            wallets.reduce((s, w) => s + w.addresses.reduce((t, a) => t + (balances[a.address] ?? 0), 0), 0),
+          )}{" "}
+          <span className="text-lg font-medium text-muted-foreground">LTC</span>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <QuickLink to="/send" icon={<Send className="h-4 w-4" />} label="Send" primary />
+          <QuickLink to="/receive" icon={<Download className="h-4 w-4" />} label="Receive" />
+          <QuickLink to="/ai" icon={<Bot className="h-4 w-4" />} label="Ask AI" />
+          <QuickLink to="/earn" icon={<Sprout className="h-4 w-4" />} label="Explore Earn" />
+          <QuickLink to="/guard" icon={<Shield className="h-4 w-4" />} label="Wallet health" />
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Next step: check your wallet health in Quantum Guard, and use a fresh receive address for each payment.{" "}
+          <Link to="/guard" className="text-primary hover:underline">Learn more</Link>
+        </p>
+      </section>
 
       <div className="grid md:grid-cols-3 gap-3 mb-8">
         <ActionCard icon={<Plus />} title="Create new" body="Generate a fresh 12-word seed" onClick={() => setOpenDialog("create")} />
