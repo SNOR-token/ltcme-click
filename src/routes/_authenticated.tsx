@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
 import { BigGhost } from "@/components/Pacman";
-import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote } from "lucide-react";
+import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote, Shield, Eye, FileSpreadsheet, FlaskConical } from "lucide-react";
+import { TestnetBanner, NetworkToggle } from "@/components/ProGate";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
 });
@@ -40,6 +41,7 @@ function Shell() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <TestnetBanner />
       <TopNav />
       <UserBar email={email} />
       <BigGhost />
@@ -82,6 +84,10 @@ function TopNav() {
     { to: "/buy", label: "Buy / Sell", icon: Banknote },
     { to: "/tx-builder", label: "TX Builder", icon: Hammer },
     { to: "/tools", label: "Tools", icon: Wrench },
+    { to: "/guard", label: "Quantum Guard", icon: Shield },
+    { to: "/vaults", label: "Vaults", icon: Eye },
+    { to: "/reports", label: "Reports", icon: FileSpreadsheet },
+    { to: "/pq-lab", label: "PQ Lab", icon: FlaskConical },
   ] as const;
   return (
     <header className="sticky top-0 z-20 border-b border-border/60 bg-background/70 backdrop-blur-md">
@@ -109,6 +115,7 @@ function TopNav() {
             );
           })}
         </nav>
+        <NetworkToggle />
       </div>
     </header>
   );
