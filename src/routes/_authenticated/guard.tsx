@@ -81,7 +81,16 @@ function GuardPage() {
     const funded = rows.filter((r) => r.balanceSats > 0);
     const largest = funded.slice().sort((a, b) => b.balanceSats - a.balanceSats)[0];
     const concentration = total > 0 && largest ? Math.round((largest.balanceSats / total) * 100) : 0;
-    return { total, reused, exposed, funded, concentration, largest };
+    const exposedBalance = rows
+      .filter((r) => r.txCount > 1 || (r.txCount > 0 && addrType(r.address) === "Legacy"))
+      .reduce((s, r) => s + r.balanceSats, 0);
+    const status: "Protected" | "Needs Attention" | "Higher Exposure" =
+      exposed.length > 0 || (total > 0 && exposedBalance / total > 0.5)
+        ? "Higher Exposure"
+        : reused.length > 0 || concentration > 70
+          ? "Needs Attention"
+          : "Protected";
+    return { total, reused, exposed, funded, concentration, largest, exposedBalance, status };
   }, [rows]);
 
   return (
@@ -93,7 +102,8 @@ function GuardPage() {
         <div className="flex-1 min-w-[200px]">
           <h1 className="text-2xl md:text-3xl font-bold">Quantum Guard</h1>
           <p className="text-sm text-muted-foreground">
-            Free safety foundations and a basic exposure summary for every address you hold or watch.
+            Quantum Guard checks whether your Litecoin addresses have been reused or have exposed public keys. It then
+            helps you move LTC to fresh addresses when appropriate.
           </p>
         </div>
         <NetworkToggle />
@@ -107,12 +117,38 @@ function GuardPage() {
 
       <ProExpiredNotice state={pro} />
 
+      {/* FREE: one simple wallet status */}
+      <section
+        className={`rounded-2xl border p-5 ${
+          summary.status === "Protected"
+            ? "border-emerald-500/40 bg-emerald-500/10"
+            : summary.status === "Needs Attention"
+              ? "border-amber-500/40 bg-amber-500/10"
+              : "border-destructive/40 bg-destructive/10"
+        }`}
+      >
+        <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Your wallet status</div>
+        <div className="text-2xl font-bold mt-1">{loading ? "Checking…" : summary.status}</div>
+        <p className="text-sm text-muted-foreground mt-1">
+          {summary.status === "Protected"
+            ? "Nothing needs your attention right now. Keep using a fresh receive address for each payment."
+            : summary.status === "Needs Attention"
+              ? "Some addresses have been reused, or most of your balance sits on one address. Moving LTC to fresh addresses helps."
+              : "Some funded addresses have already revealed their public key. Moving that LTC to fresh addresses is the safest next step."}
+        </p>
+        <p className="text-[11px] text-muted-foreground mt-2">
+          Litecoin mainnet transactions are not post-quantum protected today. Quantum Guard reduces exposure — it cannot
+          make current transactions quantum-proof.
+        </p>
+      </section>
+
       {!pro.pro && (
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5 space-y-2">
-          <h2 className="text-lg font-semibold">Turn your Litecoin wallet into an active security partner.</h2>
+          <h2 className="text-lg font-semibold">Make your Litecoin wallet work smarter.</h2>
           <p className="text-sm text-muted-foreground">
-            Your free wallet keeps you in control. Quantum Guard Pro continuously analyzes exposure, explains
-            transactions, watches for risk, and prepares safer actions—without ever accessing your private keys.
+            Quantum Guard Pro gives you an AI security partner, advanced transaction planning, continuous wallet
+            monitoring, Agentic Earn tools, reports, alerts, and experimental post-quantum features—without taking
+            control of your keys.
           </p>
           <PlansInline compact />
         </div>
