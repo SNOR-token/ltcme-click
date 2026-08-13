@@ -8,18 +8,18 @@ export const Route = createFileRoute("/")({
   component: RootGate,
   head: () => ({
     meta: [
-      { title: "LTCme.click — AI-powered Litecoin self-custody wallet" },
+      { title: "LTCme.click — Agentic Litecoin & Post-Quantum-Ready Wallet" },
       {
         name: "description",
         content:
-          "Non-custodial Litecoin wallet with a built-in AI companion. Send, receive, buy, and cash out LTC easily.",
+          "Securing your financial future. A friendly self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
       },
-      { property: "og:title", content: "LTCme.click — AI-powered Litecoin self-custody wallet" },
+      { property: "og:title", content: "LTCme.click — Agentic Litecoin & Post-Quantum-Ready Wallet" },
       { property: "og:url", content: "https://ltcme.click/" },
       {
         property: "og:description",
         content:
-          "Non-custodial Litecoin wallet with a built-in AI companion. Send, receive, buy and cash out LTC.",
+          "Securing your financial future. Self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
       },
     ],
     links: [{ rel: "canonical", href: "https://ltcme.click/" }],
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Non-custodial Litecoin wallet with a built-in AI companion. Send, receive, buy, and cash out LTC.",
+            "Securing your financial future. Self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
         }),
       },
     ],
@@ -59,12 +59,14 @@ function RootGate() {
             <span className="text-xl font-semibold gradient-text">LTCme.click</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-            AI-powered Litecoin self-custody wallet
+            The Agentic Litecoin &amp; Post-Quantum-Ready Wallet
           </h1>
+          <p className="mt-2 text-lg font-medium gradient-text">Securing your financial future.</p>
           <p className="mt-4 text-base text-muted-foreground">
-            Non-custodial Litecoin wallet with a built-in AI companion. Import
-            unlimited wallets, send and receive LTC, buy with a card, cash out
-            to a debit card, and get expert Litecoin help — all in one place.
+            A simple, friendly Litecoin wallet that helps everyday LTC holders keep
+            their funds safe as technology changes. Import unlimited wallets, send and
+            receive LTC, buy or cash out with a card, and let an AI security partner
+            watch your wallet — without ever touching your keys.
           </p>
           <h2 className="mt-8 text-lg font-semibold">What you can do</h2>
           <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground list-disc pl-6">
@@ -72,6 +74,7 @@ function RootGate() {
             <li>Send and receive LTC on mainnet with live fee estimates.</li>
             <li>Buy Litecoin with a debit or credit card.</li>
             <li>Cash out LTC to a debit card via supported off-ramps.</li>
+            <li>Check wallet health with Quantum Guard, and explore Earn options.</li>
             <li>Ask the built-in AI companion anything about Litecoin.</li>
           </ul>
         </section>
@@ -84,7 +87,7 @@ function RootGate() {
             <span className="gradient-text">Sign in</span>
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Litecoin's AI-powered self-custody wallet.
+            The Agentic Litecoin &amp; Post-Quantum-Ready Wallet.
           </p>
           <EmailAuth onSignedIn={() => navigate({ to: "/wallets" })} />
           <p className="mt-5 text-xs text-muted-foreground">
