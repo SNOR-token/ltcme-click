@@ -14,18 +14,20 @@ export const getAiEntitlement = createServerFn({ method: "GET" })
       .maybeSingle();
     const { data: subs } = await supabase
       .from("subscriptions")
-      .select("tier,status,current_period_end")
-      .eq("user_id", userId)
-      .eq("status", "active");
+      .select("tier,status,current_period_end");
     const now = Date.now();
-    const active = (subs || []).some(
-      (s: any) => !s.current_period_end || new Date(s.current_period_end).getTime() > now,
+    const all = subs || [];
+    const active = all.some(
+      (s: any) =>
+        s.status === "active" &&
+        (!s.current_period_end || new Date(s.current_period_end).getTime() > now),
     );
     return {
       freeUsed: usage?.free_messages_used ?? 0,
       freeLimit: FREE_LIMIT,
       totalMessages: usage?.total_messages ?? 0,
       hasActiveSub: active,
+      everSubscribed: all.length > 0,
       canSend:
         active || (usage?.free_messages_used ?? 0) < FREE_LIMIT,
     };
