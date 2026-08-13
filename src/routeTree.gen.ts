@@ -18,6 +18,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedWalletsRouteImport } from './routes/_authenticated/wallets'
+import { Route as AuthenticatedVaultsRouteImport } from './routes/_authenticated/vaults'
 import { Route as AuthenticatedTxBuilderRouteImport } from './routes/_authenticated/tx-builder'
 import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated/tools'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
@@ -69,6 +70,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
 const AuthenticatedWalletsRoute = AuthenticatedWalletsRouteImport.update({
   id: '/wallets',
   path: '/wallets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedVaultsRoute = AuthenticatedVaultsRouteImport.update({
+  id: '/vaults',
+  path: '/vaults',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTxBuilderRoute = AuthenticatedTxBuilderRouteImport.update({
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
   '/tx-builder': typeof AuthenticatedTxBuilderRoute
+  '/vaults': typeof AuthenticatedVaultsRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
   '/tx-builder': typeof AuthenticatedTxBuilderRoute
+  '/vaults': typeof AuthenticatedVaultsRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated/send': typeof AuthenticatedSendRoute
   '/_authenticated/tools': typeof AuthenticatedToolsRoute
   '/_authenticated/tx-builder': typeof AuthenticatedTxBuilderRoute
+  '/_authenticated/vaults': typeof AuthenticatedVaultsRoute
   '/_authenticated/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/send'
     | '/tools'
     | '/tx-builder'
+    | '/vaults'
     | '/wallets'
     | '/api/chat'
     | '/api/public/payments/webhook'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/send'
     | '/tools'
     | '/tx-builder'
+    | '/vaults'
     | '/wallets'
     | '/api/chat'
     | '/api/public/payments/webhook'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/send'
     | '/_authenticated/tools'
     | '/_authenticated/tx-builder'
+    | '/_authenticated/vaults'
     | '/_authenticated/wallets'
     | '/api/chat'
     | '/api/public/payments/webhook'
@@ -304,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWalletsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/vaults': {
+      id: '/_authenticated/vaults'
+      path: '/vaults'
+      fullPath: '/vaults'
+      preLoaderRoute: typeof AuthenticatedVaultsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/tx-builder': {
       id: '/_authenticated/tx-builder'
       path: '/tx-builder'
@@ -371,6 +390,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
   AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
   AuthenticatedTxBuilderRoute: typeof AuthenticatedTxBuilderRoute
+  AuthenticatedVaultsRoute: typeof AuthenticatedVaultsRoute
   AuthenticatedWalletsRoute: typeof AuthenticatedWalletsRoute
 }
 
@@ -382,6 +402,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSendRoute: AuthenticatedSendRoute,
   AuthenticatedToolsRoute: AuthenticatedToolsRoute,
   AuthenticatedTxBuilderRoute: AuthenticatedTxBuilderRoute,
+  AuthenticatedVaultsRoute: AuthenticatedVaultsRoute,
   AuthenticatedWalletsRoute: AuthenticatedWalletsRoute,
 }
 

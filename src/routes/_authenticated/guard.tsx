@@ -50,7 +50,7 @@ function GuardPage() {
     let alive = true;
     setLoading(true);
     const wallets = loadStore().wallets.flatMap((w) =>
-      w.addresses.map((a) => ({ address: a.address, label: w.meta.label ?? "Wallet", kind: "wallet" as const })),
+      w.addresses.map((a) => ({ address: a.address, label: w.meta.name ?? "Wallet", kind: "wallet" as const })),
     );
     const watch = entries.map((e) => ({ address: e.address, label: e.label, kind: "watch-only" as const }));
     const all = [...wallets, ...watch];
