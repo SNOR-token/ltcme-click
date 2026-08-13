@@ -22,6 +22,7 @@ import { Route as AuthenticatedTxBuilderRouteImport } from './routes/_authentica
 import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated/tools'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
+import { Route as AuthenticatedGuardRouteImport } from './routes/_authenticated/guard'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -90,6 +91,11 @@ const AuthenticatedReceiveRoute = AuthenticatedReceiveRouteImport.update({
   path: '/receive',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedGuardRoute = AuthenticatedGuardRouteImport.update({
+  id: '/guard',
+  path: '/guard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedBuyRoute = AuthenticatedBuyRouteImport.update({
   id: '/buy',
   path: '/buy',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
+  '/guard': typeof AuthenticatedGuardRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
+  '/guard': typeof AuthenticatedGuardRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
+  '/_authenticated/guard': typeof AuthenticatedGuardRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
   '/_authenticated/send': typeof AuthenticatedSendRoute
   '/_authenticated/tools': typeof AuthenticatedToolsRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai'
     | '/buy'
+    | '/guard'
     | '/receive'
     | '/send'
     | '/tools'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai'
     | '/buy'
+    | '/guard'
     | '/receive'
     | '/send'
     | '/tools'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/ai'
     | '/_authenticated/buy'
+    | '/_authenticated/guard'
     | '/_authenticated/receive'
     | '/_authenticated/send'
     | '/_authenticated/tools'
@@ -320,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReceiveRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/guard': {
+      id: '/_authenticated/guard'
+      path: '/guard'
+      fullPath: '/guard'
+      preLoaderRoute: typeof AuthenticatedGuardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/buy': {
       id: '/_authenticated/buy'
       path: '/buy'
@@ -347,6 +366,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
+  AuthenticatedGuardRoute: typeof AuthenticatedGuardRoute
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
   AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
@@ -357,6 +377,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
+  AuthenticatedGuardRoute: AuthenticatedGuardRoute,
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
   AuthenticatedSendRoute: AuthenticatedSendRoute,
   AuthenticatedToolsRoute: AuthenticatedToolsRoute,
