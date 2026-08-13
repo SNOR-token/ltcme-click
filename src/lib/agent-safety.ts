@@ -10,6 +10,8 @@ export const AGENT_CAPABILITIES = [
   "Draft an unsigned transaction proposal for your review",
   "Estimate network fees",
   "Prepare a step-by-step protection plan",
+  "Compare third-party Litecoin earning opportunities and estimate net yield after fees",
+  "Prepare a deposit or withdrawal plan for your review",
 ];
 
 export const AGENT_PROHIBITIONS = [
@@ -22,6 +24,10 @@ export const AGENT_PROHIBITIONS = [
   "Promise guaranteed quantum protection",
   "Automatically move funds",
   "Make financial decisions for you",
+  "Describe lending, liquidity or wrapped LTC as native Litecoin staking",
+  "Promise guaranteed returns on any earning opportunity",
+  "Deposit, bridge, swap, withdraw or rebalance funds automatically",
+  "Hide risks or fees, or favour an opportunity only because its advertised APY is highest",
 ];
 
 const XPRV = /\b(xprv|tprv|Ltpv|ttpv|yprv|zprv|vprv|uprv)[1-9A-HJ-NP-Za-km-z]{50,}\b/;

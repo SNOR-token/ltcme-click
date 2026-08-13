@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
 import { BigGhost } from "@/components/Pacman";
-import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote, Shield, Eye, FileSpreadsheet, FlaskConical } from "lucide-react";
+import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote, Shield, Eye, FileSpreadsheet, FlaskConical, Sprout } from "lucide-react";
 import { TestnetBanner, NetworkToggle } from "@/components/ProGate";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
@@ -82,7 +82,8 @@ function TopNav() {
     { to: "/send", label: "Send", icon: Send },
     { to: "/receive", label: "Receive", icon: Download },
     { to: "/buy", label: "Buy / Sell", icon: Banknote },
-    { to: "/tx-builder", label: "TX Builder", icon: Hammer },
+    { to: "/tx-builder", label: "AI Tx Builder", icon: Hammer },
+    { to: "/earn", label: "Earn", icon: Sprout },
     { to: "/tools", label: "Tools", icon: Wrench },
     { to: "/guard", label: "Quantum Guard", icon: Shield },
     { to: "/vaults", label: "Vaults", icon: Eye },

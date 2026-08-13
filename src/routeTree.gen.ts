@@ -26,6 +26,7 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
 import { Route as AuthenticatedPqLabRouteImport } from './routes/_authenticated/pq-lab'
 import { Route as AuthenticatedGuardRouteImport } from './routes/_authenticated/guard'
+import { Route as AuthenticatedEarnRouteImport } from './routes/_authenticated/earn'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -114,6 +115,11 @@ const AuthenticatedGuardRoute = AuthenticatedGuardRouteImport.update({
   path: '/guard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEarnRoute = AuthenticatedEarnRouteImport.update({
+  id: '/earn',
+  path: '/earn',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedBuyRoute = AuthenticatedBuyRouteImport.update({
   id: '/buy',
   path: '/buy',
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
+  '/earn': typeof AuthenticatedEarnRoute
   '/guard': typeof AuthenticatedGuardRoute
   '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
+  '/earn': typeof AuthenticatedEarnRoute
   '/guard': typeof AuthenticatedGuardRoute
   '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
+  '/_authenticated/earn': typeof AuthenticatedEarnRoute
   '/_authenticated/guard': typeof AuthenticatedGuardRoute
   '/_authenticated/pq-lab': typeof AuthenticatedPqLabRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai'
     | '/buy'
+    | '/earn'
     | '/guard'
     | '/pq-lab'
     | '/receive'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai'
     | '/buy'
+    | '/earn'
     | '/guard'
     | '/pq-lab'
     | '/receive'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/ai'
     | '/_authenticated/buy'
+    | '/_authenticated/earn'
     | '/_authenticated/guard'
     | '/_authenticated/pq-lab'
     | '/_authenticated/receive'
@@ -396,6 +408,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGuardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/earn': {
+      id: '/_authenticated/earn'
+      path: '/earn'
+      fullPath: '/earn'
+      preLoaderRoute: typeof AuthenticatedEarnRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/buy': {
       id: '/_authenticated/buy'
       path: '/buy'
@@ -423,6 +442,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
+  AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
   AuthenticatedGuardRoute: typeof AuthenticatedGuardRoute
   AuthenticatedPqLabRoute: typeof AuthenticatedPqLabRoute
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
@@ -437,6 +457,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
+  AuthenticatedEarnRoute: AuthenticatedEarnRoute,
   AuthenticatedGuardRoute: AuthenticatedGuardRoute,
   AuthenticatedPqLabRoute: AuthenticatedPqLabRoute,
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
