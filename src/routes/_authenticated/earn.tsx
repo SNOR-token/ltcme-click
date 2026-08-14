@@ -183,7 +183,7 @@ function EarnPage() {
             <div>• Move anything without a full transaction preview and your explicit approval</div>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Version one is read-only comparison and transaction preparation. Autonomous fund movement is disabled.
+            The assistant compares, explains and prepares — you always review and approve every transaction yourself.
           </p>
         </section>
       </ProLock>
