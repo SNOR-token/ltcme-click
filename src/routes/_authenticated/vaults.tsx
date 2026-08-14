@@ -75,7 +75,7 @@ function VaultsPage() {
   );
 }
 
-function VaultManager({ network }: { network: "mainnet" | "testnet" }) {
+function VaultManager({ network }: { network: "mainnet" }) {
   const { entries } = useWatchList(network);
   const [address, setAddress] = useState("");
   const [label, setLabel] = useState("");
