@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { EmailAuth } from "@/components/EmailAuth";
 import { PacmanBanner } from "@/components/Pacman";
+import { ProValueGrid } from "@/components/ProValue";
+import { Wallet, Send, ShieldCheck, Bot, Banknote, Sprout } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: RootGate,
@@ -51,56 +53,85 @@ function RootGate() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <PacmanBanner />
-      <main className="flex-1 px-6 py-10 max-w-5xl w-full mx-auto grid gap-10 md:grid-cols-2 md:items-center">
-        <section className="text-foreground">
-          <div className="flex items-center gap-3 mb-6">
-            <LogoMark size={44} />
-            <span className="text-xl font-semibold gradient-text">LTCme.click</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-            The Agentic Litecoin &amp; Post-Quantum-Ready Wallet
-          </h1>
-          <p className="mt-2 text-lg font-medium gradient-text">Securing your financial future.</p>
-          <p className="mt-4 text-base text-muted-foreground">
-            A simple, friendly Litecoin wallet that helps everyday LTC holders keep
-            their funds safe as technology changes. Import unlimited wallets, send and
-            receive LTC, buy or cash out with a card, and let an AI security partner
-            watch your wallet — without ever touching your keys.
-          </p>
-          <h2 className="mt-8 text-lg font-semibold">What you can do</h2>
-          <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground list-disc pl-6">
-            <li>Create or import wallets from a BIP39 seed or WIF key.</li>
-            <li>Send and receive LTC on mainnet with live fee estimates.</li>
-            <li>Buy Litecoin with a debit or credit card.</li>
-            <li>Cash out LTC to a debit card via supported off-ramps.</li>
-            <li>Check wallet health with Quantum Guard, and explore Earn options.</li>
-            <li>Ask the built-in AI companion anything about Litecoin.</li>
-          </ul>
-        </section>
+      <PacmanBanner compact />
+      <main className="flex-1 px-6 py-12 max-w-6xl w-full mx-auto">
+        <div className="grid gap-10 md:grid-cols-2 md:items-center">
+          <section className="text-foreground">
+            <div className="flex items-center gap-3 mb-6">
+              <LogoMark size={44} />
+              <span className="text-xl font-semibold">LTCme<span className="text-primary">.click</span></span>
+            </div>
+            <span className="eyebrow">Self-custody · Litecoin only</span>
+            <h1 className="mt-3 text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]">
+              The Agentic Litecoin &amp;<br className="hidden md:block" /> Post-Quantum-Ready Wallet
+            </h1>
+            <p className="mt-3 text-lg font-medium gradient-text">Securing your financial future.</p>
+            <p className="mt-5 text-base text-muted-foreground leading-relaxed">
+              LTCme.click is a real Litecoin wallet you fully control. Keys are generated and stored
+              in your browser — never on our servers. An always-on AI agent sits beside every screen
+              to explain what you're doing, watch your addresses for exposure, and prepare
+              transactions you approve and sign yourself.
+            </p>
+            <div className="mt-7 grid sm:grid-cols-2 gap-2.5">
+              {[
+                { icon: Wallet, t: "Unlimited wallets", d: "Create or import BIP39 seeds and WIF keys. BIP44, BIP49 and BIP84 addresses." },
+                { icon: Send, t: "Send & receive", d: "Live mainnet balances, fee estimates and address validation." },
+                { icon: Banknote, t: "Buy & cash out", d: "Card on-ramps and off-ramps to a debit card via vetted partners." },
+                { icon: ShieldCheck, t: "Quantum Guard", d: "Plain-language wallet health: Protected, Needs Attention or Higher Exposure." },
+                { icon: Sprout, t: "Earn", d: "Compare vetted third-party LTC yield. Litecoin has no native staking." },
+                { icon: Bot, t: "Agentic AI", d: "Always-on Litecoin agent. It can never see keys or move funds." },
+              ].map((f) => (
+                <div key={f.t} className="rounded-xl card-glass p-3.5">
+                  <div className="flex items-center gap-2">
+                    <f.icon className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium">{f.t}</span>
+                  </div>
+                  <p className="mt-1.5 text-xs text-muted-foreground">{f.d}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
-        <section className="card-glass rounded-3xl p-8 md:p-10 text-center">
-          <div className="flex justify-center mb-5">
-            <LogoMark size={56} />
+          <section className="card-glass neon-edge rounded-3xl p-8 md:p-10 text-center">
+            <div className="flex justify-center mb-5">
+              <LogoMark size={56} />
+            </div>
+            <h2 className="text-2xl font-bold">
+              <span className="gradient-text">Sign in</span>
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Email code only. No password, no wallet connect, no tracking pixels.
+            </p>
+            <EmailAuth onSignedIn={() => navigate({ to: "/wallets" })} />
+            <p className="mt-5 text-xs text-muted-foreground">
+              Your Litecoin keys are generated in your browser and stored locally on this device only. LTCme never sees them — back up your seed phrase yourself. Optionally protect your seed with a BIP39 passphrase (25th word).
+            </p>
+            <p className="mt-3 text-[11px] text-muted-foreground">
+              By continuing you agree to our{" "}
+              <Link to="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
+              <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+            </p>
+          </section>
+        </div>
+
+        <section className="mt-16">
+          <span className="eyebrow">Free vs Quantum Guard Pro</span>
+          <h2 className="mt-2 text-2xl font-bold">The wallet is free. Pro is the intelligence layer.</h2>
+          <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+            Creating wallets, sending, receiving, buying and checking your wallet status are free forever, and
+            never expire. Quantum Guard Pro ($4.99/mo, $9.99/3mo, $19.99/yr) adds the agent and the monitoring
+            around it. Everything Pro does is free on testnet, so you can try it all before paying.
+          </p>
+          <div className="mt-5">
+            <ProValueGrid />
           </div>
-          <h2 className="text-2xl font-bold">
-            <span className="gradient-text">Sign in</span>
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            The Agentic Litecoin &amp; Post-Quantum-Ready Wallet.
-          </p>
-          <EmailAuth onSignedIn={() => navigate({ to: "/wallets" })} />
-          <p className="mt-5 text-xs text-muted-foreground">
-            Your Litecoin keys are generated in your browser and stored locally on this device only. LTCme never sees them — back up your seed phrase yourself. Optionally protect your seed with a BIP39 passphrase (25th word).
-          </p>
-          <p className="mt-3 text-[11px] text-muted-foreground">
-            By continuing you agree to our{" "}
-            <Link to="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
-            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+          <p className="mt-4 text-[11px] text-muted-foreground max-w-2xl">
+            Post-quantum-ready means LTCme helps you reduce key-exposure today and experiment with post-quantum
+            signatures in the PQ Lab. Litecoin mainnet transactions themselves are not post-quantum protected yet.
           </p>
         </section>
       </main>
-      <PacmanBanner />
+      <PacmanBanner compact />
       <footer className="px-6 py-4 text-[11px] text-muted-foreground flex items-center justify-between flex-wrap gap-2 border-t border-border/40">
         <span>© 2026 LTCme.click</span>
         <span className="flex items-center gap-4">

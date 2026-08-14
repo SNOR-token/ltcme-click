@@ -2,7 +2,6 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
-import { BigGhost } from "@/components/Pacman";
 import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote, Shield, Eye, FileSpreadsheet, FlaskConical, Sprout } from "lucide-react";
 import { TestnetBanner, NetworkToggle } from "@/components/ProGate";
 export const Route = createFileRoute("/_authenticated")({
@@ -42,9 +41,7 @@ function Shell() {
   return (
     <div className="min-h-screen flex flex-col">
       <TestnetBanner />
-      <TopNav />
-      <UserBar email={email} />
-      <BigGhost />
+      <TopNav email={email} />
       <main className="flex-1 min-w-0">
         <Outlet />
       </main>
@@ -75,38 +72,41 @@ function LegalFooter() {
   );
 }
 
-function TopNav() {
+function TopNav({ email }: { email: string | null }) {
+  const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const tabs = [
     { to: "/wallets", label: "Wallet", icon: Wallet },
     { to: "/send", label: "Send", icon: Send },
     { to: "/receive", label: "Receive", icon: Download },
     { to: "/buy", label: "Buy / Sell", icon: Banknote },
-    { to: "/tx-builder", label: "AI Tx Builder", icon: Hammer },
-    { to: "/earn", label: "Earn", icon: Sprout },
-    { to: "/tools", label: "Tools", icon: Wrench },
     { to: "/guard", label: "Quantum Guard", icon: Shield },
+    { to: "/earn", label: "Earn", icon: Sprout },
+  ] as const;
+  const secondary = [
+    { to: "/tx-builder", label: "AI Tx Builder", icon: Hammer },
     { to: "/vaults", label: "Vaults", icon: Eye },
     { to: "/reports", label: "Reports", icon: FileSpreadsheet },
+    { to: "/tools", label: "Tools", icon: Wrench },
     { to: "/pq-lab", label: "PQ Lab", icon: FlaskConical },
   ] as const;
   return (
-    <header className="sticky top-0 z-20 border-b border-border/60 bg-background/70 backdrop-blur-md">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 md:px-6 py-2">
+    <header className="sticky top-0 z-20 hairline bg-background/80 backdrop-blur-xl">
+      <div className="px-4 md:px-6 py-2.5 flex items-center gap-3">
         <Link to="/wallets" className="flex items-center gap-2 shrink-0">
           <LogoMark />
-          <span className="font-semibold tracking-tight hidden sm:inline">LTCme.click</span>
+          <span className="font-semibold tracking-tight hidden sm:inline">LTCme<span className="text-primary">.click</span></span>
         </Link>
-        <nav className="flex-1 flex items-center gap-1 flex-wrap">
+        <nav className="flex-1 flex items-center gap-1 flex-wrap min-w-0">
           {tabs.map(({ to, label, icon: Icon }) => {
             const active = pathname.startsWith(to);
             return (
               <Link
                 key={to}
                 to={to}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition whitespace-nowrap ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap ${
                   active
-                    ? "bg-primary text-primary-foreground btn-glow"
+                    ? "bg-primary/15 text-primary neon-edge"
                     : "text-muted-foreground hover:text-foreground hover:bg-card/60"
                 }`}
               >
@@ -117,31 +117,48 @@ function TopNav() {
           })}
         </nav>
         <NetworkToggle />
+        <div className="hidden md:flex flex-col items-end leading-tight">
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              navigate({ to: "/auth" });
+            }}
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="h-3.5 w-3.5" /> Sign out
+          </button>
+          {email && <span className="text-[10px] text-muted-foreground/70 truncate max-w-[180px]">{email}</span>}
+        </div>
+      </div>
+      <div className="px-4 md:px-6 pb-2 flex items-center gap-1 flex-wrap">
+        <span className="eyebrow mr-1">Advanced</span>
+        {secondary.map(({ to, label, icon: Icon }) => {
+          const active = pathname.startsWith(to);
+          return (
+            <Link
+              key={to}
+              to={to}
+              className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] transition ${
+                active ? "text-primary bg-primary/10" : "text-muted-foreground/80 hover:text-foreground"
+              }`}
+            >
+              <Icon className="h-3 w-3" />
+              {label}
+            </Link>
+          );
+        })}
+        <div className="md:hidden ml-auto flex items-center gap-2">
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              navigate({ to: "/auth" });
+            }}
+            className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="h-3 w-3" /> Sign out
+          </button>
+        </div>
       </div>
     </header>
-  );
-}
-
-function UserBar({ email }: { email: string | null }) {
-  const navigate = useNavigate();
-  return (
-    <div className="px-4 md:px-6 pt-4">
-      <div className="max-w-5xl mx-auto flex flex-col items-end gap-1">
-        <button
-          onClick={async () => {
-            await supabase.auth.signOut();
-            navigate({ to: "/auth" });
-          }}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-4 py-2 text-sm text-foreground hover:bg-card transition"
-        >
-          <LogOut className="h-3.5 w-3.5" /> Sign out
-        </button>
-        {email && (
-          <span className="text-xs text-muted-foreground truncate max-w-[220px]">
-            {email}
-          </span>
-        )}
-      </div>
-    </div>
   );
 }

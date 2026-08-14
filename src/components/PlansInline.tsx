@@ -41,8 +41,9 @@ export function PlansInline({ compact = false }: { compact?: boolean }) {
         <span className="font-medium">Unlock Quantum Guard Pro</span>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Your free wallet stays fully operational — monitoring, AI analysis, alerts, reports and the PQ Lab are Pro.
-        Free on testnet. Pay by card or with Litecoin.
+        Pro adds four things: unlimited wallet-aware AI, continuous monitoring &amp; alerts, quantum migration
+        planning, and Earn intelligence + reports. Your free wallet never stops working. Free on testnet.
+        Pay by card or with Litecoin.
       </p>
       <div className={compact ? "grid grid-cols-3 gap-1.5" : "grid grid-cols-1 sm:grid-cols-3 gap-2"}>
         {PLANS.map((p) => {

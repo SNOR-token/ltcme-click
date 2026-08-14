@@ -9,6 +9,7 @@ import { useNetworkMode } from "@/lib/ltc/network-mode";
 import { useProAccess } from "@/lib/pro";
 import { ProLock, ProExpiredNotice, NetworkToggle } from "@/components/ProGate";
 import { PlansInline } from "@/components/PlansInline";
+import { ProValueGrid } from "@/components/ProValue";
 import { AGENT_CAPABILITIES, AGENT_PROHIBITIONS } from "@/lib/agent-safety";
 
 export const Route = createFileRoute("/_authenticated/guard")({
@@ -143,12 +144,13 @@ function GuardPage() {
       </section>
 
       {!pro.pro && (
-        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5 space-y-2">
-          <h2 className="text-lg font-semibold">Make your Litecoin wallet work smarter.</h2>
-          <p className="text-sm text-muted-foreground">
-            Quantum Guard Pro gives you an AI security partner, advanced transaction planning, continuous wallet
-            monitoring, Agentic Earn tools, reports, alerts, and experimental post-quantum features—without taking
-            control of your keys.
+        <div className="rounded-2xl neon-edge bg-primary/5 p-5 space-y-3">
+          <span className="eyebrow">What Pro is for</span>
+          <h2 className="text-lg font-semibold">Your wallet is free. Pro is the intelligence around it.</h2>
+          <ProValueGrid dense />
+          <p className="text-xs text-muted-foreground">
+            Cancelling never disables your wallet — sending, receiving and your status check stay free forever.
+            Every Pro feature is free on testnet, so you can try before you pay.
           </p>
           <PlansInline compact />
         </div>
