@@ -22,23 +22,32 @@ export const Route = createFileRoute("/_authenticated/ai")({
 
 function AiPage() {
   const transport = useRef(new DefaultChatTransport({ api: "/api/chat" }));
-  const { messages, sendMessage, status } = useChat({ id: "main-ai", transport: transport.current });
+  const { messages, sendMessage, status } = useChat({
+    id: "main-ai",
+    transport: transport.current,
+    onError: (e) => setError(e.message || "The assistant could not respond. Please try again."),
+  });
   const [input, setInput] = useState("");
-  const [entitlement, setEntitlement] = useState<{ freeUsed: number; freeLimit: number; hasActiveSub: boolean; canSend: boolean } | null>(null);
+  const [entitlement, setEntitlement] = useState<{ hasActiveSub: boolean; inTrial: boolean; trialDaysLeft: number; canSend: boolean } | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const refresh = useServerFn(getAiEntitlement);
   const consume = useServerFn(consumeAiMessage);
   const busy = status === "submitted" || status === "streaming";
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { refresh().then(setEntitlement).catch(() => {}); }, [refresh]);
+  useEffect(() => {
+    refresh()
+      .then((r) => setEntitlement({ hasActiveSub: r.hasActiveSub, inTrial: r.inTrial, trialDaysLeft: r.trialDaysLeft, canSend: r.canSend }))
+      .catch(() => {});
+  }, [refresh]);
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }); }, [messages]);
 
   async function submit() {
     const text = input.trim();
     if (!text || busy) return;
+    setError(null);
     const r = await consume();
-    if (!r.ok) { setEntitlement((e) => e && { ...e, canSend: false }); return; }
-    setEntitlement((e) => e && { ...e, freeUsed: r.freeUsed, canSend: e.hasActiveSub || r.freeUsed < r.freeLimit });
+    if (!r.ok) { setEntitlement((e) => e && { ...e, canSend: false, inTrial: false }); return; }
     setInput("");
     sendMessage({ text });
   }
@@ -59,8 +68,10 @@ function AiPage() {
           <div className="text-xs text-muted-foreground">
             {entitlement.hasActiveSub ? (
               <span className="text-primary">Unlimited</span>
+            ) : entitlement.inTrial ? (
+              <span>Free trial — {entitlement.trialDaysLeft} {entitlement.trialDaysLeft === 1 ? "day" : "days"} left</span>
             ) : (
-              <span>{Math.max(0, entitlement.freeLimit - entitlement.freeUsed)} / {entitlement.freeLimit} free left</span>
+              <span>Trial ended</span>
             )}
           </div>
         )}
@@ -84,7 +95,10 @@ function AiPage() {
       </div>
 
       <div className="p-4 border-t border-border/60 space-y-3">
-        {!(entitlement && !entitlement.canSend && !entitlement.hasActiveSub) && (
+        {error && (
+          <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">{error}</div>
+        )}
+        {!(entitlement && !entitlement.canSend) && (
           <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="flex gap-2">
             <input value={input} onChange={(e) => setInput(e.target.value)} disabled={busy} placeholder="Ask LTCme AI…" className="flex-1 rounded-full bg-input border border-border px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
             <button type="submit" disabled={busy || !input.trim()} className="rounded-full bg-primary text-primary-foreground h-11 w-11 flex items-center justify-center disabled:opacity-50">
@@ -92,7 +106,7 @@ function AiPage() {
             </button>
           </form>
         )}
-        {entitlement && !entitlement.hasActiveSub && <PlansInline />}
+        {entitlement && !entitlement.hasActiveSub && !entitlement.inTrial && <PlansInline />}
       </div>
     </div>
   );
