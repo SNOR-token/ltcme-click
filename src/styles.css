@@ -204,13 +204,13 @@
 
   @keyframes aurora-drift {
     0% {
-      background-position: 8% 6%, 88% 22%, 52% 96%, 0 0, 0 0, 0 0;
+      background-position: 8% 6%, 88% 22%, 52% 96%, 110% 78%, 0 0, 0 0, 0 0, 0 0;
     }
     50% {
-      background-position: 20% 16%, 74% 8%, 40% 84%, 120px 0, -60px 0, 0 0;
+      background-position: 20% 16%, 74% 8%, 40% 84%, 96% 64%, 120px 0, -60px 0, 80px 0, 0 0;
     }
     100% {
-      background-position: 2% 22%, 94% 30%, 62% 100%, 240px 0, -120px 0, 0 0;
+      background-position: 2% 22%, 94% 30%, 62% 100%, 84% 88%, 240px 0, -120px 0, 160px 0, 0 0;
     }
   }
 
