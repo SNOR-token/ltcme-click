@@ -135,8 +135,10 @@
     z-index: 0;
     background-image:
       linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-    background-size: 56px 56px;
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to right, oklch(0.89 0.19 100 / 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.89 0.19 100 / 0.03) 1px, transparent 1px);
+    background-size: 224px 224px, 224px 224px, 56px 56px, 56px 56px;
     mask-image: radial-gradient(circle at 50% 0%, black, transparent 85%);
   }
 
@@ -149,28 +151,37 @@
     pointer-events: none;
     z-index: 0;
     background-image:
-      radial-gradient(closest-side, oklch(0.80 0.15 232 / 0.16), transparent 100%),
-      radial-gradient(closest-side, oklch(0.72 0.16 205 / 0.13), transparent 100%),
-      radial-gradient(closest-side, oklch(0.55 0.14 262 / 0.14), transparent 100%),
+      radial-gradient(closest-side, oklch(0.89 0.19 100 / 0.20), transparent 100%),
+      radial-gradient(closest-side, oklch(0.82 0.19 78 / 0.16), transparent 100%),
+      radial-gradient(closest-side, oklch(0.86 0.17 120 / 0.14), transparent 100%),
       repeating-linear-gradient(
         115deg,
-        oklch(0.90 0.11 210 / 0.045) 0px,
-        oklch(0.90 0.11 210 / 0.045) 1px,
+        oklch(0.95 0.16 105 / 0.05) 0px,
+        oklch(0.95 0.16 105 / 0.05) 1px,
         transparent 1px,
         transparent 190px
       ),
-      radial-gradient(oklch(0.90 0.11 210 / 0.16) 1px, transparent 1px);
-    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat;
+      repeating-linear-gradient(
+        -60deg,
+        oklch(0.82 0.19 78 / 0.035) 0px,
+        oklch(0.82 0.19 78 / 0.035) 1px,
+        transparent 1px,
+        transparent 96px
+      ),
+      radial-gradient(oklch(0.95 0.16 105 / 0.18) 1px, transparent 1px);
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, repeat;
     background-size:
       52vw 52vw,
       44vw 44vw,
       60vw 60vw,
+      auto,
       auto,
       22px 22px;
     background-position:
       8% 6%,
       88% 22%,
       52% 96%,
+      0 0,
       0 0,
       0 0;
     animation: aurora-drift 34s ease-in-out infinite alternate;
@@ -179,13 +190,13 @@
 
   @keyframes aurora-drift {
     0% {
-      background-position: 8% 6%, 88% 22%, 52% 96%, 0 0, 0 0;
+      background-position: 8% 6%, 88% 22%, 52% 96%, 0 0, 0 0, 0 0;
     }
     50% {
-      background-position: 20% 16%, 74% 8%, 40% 84%, 120px 0, 0 0;
+      background-position: 20% 16%, 74% 8%, 40% 84%, 120px 0, -60px 0, 0 0;
     }
     100% {
-      background-position: 2% 22%, 94% 30%, 62% 100%, 240px 0, 0 0;
+      background-position: 2% 22%, 94% 30%, 62% 100%, 240px 0, -120px 0, 0 0;
     }
   }
 
@@ -206,7 +217,8 @@
   }
 
   ::selection {
-    background: oklch(0.80 0.15 232 / 0.35);
+    background: oklch(0.89 0.19 100 / 0.35);
+    color: oklch(0.16 0.03 95);
   }
 }
 
@@ -233,11 +245,11 @@
 }
 
 @utility neon-edge {
-  border: 1px solid color-mix(in oklab, var(--primary) 40%, transparent);
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
   box-shadow:
-    0 0 0 1px oklch(0.80 0.15 232 / 0.08),
-    0 0 24px -6px oklch(0.80 0.15 232 / 0.35),
-    inset 0 1px 0 oklch(0.90 0.11 210 / 0.12);
+    0 0 0 1px oklch(0.89 0.19 100 / 0.10),
+    0 0 26px -6px oklch(0.89 0.19 100 / 0.40),
+    inset 0 1px 0 oklch(0.95 0.16 105 / 0.16);
 }
 
 @utility hairline {
@@ -264,7 +276,7 @@
   z-index: -1;
   border-radius: inherit;
   background:
-    radial-gradient(60% 80% at 10% 0%, oklch(0.80 0.15 232 / 0.18), transparent 70%),
-    radial-gradient(50% 70% at 95% 10%, oklch(0.72 0.16 205 / 0.14), transparent 70%);
+    radial-gradient(60% 80% at 10% 0%, oklch(0.89 0.19 100 / 0.20), transparent 70%),
+    radial-gradient(50% 70% at 95% 10%, oklch(0.82 0.19 78 / 0.16), transparent 70%);
   pointer-events: none;
 }
