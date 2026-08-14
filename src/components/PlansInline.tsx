@@ -42,7 +42,7 @@ export function PlansInline({ compact = false }: { compact?: boolean }) {
       </div>
       <p className="text-[11px] text-muted-foreground">
         Pro adds four things: unlimited wallet-aware AI, continuous monitoring &amp; alerts, quantum migration
-        planning, and Earn intelligence + reports. Your free wallet never stops working. Free on testnet.
+        planning, and Earn intelligence + reports. Your free wallet never stops working. 3 days free.
         Pay by card or with Litecoin.
       </p>
       <div className={compact ? "grid grid-cols-3 gap-1.5" : "grid grid-cols-1 sm:grid-cols-3 gap-2"}>

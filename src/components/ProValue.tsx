@@ -5,13 +5,13 @@ export const PRO_PILLARS = [
     icon: Bot,
     title: "Unlimited AI agent",
     body: "Unlimited messages with a wallet-aware Litecoin agent that reads your public addresses, explains transactions and drafts plans you approve.",
-    free: "5 free messages",
+    free: "3-day free trial",
   },
   {
     icon: Radar,
     title: "Continuous monitoring & alerts",
     body: "Background scanning of every wallet and watch-only vault for address reuse, exposed public keys, dust attacks and fee targets.",
-    free: "One-off manual check",
+    free: "One-off manual check after trial",
   },
   {
     icon: ShieldCheck,

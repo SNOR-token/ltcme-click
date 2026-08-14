@@ -150,7 +150,7 @@ function GuardPage() {
           <ProValueGrid dense />
           <p className="text-xs text-muted-foreground">
             Cancelling never disables your wallet — sending, receiving and your status check stay free forever.
-            Every Pro feature is free on testnet, so you can try before you pay.
+            Every new account gets 3 days of full Pro access free, so you can try before you pay.
           </p>
           <PlansInline compact />
         </div>

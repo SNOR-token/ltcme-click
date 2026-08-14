@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
 import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote, Shield, Eye, FileSpreadsheet, FlaskConical, Sprout, Users } from "lucide-react";
-import { TestnetBanner, NetworkToggle } from "@/components/ProGate";
+import { NetworkToggle } from "@/components/ProGate";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
 });
@@ -40,7 +40,6 @@ function Shell() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <TestnetBanner />
       <TopNav email={email} />
       <main className="flex-1 min-w-0">
         <Outlet />
