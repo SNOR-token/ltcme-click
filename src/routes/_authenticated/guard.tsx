@@ -9,6 +9,7 @@ import { useNetworkMode } from "@/lib/ltc/network-mode";
 import { useProAccess } from "@/lib/pro";
 import { ProLock, ProExpiredNotice, NetworkToggle } from "@/components/ProGate";
 import { PlansInline } from "@/components/PlansInline";
+import { ProValueGrid } from "@/components/ProValue";
 import { AGENT_CAPABILITIES, AGENT_PROHIBITIONS } from "@/lib/agent-safety";
 
 export const Route = createFileRoute("/_authenticated/guard")({
