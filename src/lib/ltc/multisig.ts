@@ -10,7 +10,7 @@ import * as scureBip39 from "@scure/bip39";
 import { Buffer } from "buffer";
 import coinSelect from "coinselect";
 import { litecoinMainnet } from "./network";
-import { litecoinTestnet, getNetworkMode, type NetMode } from "./network-mode";
+import { type NetMode } from "./network-mode";
 import { validateMnemonic, keyPairFromPrivate } from "./wallet";
 import { getUtxos, getRawTx, estimateFeeRate } from "./api";
 import { useSyncExternalStore } from "react";
@@ -41,7 +41,7 @@ export interface MultisigWallet {
 export const DEFAULT_ACCOUNT_PATH = "m/48'/2'/0'/2'";
 
 export function net() {
-  return (getNetworkMode() === "testnet" ? litecoinTestnet : litecoinMainnet) as any;
+  return litecoinMainnet as any;
 }
 
 // ---------------------------------------------------------------- key parsing
@@ -59,10 +59,6 @@ const KNOWN_PUB_VERSIONS = new Set([
   0x01b26ef6, // Mtub (LTC p2sh-segwit)
   0x04b24746, // zpub
   0x049d7cb2, // ypub
-  0x043587cf, // tpub
-  0x044a5262, // upub
-  0x045f1cf6, // vpub
-  0x0436f6e1, // ttub (LTC testnet)
 ]);
 
 export function isHexPubkey(s: string) {
