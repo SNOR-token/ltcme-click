@@ -1,38 +1,24 @@
 import { Link } from "@tanstack/react-router";
-import { Lock, ShieldCheck, FlaskConical } from "lucide-react";
-import { useNetworkMode, setNetworkMode, TESTNET_NOTICE } from "@/lib/ltc/network-mode";
-import { PRO_EXPIRED_MESSAGE, type ProState } from "@/lib/pro";
+import { Lock, ShieldCheck, Clock } from "lucide-react";
+import { PRO_EXPIRED_MESSAGE, TRIAL_DAYS, type ProState } from "@/lib/pro";
 
-export function TestnetBanner() {
-  const [mode, setMode] = useNetworkMode();
-  if (mode !== "testnet") return null;
+/** Static mainnet indicator — LTCme.click is mainnet only. */
+export function NetworkToggle() {
   return (
-    <div className="sticky top-0 z-30 bg-primary text-primary-foreground text-xs font-semibold text-center px-4 py-1.5 flex items-center justify-center gap-3">
-      <FlaskConical className="h-3.5 w-3.5" />
-      <span>{TESTNET_NOTICE}</span>
-      <button onClick={() => setMode("mainnet")} className="underline underline-offset-2 font-normal">
-        Switch to mainnet
-      </button>
-    </div>
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2.5 py-1 text-[11px] text-muted-foreground">
+      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+      Litecoin Mainnet
+    </span>
   );
 }
 
-export function NetworkToggle() {
-  const [mode, setMode] = useNetworkMode();
+export function TrialBadge({ state }: { state: ProState }) {
+  if (state.loading || !state.inTrial) return null;
   return (
-    <div className="inline-flex rounded-full border border-border bg-background/60 p-0.5 text-[11px]">
-      {(["mainnet", "testnet"] as const).map((m) => (
-        <button
-          key={m}
-          onClick={() => setMode(m)}
-          className={`px-2.5 py-1 rounded-full capitalize transition ${
-            mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {m}
-        </button>
-      ))}
-    </div>
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[11px] text-primary">
+      <Clock className="h-3 w-3" />
+      {state.trialDaysLeft} {state.trialDaysLeft === 1 ? "day" : "days"} left in free trial
+    </span>
   );
 }
 
@@ -46,8 +32,8 @@ export function ProExpiredNotice({ state }: { state: ProState }) {
 }
 
 /**
- * Locked preview. Renders the real feature when Pro access is available
- * (always on testnet), otherwise a preview with an explicit upgrade path.
+ * Locked preview. Renders the real feature during the free trial or with an
+ * active subscription, otherwise a preview with an explicit upgrade path.
  */
 export function ProLock({
   state,
@@ -87,19 +73,16 @@ export function ProLock({
           </li>
         ))}
       </ul>
-      <div className="flex flex-wrap gap-2 pt-1">
+      <p className="text-[11px] text-muted-foreground">
+        Every account gets {TRIAL_DAYS} days of full access free. Your free wallet keeps working either way.
+      </p>
+      <div className="pt-1">
         <Link
           to="/guard"
-          className="rounded-lg bg-primary text-primary-foreground px-3 py-2 text-xs font-medium hover:opacity-90"
+          className="inline-block rounded-lg bg-primary text-primary-foreground px-3 py-2 text-xs font-medium hover:opacity-90"
         >
           Upgrade to Quantum Guard Pro
         </Link>
-        <button
-          onClick={() => setNetworkMode("testnet")}
-          className="rounded-lg border border-primary/40 px-3 py-2 text-xs hover:bg-primary/10"
-        >
-          Try it free on testnet
-        </button>
       </div>
     </div>
   );
