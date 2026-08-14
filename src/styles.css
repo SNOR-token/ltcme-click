@@ -250,11 +250,11 @@
       color-mix(in oklab, var(--card) 88%, transparent),
       color-mix(in oklab, var(--background) 88%, transparent)
     ),
-    radial-gradient(120% 100% at 0% 0%, oklch(0.89 0.19 100 / 0.07), transparent 55%),
-    radial-gradient(120% 100% at 100% 100%, oklch(0.70 0.16 240 / 0.08), transparent 55%);
+    radial-gradient(120% 100% at 0% 0%, oklch(0.70 0.16 240 / 0.10), transparent 55%),
+    radial-gradient(120% 100% at 100% 100%, oklch(0.89 0.19 100 / 0.05), transparent 55%);
   backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in oklab, var(--primary) 14%, color-mix(in oklab, var(--accent) 30%, var(--border)));
-  box-shadow: var(--shadow-card), inset 0 1px 0 oklch(0.95 0.16 105 / 0.08);
+  border: 1px solid color-mix(in oklab, var(--primary) 22%, color-mix(in oklab, var(--accent) 10%, var(--border)));
+  box-shadow: var(--shadow-card), inset 0 1px 0 oklch(0.86 0.13 235 / 0.10);
 }
 
 @utility btn-glow {
@@ -262,12 +262,12 @@
 }
 
 @utility neon-edge {
-  border: 1px solid color-mix(in oklab, var(--primary) 35%, color-mix(in oklab, var(--accent) 45%, transparent));
+  border: 1px solid color-mix(in oklab, var(--primary) 55%, color-mix(in oklab, var(--accent) 18%, transparent));
   box-shadow:
-    0 0 0 1px oklch(0.89 0.19 100 / 0.08),
-    0 0 28px -6px oklch(0.89 0.19 100 / 0.32),
-    0 0 28px -6px oklch(0.70 0.16 240 / 0.22),
-    inset 0 1px 0 oklch(0.95 0.16 105 / 0.12);
+    0 0 0 1px oklch(0.78 0.15 240 / 0.10),
+    0 0 28px -6px oklch(0.70 0.16 240 / 0.34),
+    0 0 28px -6px oklch(0.89 0.19 100 / 0.14),
+    inset 0 1px 0 oklch(0.86 0.13 235 / 0.14);
 }
 
 @utility hairline {
@@ -294,8 +294,8 @@
   z-index: -1;
   border-radius: inherit;
   background:
-    radial-gradient(60% 80% at 10% 0%, oklch(0.89 0.19 100 / 0.20), transparent 70%),
-    radial-gradient(50% 70% at 95% 10%, oklch(0.82 0.19 78 / 0.16), transparent 70%),
-    radial-gradient(50% 60% at 85% 95%, oklch(0.70 0.16 240 / 0.16), transparent 70%);
+    radial-gradient(60% 80% at 10% 0%, oklch(0.70 0.16 240 / 0.22), transparent 70%),
+    radial-gradient(50% 70% at 95% 10%, oklch(0.65 0.18 220 / 0.18), transparent 70%),
+    radial-gradient(50% 60% at 85% 95%, oklch(0.89 0.19 100 / 0.10), transparent 70%);
   pointer-events: none;
 }
