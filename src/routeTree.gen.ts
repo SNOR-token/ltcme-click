@@ -25,6 +25,7 @@ import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/s
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
 import { Route as AuthenticatedPqLabRouteImport } from './routes/_authenticated/pq-lab'
+import { Route as AuthenticatedMultisigRouteImport } from './routes/_authenticated/multisig'
 import { Route as AuthenticatedGuardRouteImport } from './routes/_authenticated/guard'
 import { Route as AuthenticatedEarnRouteImport } from './routes/_authenticated/earn'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
@@ -110,6 +111,11 @@ const AuthenticatedPqLabRoute = AuthenticatedPqLabRouteImport.update({
   path: '/pq-lab',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMultisigRoute = AuthenticatedMultisigRouteImport.update({
+  id: '/multisig',
+  path: '/multisig',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedGuardRoute = AuthenticatedGuardRouteImport.update({
   id: '/guard',
   path: '/guard',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/buy': typeof AuthenticatedBuyRoute
   '/earn': typeof AuthenticatedEarnRoute
   '/guard': typeof AuthenticatedGuardRoute
+  '/multisig': typeof AuthenticatedMultisigRoute
   '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/reports': typeof AuthenticatedReportsRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/buy': typeof AuthenticatedBuyRoute
   '/earn': typeof AuthenticatedEarnRoute
   '/guard': typeof AuthenticatedGuardRoute
+  '/multisig': typeof AuthenticatedMultisigRoute
   '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/reports': typeof AuthenticatedReportsRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
   '/_authenticated/earn': typeof AuthenticatedEarnRoute
   '/_authenticated/guard': typeof AuthenticatedGuardRoute
+  '/_authenticated/multisig': typeof AuthenticatedMultisigRoute
   '/_authenticated/pq-lab': typeof AuthenticatedPqLabRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/buy'
     | '/earn'
     | '/guard'
+    | '/multisig'
     | '/pq-lab'
     | '/receive'
     | '/reports'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/buy'
     | '/earn'
     | '/guard'
+    | '/multisig'
     | '/pq-lab'
     | '/receive'
     | '/reports'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/_authenticated/buy'
     | '/_authenticated/earn'
     | '/_authenticated/guard'
+    | '/_authenticated/multisig'
     | '/_authenticated/pq-lab'
     | '/_authenticated/receive'
     | '/_authenticated/reports'
@@ -401,6 +413,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPqLabRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/multisig': {
+      id: '/_authenticated/multisig'
+      path: '/multisig'
+      fullPath: '/multisig'
+      preLoaderRoute: typeof AuthenticatedMultisigRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/guard': {
       id: '/_authenticated/guard'
       path: '/guard'
@@ -444,6 +463,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
   AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
   AuthenticatedGuardRoute: typeof AuthenticatedGuardRoute
+  AuthenticatedMultisigRoute: typeof AuthenticatedMultisigRoute
   AuthenticatedPqLabRoute: typeof AuthenticatedPqLabRoute
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
@@ -459,6 +479,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
   AuthenticatedEarnRoute: AuthenticatedEarnRoute,
   AuthenticatedGuardRoute: AuthenticatedGuardRoute,
+  AuthenticatedMultisigRoute: AuthenticatedMultisigRoute,
   AuthenticatedPqLabRoute: AuthenticatedPqLabRoute,
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,

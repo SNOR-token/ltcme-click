@@ -140,6 +140,61 @@
     mask-image: radial-gradient(circle at 50% 0%, black, transparent 85%);
   }
 
+  /* Decorative background: drifting aurora orbs, diagonal light rays and a
+     fine dot constellation layered under all page content. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: -20%;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(closest-side, oklch(0.80 0.15 232 / 0.16), transparent 100%),
+      radial-gradient(closest-side, oklch(0.72 0.16 205 / 0.13), transparent 100%),
+      radial-gradient(closest-side, oklch(0.55 0.14 262 / 0.14), transparent 100%),
+      repeating-linear-gradient(
+        115deg,
+        oklch(0.90 0.11 210 / 0.045) 0px,
+        oklch(0.90 0.11 210 / 0.045) 1px,
+        transparent 1px,
+        transparent 190px
+      ),
+      radial-gradient(oklch(0.90 0.11 210 / 0.16) 1px, transparent 1px);
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat;
+    background-size:
+      52vw 52vw,
+      44vw 44vw,
+      60vw 60vw,
+      auto,
+      22px 22px;
+    background-position:
+      8% 6%,
+      88% 22%,
+      52% 96%,
+      0 0,
+      0 0;
+    animation: aurora-drift 34s ease-in-out infinite alternate;
+    opacity: 0.9;
+  }
+
+  @keyframes aurora-drift {
+    0% {
+      background-position: 8% 6%, 88% 22%, 52% 96%, 0 0, 0 0;
+    }
+    50% {
+      background-position: 20% 16%, 74% 8%, 40% 84%, 120px 0, 0 0;
+    }
+    100% {
+      background-position: 2% 22%, 94% 30%, 62% 100%, 240px 0, 0 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after {
+      animation: none;
+    }
+  }
+
   body > * {
     position: relative;
     z-index: 1;
@@ -195,4 +250,21 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted-foreground);
+}
+
+/* Soft glowing corner accent for section headers / hero blocks */
+@utility panel-decor {
+  position: relative;
+  isolation: isolate;
+}
+
+@utility panel-decor-glow {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(60% 80% at 10% 0%, oklch(0.80 0.15 232 / 0.18), transparent 70%),
+    radial-gradient(50% 70% at 95% 10%, oklch(0.72 0.16 205 / 0.14), transparent 70%);
+  pointer-events: none;
 }

@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
-import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote, Shield, Eye, FileSpreadsheet, FlaskConical, Sprout } from "lucide-react";
+import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote, Shield, Eye, FileSpreadsheet, FlaskConical, Sprout, Users } from "lucide-react";
 import { TestnetBanner, NetworkToggle } from "@/components/ProGate";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
@@ -85,6 +85,7 @@ function TopNav({ email }: { email: string | null }) {
   ] as const;
   const secondary = [
     { to: "/tx-builder", label: "AI Tx Builder", icon: Hammer },
+    { to: "/multisig", label: "Multisig", icon: Users },
     { to: "/vaults", label: "Vaults", icon: Eye },
     { to: "/reports", label: "Reports", icon: FileSpreadsheet },
     { to: "/tools", label: "Tools", icon: Wrench },
