@@ -63,7 +63,7 @@
 
 :root {
   --radius: 0.75rem;
-  /* LTCme.click — deep ink with a bright electric-yellow neon edge */
+  /* LTCme.click — deep ink with an electric yellow + baby-blue neon edge */
   --background: oklch(0.14 0.018 95);
   --foreground: oklch(0.98 0.02 100);
   --card: oklch(0.19 0.024 95);
@@ -77,8 +77,8 @@
   --secondary-foreground: oklch(0.98 0.02 100);
   --muted: oklch(0.23 0.026 95);
   --muted-foreground: oklch(0.78 0.04 98);
-  --accent: oklch(0.82 0.19 78);            /* warm amber */
-  --accent-foreground: oklch(0.16 0.03 95);
+  --accent: oklch(0.70 0.16 240);          /* baby blue */
+  --accent-foreground: oklch(0.98 0.02 100);
   --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
   --success: oklch(0.80 0.17 140);
@@ -86,9 +86,9 @@
   --input: oklch(0.22 0.026 95);
   --ring: oklch(0.89 0.19 100);
   --chart-1: oklch(0.89 0.19 100);
-  --chart-2: oklch(0.82 0.19 78);
+  --chart-2: oklch(0.70 0.16 240);         /* baby blue */
   --chart-3: oklch(0.95 0.16 105);
-  --chart-4: oklch(0.70 0.17 62);
+  --chart-4: oklch(0.65 0.18 220);         /* deeper blue */
   --chart-5: oklch(0.86 0.17 120);
   --sidebar: oklch(0.12 0.016 95);
   --sidebar-foreground: oklch(0.98 0.02 100);
@@ -99,14 +99,16 @@
   --sidebar-border: oklch(0.33 0.05 95);
   --sidebar-ring: oklch(0.89 0.19 100);
 
-  --gradient-primary: linear-gradient(135deg, oklch(0.89 0.19 100), oklch(0.82 0.19 78));
+  --gradient-primary: linear-gradient(135deg, oklch(0.89 0.19 100), oklch(0.70 0.16 240));
   --gradient-hero:
     radial-gradient(900px 600px at 12% -10%, oklch(0.89 0.19 100 / 0.22), transparent 70%),
     radial-gradient(700px 500px at 95% 8%, oklch(0.82 0.19 78 / 0.16), transparent 70%),
-    radial-gradient(800px 700px at 50% 110%, oklch(0.86 0.17 120 / 0.14), transparent 70%),
+    radial-gradient(800px 700px at 50% 110%, oklch(0.70 0.16 240 / 0.18), transparent 70%),
+    radial-gradient(600px 500px at 80% 90%, oklch(0.65 0.18 220 / 0.14), transparent 70%),
     linear-gradient(180deg, oklch(0.14 0.018 95), oklch(0.09 0.014 95));
-  --grid-line: oklch(0.89 0.19 100 / 0.07);
-  --shadow-glow: 0 0 0 1px oklch(0.89 0.19 100 / 0.40), 0 0 30px oklch(0.89 0.19 100 / 0.30);
+  --grid-line: oklch(0.70 0.16 240 / 0.10);
+  --shadow-glow: 0 0 0 1px oklch(0.89 0.19 100 / 0.35), 0 0 30px oklch(0.89 0.19 100 / 0.25);
+  --shadow-glow-blue: 0 0 0 1px oklch(0.70 0.16 240 / 0.40), 0 0 30px oklch(0.70 0.16 240 / 0.30);
   --shadow-card: 0 20px 50px -24px oklch(0.06 0.02 95 / 0.9);
 }
 
@@ -142,8 +144,8 @@
     mask-image: radial-gradient(circle at 50% 0%, black, transparent 85%);
   }
 
-  /* Decorative background: drifting aurora orbs, diagonal light rays and a
-     fine dot constellation layered under all page content. */
+  /* Decorative background: drifting yellow + blue aurora orbs, crossing light
+     rays and a fine dot constellation layered under all page content. */
   body::after {
     content: "";
     position: fixed;
@@ -153,7 +155,8 @@
     background-image:
       radial-gradient(closest-side, oklch(0.89 0.19 100 / 0.20), transparent 100%),
       radial-gradient(closest-side, oklch(0.82 0.19 78 / 0.16), transparent 100%),
-      radial-gradient(closest-side, oklch(0.86 0.17 120 / 0.14), transparent 100%),
+      radial-gradient(closest-side, oklch(0.70 0.16 240 / 0.18), transparent 100%),
+      radial-gradient(closest-side, oklch(0.65 0.18 220 / 0.14), transparent 100%),
       repeating-linear-gradient(
         115deg,
         oklch(0.95 0.16 105 / 0.05) 0px,
@@ -163,17 +166,26 @@
       ),
       repeating-linear-gradient(
         -60deg,
-        oklch(0.82 0.19 78 / 0.035) 0px,
-        oklch(0.82 0.19 78 / 0.035) 1px,
+        oklch(0.70 0.16 240 / 0.045) 0px,
+        oklch(0.70 0.16 240 / 0.045) 1px,
         transparent 1px,
         transparent 96px
       ),
-      radial-gradient(oklch(0.95 0.16 105 / 0.18) 1px, transparent 1px);
-    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, repeat;
+      repeating-linear-gradient(
+        35deg,
+        oklch(0.82 0.19 78 / 0.03) 0px,
+        oklch(0.82 0.19 78 / 0.03) 1px,
+        transparent 1px,
+        transparent 140px
+      ),
+      radial-gradient(oklch(0.70 0.16 240 / 0.22) 1px, transparent 1px);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat, repeat, repeat;
     background-size:
       52vw 52vw,
       44vw 44vw,
-      60vw 60vw,
+      58vw 58vw,
+      46vw 46vw,
+      auto,
       auto,
       auto,
       22px 22px;
@@ -181,6 +193,8 @@
       8% 6%,
       88% 22%,
       52% 96%,
+      110% 78%,
+      0 0,
       0 0,
       0 0,
       0 0;
@@ -190,13 +204,13 @@
 
   @keyframes aurora-drift {
     0% {
-      background-position: 8% 6%, 88% 22%, 52% 96%, 0 0, 0 0, 0 0;
+      background-position: 8% 6%, 88% 22%, 52% 96%, 110% 78%, 0 0, 0 0, 0 0, 0 0;
     }
     50% {
-      background-position: 20% 16%, 74% 8%, 40% 84%, 120px 0, -60px 0, 0 0;
+      background-position: 20% 16%, 74% 8%, 40% 84%, 96% 64%, 120px 0, -60px 0, 80px 0, 0 0;
     }
     100% {
-      background-position: 2% 22%, 94% 30%, 62% 100%, 240px 0, -120px 0, 0 0;
+      background-position: 2% 22%, 94% 30%, 62% 100%, 84% 88%, 240px 0, -120px 0, 160px 0, 0 0;
     }
   }
 
@@ -217,7 +231,7 @@
   }
 
   ::selection {
-    background: oklch(0.89 0.19 100 / 0.35);
+    background: oklch(0.80 0.14 210 / 0.40);
     color: oklch(0.16 0.03 95);
   }
 }
@@ -230,14 +244,16 @@
 }
 
 @utility card-glass {
-  background: linear-gradient(
+  background:
+    linear-gradient(
       160deg,
       color-mix(in oklab, var(--card) 88%, transparent),
       color-mix(in oklab, var(--background) 88%, transparent)
     ),
-    radial-gradient(120% 100% at 0% 0%, oklch(0.89 0.19 100 / 0.07), transparent 60%);
+    radial-gradient(120% 100% at 0% 0%, oklch(0.89 0.19 100 / 0.07), transparent 55%),
+    radial-gradient(120% 100% at 100% 100%, oklch(0.70 0.16 240 / 0.08), transparent 55%);
   backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in oklab, var(--primary) 18%, var(--border));
+  border: 1px solid color-mix(in oklab, var(--primary) 14%, color-mix(in oklab, var(--accent) 30%, var(--border)));
   box-shadow: var(--shadow-card), inset 0 1px 0 oklch(0.95 0.16 105 / 0.08);
 }
 
@@ -246,11 +262,12 @@
 }
 
 @utility neon-edge {
-  border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, color-mix(in oklab, var(--accent) 45%, transparent));
   box-shadow:
-    0 0 0 1px oklch(0.89 0.19 100 / 0.10),
-    0 0 26px -6px oklch(0.89 0.19 100 / 0.40),
-    inset 0 1px 0 oklch(0.95 0.16 105 / 0.16);
+    0 0 0 1px oklch(0.89 0.19 100 / 0.08),
+    0 0 28px -6px oklch(0.89 0.19 100 / 0.32),
+    0 0 28px -6px oklch(0.70 0.16 240 / 0.22),
+    inset 0 1px 0 oklch(0.95 0.16 105 / 0.12);
 }
 
 @utility hairline {
@@ -278,6 +295,7 @@
   border-radius: inherit;
   background:
     radial-gradient(60% 80% at 10% 0%, oklch(0.89 0.19 100 / 0.20), transparent 70%),
-    radial-gradient(50% 70% at 95% 10%, oklch(0.82 0.19 78 / 0.16), transparent 70%);
+    radial-gradient(50% 70% at 95% 10%, oklch(0.82 0.19 78 / 0.16), transparent 70%),
+    radial-gradient(50% 60% at 85% 95%, oklch(0.70 0.16 240 / 0.16), transparent 70%);
   pointer-events: none;
 }
