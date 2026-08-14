@@ -120,7 +120,7 @@ function RootGate() {
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
             Creating wallets, sending, receiving, buying and checking your wallet status are free forever, and
             never expire. Quantum Guard Pro ($4.99/mo, $9.99/3mo, $19.99/yr) adds the agent and the monitoring
-            around it. Everything Pro does is free on testnet, so you can try it all before paying.
+            around it. Every new account starts with a 3-day free trial of everything Pro does.
           </p>
           <div className="mt-5">
             <ProValueGrid />

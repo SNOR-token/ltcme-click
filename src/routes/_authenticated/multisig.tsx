@@ -92,7 +92,7 @@ function MultisigPage() {
 
 // ------------------------------------------------------------------ wallets
 
-function WalletsTab({ wallets, network }: { wallets: MultisigWallet[]; network: "mainnet" | "testnet" }) {
+function WalletsTab({ wallets, network }: { wallets: MultisigWallet[]; network: "mainnet" }) {
   const [name, setName] = useState("");
   const [m, setM] = useState(2);
   const [script, setScript] = useState<MultisigScript>("p2wsh");

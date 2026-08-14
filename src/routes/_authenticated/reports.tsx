@@ -76,7 +76,7 @@ function ReportsPage() {
   );
 }
 
-function ReportBuilder({ network }: { network: "mainnet" | "testnet" }) {
+function ReportBuilder({ network }: { network: "mainnet" }) {
   const { entries } = useWatchList(network);
   const [rows, setRows] = useState<AddrRow[]>([]);
   const [labels, setLabels] = useState<Record<string, string>>({});

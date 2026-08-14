@@ -67,41 +67,38 @@ export const Route = createFileRoute("/api/chat")({
           return new Response(SECRET_REFUSAL, { status: 422 });
         }
 
-        // AuthZ / quota: atomically enforce free-message limit + subscription
-        // before streaming a paid model response.
-        const FREE_LIMIT = 5;
+        // AuthZ / quota: 3-day free trial, then an active subscription is
+        // required. Enforced server-side before streaming a paid response.
+        const TRIAL_MS = 3 * 24 * 60 * 60 * 1000;
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const nowIso = new Date().toISOString();
         const { data: subs } = await supabaseAdmin
           .from("subscriptions")
-          .select("current_period_end")
+          .select("status,current_period_end")
           .eq("user_id", userId)
           .eq("status", "active");
         const hasActiveSub = (subs || []).some(
           (s: { current_period_end: string | null }) =>
             !s.current_period_end || new Date(s.current_period_end).getTime() > Date.now(),
         );
+        await supabaseAdmin
+          .from("ai_usage")
+          .upsert({ user_id: userId }, { onConflict: "user_id", ignoreDuplicates: true });
         const { data: usage } = await supabaseAdmin
           .from("ai_usage")
-          .select("free_messages_used,total_messages")
+          .select("total_messages,trial_started_at")
           .eq("user_id", userId)
           .maybeSingle();
-        const freeUsed = usage?.free_messages_used ?? 0;
         const total = usage?.total_messages ?? 0;
-        if (!hasActiveSub && freeUsed >= FREE_LIMIT) {
-          return new Response("Free message limit reached. Subscribe to continue.", { status: 402 });
+        const trialStart = usage?.trial_started_at ? new Date(usage.trial_started_at).getTime() : Date.now();
+        const inTrial = Date.now() < trialStart + TRIAL_MS;
+        if (!hasActiveSub && !inTrial) {
+          return new Response("Your 3-day free trial has ended. Subscribe to continue.", { status: 402 });
         }
         const { error: upsertErr } = await supabaseAdmin
           .from("ai_usage")
-          .upsert(
-            {
-              user_id: userId,
-              free_messages_used: hasActiveSub ? freeUsed : freeUsed + 1,
-              total_messages: total + 1,
-              updated_at: nowIso,
-            },
-            { onConflict: "user_id" },
-          );
+          .update({ total_messages: total + 1, updated_at: nowIso })
+          .eq("user_id", userId);
         if (upsertErr) {
           return new Response("Could not record usage", { status: 500 });
         }

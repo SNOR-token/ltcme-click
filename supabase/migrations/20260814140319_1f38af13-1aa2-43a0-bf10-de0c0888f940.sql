@@ -1,0 +1,1 @@
+ALTER TABLE public.ai_usage ADD COLUMN IF NOT EXISTS trial_started_at timestamptz NOT NULL DEFAULT now();
