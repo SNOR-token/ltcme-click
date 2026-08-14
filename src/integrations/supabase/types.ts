@@ -18,18 +18,21 @@ export type Database = {
         Row: {
           free_messages_used: number
           total_messages: number
+          trial_started_at: string
           updated_at: string
           user_id: string
         }
         Insert: {
           free_messages_used?: number
           total_messages?: number
+          trial_started_at?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           free_messages_used?: number
           total_messages?: number
+          trial_started_at?: string
           updated_at?: string
           user_id?: string
         }
