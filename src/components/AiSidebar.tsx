@@ -9,11 +9,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function AiSidebar() {
   const [entitlement, setEntitlement] = useState<{
-    freeUsed: number;
-    freeLimit: number;
     hasActiveSub: boolean;
+    inTrial: boolean;
+    trialDaysLeft: number;
     canSend: boolean;
   } | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const refresh = useServerFn(getAiEntitlement);
   const consume = useServerFn(consumeAiMessage);
 
@@ -32,7 +33,7 @@ export function AiSidebar() {
   const { messages, sendMessage, status } = useChat({
     id: "sidebar-chat",
     transport: transport.current,
-    onError: (e) => console.error("chat error", e),
+    onError: (e) => setError(e.message || "The assistant could not respond. Please try again."),
   });
 
   useEffect(() => {
@@ -42,7 +43,13 @@ export function AiSidebar() {
       if (!data.session) return; // don't call protected fn while signed out
       try {
         const r = await refresh();
-        if (!cancelled) setEntitlement(r);
+        if (!cancelled)
+          setEntitlement({
+            hasActiveSub: r.hasActiveSub,
+            inTrial: r.inTrial,
+            trialDaysLeft: r.trialDaysLeft,
+            canSend: r.canSend,
+          });
       } catch {
         /* ignore */
       }
@@ -63,12 +70,12 @@ export function AiSidebar() {
   async function submit() {
     const text = input.trim();
     if (!text || busy) return;
+    setError(null);
     const r = await consume();
     if (!r.ok) {
-      setEntitlement((e) => e && { ...e, canSend: false });
+      setEntitlement((e) => e && { ...e, canSend: false, inTrial: false });
       return;
     }
-    setEntitlement((e) => e && { ...e, freeUsed: r.freeUsed, canSend: e.hasActiveSub || r.freeUsed < r.freeLimit });
     setInput("");
     sendMessage({ text });
   }
@@ -110,12 +117,17 @@ export function AiSidebar() {
           </div>
 
           <div className="border-t border-border p-3 space-y-2">
-            {entitlement && !entitlement.hasActiveSub && (
+            {entitlement && !entitlement.hasActiveSub && entitlement.inTrial && (
               <div className="text-[11px] text-muted-foreground">
-                {Math.max(0, entitlement.freeLimit - entitlement.freeUsed)} of {entitlement.freeLimit} free messages left
+                Free trial — {entitlement.trialDaysLeft} {entitlement.trialDaysLeft === 1 ? "day" : "days"} left
               </div>
             )}
-            {!(entitlement && !entitlement.canSend && !entitlement.hasActiveSub) && (
+            {error && (
+              <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-[11px] text-destructive">
+                {error}
+              </div>
+            )}
+            {!(entitlement && !entitlement.canSend) && (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -139,7 +151,12 @@ export function AiSidebar() {
                 </button>
               </form>
             )}
-            {entitlement && !entitlement.hasActiveSub && <PlansInline compact />}
+            {entitlement && !entitlement.canSend && (
+              <div className="text-[11px] text-muted-foreground">
+                Your 3-day free trial has ended. Subscribe to keep the AI column.
+              </div>
+            )}
+            {entitlement && !entitlement.hasActiveSub && !entitlement.inTrial && <PlansInline compact />}
             <p className="text-[10px] text-muted-foreground text-center">Never share your seed phrase with anyone.</p>
           </div>
     </aside>
