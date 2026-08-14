@@ -3,13 +3,22 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
 import { Wallet, Send, Download, Wrench, Hammer, LogOut, Banknote, Shield, Eye, FileSpreadsheet, FlaskConical, Sprout, Users } from "lucide-react";
-import { NetworkToggle } from "@/components/ProGate";
+import { NetworkToggle, TrialBadge } from "@/components/ProGate";
+import { useProAccess, TRIAL_DAYS, PRO_EXPIRED_MESSAGE } from "@/lib/pro";
+import { PlansInline } from "@/components/PlansInline";
+import { ProValueGrid } from "@/components/ProValue";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
 });
 
+/** Routes that require an active trial or subscription. */
+const PRO_ROUTES = ["/tx-builder", "/multisig", "/vaults", "/reports", "/pq-lab", "/earn", "/ai"];
+
 function Shell() {
   const navigate = useNavigate();
+  const pro = useProAccess();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const gated = PRO_ROUTES.some((r) => pathname.startsWith(r));
   const [ready, setReady] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
 
@@ -40,9 +49,9 @@ function Shell() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <TopNav email={email} />
+      <TopNav email={email} pro={pro} />
       <main className="flex-1 min-w-0">
-        <Outlet />
+        {gated && !pro.loading && !pro.pro ? <ProRouteLock /> : <Outlet />}
       </main>
       <LegalFooter />
     </div>
@@ -71,7 +80,22 @@ function LegalFooter() {
   );
 }
 
-function TopNav({ email }: { email: string | null }) {
+function ProRouteLock() {
+  return (
+    <div className="max-w-3xl mx-auto px-6 py-12 space-y-5">
+      <span className="eyebrow">Quantum Guard Pro</span>
+      <h1 className="text-2xl font-bold">This is a Pro feature</h1>
+      <p className="text-sm text-muted-foreground">{PRO_EXPIRED_MESSAGE}</p>
+      <ProValueGrid />
+      <PlansInline />
+      <p className="text-[11px] text-muted-foreground">
+        Every account includes {TRIAL_DAYS} days of full access. Your wallet, sending, receiving and buying stay free forever.
+      </p>
+    </div>
+  );
+}
+
+function TopNav({ email, pro }: { email: string | null; pro: ReturnType<typeof useProAccess> }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const tabs = [
@@ -116,6 +140,7 @@ function TopNav({ email }: { email: string | null }) {
             );
           })}
         </nav>
+        <TrialBadge state={pro} />
         <NetworkToggle />
         <div className="hidden md:flex flex-col items-end leading-tight">
           <button
