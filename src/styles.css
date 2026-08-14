@@ -231,13 +231,14 @@
 
 @utility card-glass {
   background: linear-gradient(
-    160deg,
-    color-mix(in oklab, var(--card) 88%, transparent),
-    color-mix(in oklab, var(--background) 88%, transparent)
-  );
+      160deg,
+      color-mix(in oklab, var(--card) 88%, transparent),
+      color-mix(in oklab, var(--background) 88%, transparent)
+    ),
+    radial-gradient(120% 100% at 0% 0%, oklch(0.89 0.19 100 / 0.07), transparent 60%);
   backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in oklab, var(--primary) 14%, var(--border));
-  box-shadow: var(--shadow-card);
+  border: 1px solid color-mix(in oklab, var(--primary) 18%, var(--border));
+  box-shadow: var(--shadow-card), inset 0 1px 0 oklch(0.95 0.16 105 / 0.08);
 }
 
 @utility btn-glow {
