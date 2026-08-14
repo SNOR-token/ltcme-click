@@ -1,35 +1,62 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const FREE_LIMIT = 5;
+/** Length of the free trial that unlocks the AI column + advanced features. */
+export const TRIAL_DAYS = 3;
+
+function trialEnd(startedAt: string | null | undefined): number {
+  const start = startedAt ? new Date(startedAt).getTime() : Date.now();
+  return start + TRIAL_DAYS * 24 * 60 * 60 * 1000;
+}
+
+/** Creates the usage row (and therefore starts the trial clock) exactly once. */
+async function ensureUsageRow(userId: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin
+    .from("ai_usage")
+    .upsert({ user_id: userId }, { onConflict: "user_id", ignoreDuplicates: true });
+  const { data } = await supabaseAdmin
+    .from("ai_usage")
+    .select("free_messages_used,total_messages,trial_started_at")
+    .eq("user_id", userId)
+    .maybeSingle();
+  return data as
+    | { free_messages_used: number; total_messages: number; trial_started_at: string }
+    | null;
+}
+
+async function hasActiveSubscription(supabase: any, userId: string) {
+  const { data: subs } = await supabase
+    .from("subscriptions")
+    .select("status,current_period_end")
+    .eq("user_id", userId);
+  const all = subs || [];
+  const now = Date.now();
+  const active = all.some(
+    (s: any) =>
+      s.status === "active" &&
+      (!s.current_period_end || new Date(s.current_period_end).getTime() > now),
+  );
+  return { active, everSubscribed: all.length > 0 };
+}
 
 export const getAiEntitlement = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data: usage } = await supabase
-      .from("ai_usage")
-      .select("free_messages_used,total_messages")
-      .eq("user_id", userId)
-      .maybeSingle();
-    const { data: subs } = await supabase
-      .from("subscriptions")
-      .select("tier,status,current_period_end");
-    const now = Date.now();
-    const all = subs || [];
-    const active = all.some(
-      (s: any) =>
-        s.status === "active" &&
-        (!s.current_period_end || new Date(s.current_period_end).getTime() > now),
-    );
+    const usage = await ensureUsageRow(userId);
+    const { active, everSubscribed } = await hasActiveSubscription(supabase, userId);
+    const trialEndsAt = trialEnd(usage?.trial_started_at);
+    const inTrial = !active && Date.now() < trialEndsAt;
     return {
-      freeUsed: usage?.free_messages_used ?? 0,
-      freeLimit: FREE_LIMIT,
       totalMessages: usage?.total_messages ?? 0,
       hasActiveSub: active,
-      everSubscribed: all.length > 0,
-      canSend:
-        active || (usage?.free_messages_used ?? 0) < FREE_LIMIT,
+      everSubscribed,
+      inTrial,
+      trialEndsAt,
+      trialDaysLeft: Math.max(0, Math.ceil((trialEndsAt - Date.now()) / 86400000)),
+      trialExpired: !active && Date.now() >= trialEndsAt,
+      canSend: active || inTrial,
     };
   });
 
@@ -37,36 +64,20 @@ export const consumeAiMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data: subs } = await supabase
-      .from("subscriptions")
-      .select("current_period_end")
-      .eq("user_id", userId)
-      .eq("status", "active");
-    const active = (subs || []).some(
-      (s: any) => !s.current_period_end || new Date(s.current_period_end).getTime() > Date.now(),
-    );
-    const { data: current } = await supabase
-      .from("ai_usage")
-      .select("free_messages_used,total_messages")
-      .eq("user_id", userId)
-      .maybeSingle();
-    const freeUsed = current?.free_messages_used ?? 0;
-    const total = current?.total_messages ?? 0;
-    if (!active && freeUsed >= FREE_LIMIT) {
-      return { ok: false as const, reason: "free_limit" };
+    const usage = await ensureUsageRow(userId);
+    const { active } = await hasActiveSubscription(supabase, userId);
+    const trialEndsAt = trialEnd(usage?.trial_started_at);
+    const inTrial = !active && Date.now() < trialEndsAt;
+    if (!active && !inTrial) {
+      return { ok: false as const, reason: "trial_ended" as const };
     }
-    // Upsert
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin
       .from("ai_usage")
-      .upsert(
-        {
-          user_id: userId,
-          free_messages_used: active ? freeUsed : freeUsed + 1,
-          total_messages: total + 1,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" },
-      );
-    return { ok: true as const, freeUsed: active ? freeUsed : freeUsed + 1, freeLimit: FREE_LIMIT };
+      .update({
+        total_messages: (usage?.total_messages ?? 0) + 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", userId);
+    return { ok: true as const, hasActiveSub: active, inTrial };
   });
