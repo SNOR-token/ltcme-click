@@ -8,34 +8,16 @@ const getEnv = (key: string): string => {
 
 export type StripeEnv = "sandbox" | "live";
 
-const GATEWAY_STRIPE_BASE = "https://connector-gateway.lovable.dev/stripe";
-
-export function getConnectionApiKey(env: StripeEnv): string {
+export function getStripeSecretKey(env: StripeEnv): string {
   return env === "sandbox"
-    ? getEnv("STRIPE_SANDBOX_API_KEY")
-    : getEnv("STRIPE_LIVE_API_KEY");
+    ? getEnv("STRIPE_SANDBOX_SECRET_KEY")
+    : getEnv("STRIPE_LIVE_SECRET_KEY");
 }
 
 export function createStripeClient(env: StripeEnv): Stripe {
-  const connectionApiKey = getConnectionApiKey(env);
-  const lovableApiKey = getEnv("LOVABLE_API_KEY");
-
-  return new Stripe(connectionApiKey, {
+  return new Stripe(getStripeSecretKey(env), {
     apiVersion: "2026-03-25.dahlia",
-    httpClient: Stripe.createFetchHttpClient((input, init) => {
-      const stripeUrl = input instanceof Request ? input.url : input.toString();
-      const gatewayUrl = stripeUrl.replace("https://api.stripe.com", GATEWAY_STRIPE_BASE);
-      return fetch(gatewayUrl, {
-        ...init,
-        headers: {
-          ...Object.fromEntries(
-            new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined)).entries(),
-          ),
-          "X-Connection-Api-Key": connectionApiKey,
-          "Lovable-API-Key": lovableApiKey,
-        },
-      });
-    }),
+    httpClient: Stripe.createFetchHttpClient(),
   });
 }
 
@@ -77,7 +59,8 @@ export async function verifyWebhook(
     if (key === "t") timestamp = value;
     if (key === "v1") v1Signatures.push(value);
   }
-  if (!timestamp || v1Signatures.length === 0) throw new Error("Invalid signature format");
+  if (!timestamp || v1Signatures.length === 0)
+    throw new Error("Invalid signature format");
 
   const age = Math.abs(Date.now() / 1000 - Number(timestamp));
   if (age > 300) throw new Error("Webhook timestamp too old");
@@ -95,7 +78,8 @@ export async function verifyWebhook(
     new TextEncoder().encode(`${timestamp}.${body}`),
   );
   const expected = Buffer.from(new Uint8Array(signed)).toString("hex");
-  if (!v1Signatures.includes(expected)) throw new Error("Invalid webhook signature");
+  if (!v1Signatures.includes(expected))
+    throw new Error("Invalid webhook signature");
 
   return JSON.parse(body);
 }
