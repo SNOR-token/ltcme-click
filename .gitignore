@@ -16,9 +16,15 @@ dist-ssr
 .nitro
 *.local
 
+# Environment files must stay local or in the deployment provider.
+.env
+.env.*
+!.env.example
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
+supabase/.temp/
 
 # Editor directories and files
 .vscode/*
