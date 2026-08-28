@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createAiProvider, getAiModelName } from "@/lib/ai-provider.server";
 import { createClient } from "@supabase/supabase-js";
 import {
   AGENT_SAFETY_PROMPT,
@@ -51,26 +51,33 @@ export const Route = createFileRoute("/api/chat")({
           auth: { persistSession: false, autoRefreshToken: false },
           global: { headers: { Authorization: authHeader } },
         });
-        const { data: userData, error: userErr } = await userClient.auth.getUser();
+        const { data: userData, error: userErr } =
+          await userClient.auth.getUser();
         if (userErr || !userData.user) {
           return new Response("Unauthorized", { status: 401 });
         }
         const userId = userData.user.id;
 
         const body = (await request.json()) as { messages?: UIMessage[] };
-        if (!Array.isArray(body.messages)) return new Response("bad request", { status: 400 });
+        if (!Array.isArray(body.messages))
+          return new Response("bad request", { status: 400 });
 
         // Deterministic agent-safety gate: refuse before the model ever sees
         // anything resembling a recovery phrase, private key or password.
         const latest = body.messages[body.messages.length - 1];
-        if (latest && latest.role === "user" && containsSecretMaterial(messageText(latest))) {
+        if (
+          latest &&
+          latest.role === "user" &&
+          containsSecretMaterial(messageText(latest))
+        ) {
           return new Response(SECRET_REFUSAL, { status: 422 });
         }
 
         // AuthZ / quota: 3-day free trial, then an active subscription is
         // required. Enforced server-side before streaming a paid response.
         const TRIAL_MS = 3 * 24 * 60 * 60 * 1000;
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { supabaseAdmin } =
+          await import("@/integrations/supabase/client.server");
         const nowIso = new Date().toISOString();
         const { data: subs } = await supabaseAdmin
           .from("subscriptions")
@@ -79,21 +86,30 @@ export const Route = createFileRoute("/api/chat")({
           .eq("status", "active");
         const hasActiveSub = (subs || []).some(
           (s: { current_period_end: string | null }) =>
-            !s.current_period_end || new Date(s.current_period_end).getTime() > Date.now(),
+            !s.current_period_end ||
+            new Date(s.current_period_end).getTime() > Date.now(),
         );
         await supabaseAdmin
           .from("ai_usage")
-          .upsert({ user_id: userId }, { onConflict: "user_id", ignoreDuplicates: true });
+          .upsert(
+            { user_id: userId },
+            { onConflict: "user_id", ignoreDuplicates: true },
+          );
         const { data: usage } = await supabaseAdmin
           .from("ai_usage")
           .select("total_messages,trial_started_at")
           .eq("user_id", userId)
           .maybeSingle();
         const total = usage?.total_messages ?? 0;
-        const trialStart = usage?.trial_started_at ? new Date(usage.trial_started_at).getTime() : Date.now();
+        const trialStart = usage?.trial_started_at
+          ? new Date(usage.trial_started_at).getTime()
+          : Date.now();
         const inTrial = Date.now() < trialStart + TRIAL_MS;
         if (!hasActiveSub && !inTrial) {
-          return new Response("Your 3-day free trial has ended. Subscribe to continue.", { status: 402 });
+          return new Response(
+            "Your 3-day free trial has ended. Subscribe to continue.",
+            { status: 402 },
+          );
         }
         const { error: upsertErr } = await supabaseAdmin
           .from("ai_usage")
@@ -103,16 +119,18 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Could not record usage", { status: 500 });
         }
 
-        const key = process.env.LOVABLE_API_KEY;
-        if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
-        const gateway = createLovableAiGatewayProvider(key);
-        const model = gateway("google/gemini-2.5-flash");
+        const key = process.env.AI_API_KEY;
+        if (!key) return new Response("Missing AI_API_KEY", { status: 500 });
+        const provider = createAiProvider(key);
+        const model = provider(getAiModelName());
         const result = streamText({
           model,
           system: FULL_SYSTEM,
           messages: await convertToModelMessages(body.messages),
         });
-        return result.toUIMessageStreamResponse({ originalMessages: body.messages });
+        return result.toUIMessageStreamResponse({
+          originalMessages: body.messages,
+        });
       },
     },
   },
