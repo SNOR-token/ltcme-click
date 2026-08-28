@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { EmailAuth } from "@/components/EmailAuth";
 import { LogoMark } from "./index";
-import { PacmanBanner } from "@/components/Pacman";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -29,7 +28,6 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <PacmanBanner />
       <div className="flex-1 flex items-center justify-center px-6 py-10">
         <div className="card-glass rounded-3xl p-10 max-w-md w-full text-center">
           <div className="flex justify-center mb-6">
@@ -52,7 +50,6 @@ function AuthPage() {
           </p>
         </div>
       </div>
-      <PacmanBanner />
       <footer className="px-6 py-4 text-[11px] text-muted-foreground flex items-center justify-between flex-wrap gap-2 border-t border-border/40">
         <span>© 2026 LTCme.click</span>
         <span className="flex items-center gap-4">
