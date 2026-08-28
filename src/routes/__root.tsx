@@ -88,7 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         {
           name: "description",
           content:
-            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
+            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
         },
         { name: "author", content: "LTCme.click" },
         {
@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         {
           property: "og:description",
           content:
-            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
+            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
         },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
@@ -111,7 +111,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         {
           name: "twitter:description",
           content:
-            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
+            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
         },
         {
           property: "og:image",
