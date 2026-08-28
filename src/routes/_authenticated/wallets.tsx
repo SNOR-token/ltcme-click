@@ -94,7 +94,7 @@ function WalletsPage() {
           <QuickLink to="/guard" icon={<Shield className="h-4 w-4" />} label="Wallet health" />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Next step: check your wallet health in Quantum Guard, and use a fresh receive address for each payment.{" "}
+          Next step: use a fresh receive address for each payment.{" "}
           <Link to="/guard" className="text-primary hover:underline">Learn more</Link>
         </p>
       </section>
