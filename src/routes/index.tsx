@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { EmailAuth } from "@/components/EmailAuth";
-import { PacmanBanner } from "@/components/Pacman";
 import { Wallet, Send, ShieldCheck, Bot, Banknote, Sprout } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -52,7 +51,6 @@ function RootGate() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <PacmanBanner compact />
       <main className="flex-1 px-6 py-12 max-w-6xl w-full mx-auto">
         <div className="grid gap-10 md:grid-cols-2 md:items-center">
           <section className="text-foreground">
@@ -123,7 +121,6 @@ function RootGate() {
           </p>
         </section>
       </main>
-      <PacmanBanner compact />
       <footer className="px-6 py-4 text-[11px] text-muted-foreground flex items-center justify-between flex-wrap gap-2 border-t border-border/40">
         <span>© 2026 LTCme.click</span>
         <span className="flex items-center gap-4">

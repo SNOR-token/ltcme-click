@@ -13,7 +13,6 @@ import { type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { Toaster } from "sonner";
 import { AiSidebar } from "@/components/AiSidebar";
-import { PacmanBanner } from "@/components/Pacman";
 
 ensureBuffer();
 
@@ -181,7 +180,6 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <div className="md:pr-[30%]">
-        <PacmanBanner compact />
         <Outlet />
       </div>
       <AiSidebar />
