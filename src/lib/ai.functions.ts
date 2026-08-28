@@ -1,15 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-/** Length of the free trial that unlocks the AI column + advanced features. */
-export const TRIAL_DAYS = 3;
+/** Free AI messages every account gets before a subscription is required. */
+export const FREE_MESSAGES = 5;
 
-function trialEnd(startedAt: string | null | undefined): number {
-  const start = startedAt ? new Date(startedAt).getTime() : Date.now();
-  return start + TRIAL_DAYS * 24 * 60 * 60 * 1000;
-}
-
-/** Creates the usage row (and therefore starts the trial clock) exactly once. */
+/** Creates the usage row exactly once. */
 async function ensureUsageRow(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   await supabaseAdmin
@@ -17,12 +12,10 @@ async function ensureUsageRow(userId: string) {
     .upsert({ user_id: userId }, { onConflict: "user_id", ignoreDuplicates: true });
   const { data } = await supabaseAdmin
     .from("ai_usage")
-    .select("free_messages_used,total_messages,trial_started_at")
+    .select("free_messages_used,total_messages")
     .eq("user_id", userId)
     .maybeSingle();
-  return data as
-    | { free_messages_used: number; total_messages: number; trial_started_at: string }
-    | null;
+  return data as { free_messages_used: number; total_messages: number } | null;
 }
 
 async function hasActiveSubscription(supabase: any, userId: string) {
@@ -46,17 +39,14 @@ export const getAiEntitlement = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const usage = await ensureUsageRow(userId);
     const { active, everSubscribed } = await hasActiveSubscription(supabase, userId);
-    const trialEndsAt = trialEnd(usage?.trial_started_at);
-    const inTrial = !active && Date.now() < trialEndsAt;
+    const used = usage?.free_messages_used ?? 0;
+    const freeRemaining = Math.max(0, FREE_MESSAGES - used);
     return {
       totalMessages: usage?.total_messages ?? 0,
       hasActiveSub: active,
       everSubscribed,
-      inTrial,
-      trialEndsAt,
-      trialDaysLeft: Math.max(0, Math.ceil((trialEndsAt - Date.now()) / 86400000)),
-      trialExpired: !active && Date.now() >= trialEndsAt,
-      canSend: active || inTrial,
+      freeRemaining,
+      canSend: active || freeRemaining > 0,
     };
   });
 
@@ -66,18 +56,22 @@ export const consumeAiMessage = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const usage = await ensureUsageRow(userId);
     const { active } = await hasActiveSubscription(supabase, userId);
-    const trialEndsAt = trialEnd(usage?.trial_started_at);
-    const inTrial = !active && Date.now() < trialEndsAt;
-    if (!active && !inTrial) {
-      return { ok: false as const, reason: "trial_ended" as const };
+    const used = usage?.free_messages_used ?? 0;
+    if (!active && used >= FREE_MESSAGES) {
+      return { ok: false as const, reason: "free_limit" as const, freeRemaining: 0 };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin
       .from("ai_usage")
       .update({
+        free_messages_used: active ? used : used + 1,
         total_messages: (usage?.total_messages ?? 0) + 1,
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", userId);
-    return { ok: true as const, hasActiveSub: active, inTrial };
+    return {
+      ok: true as const,
+      hasActiveSub: active,
+      freeRemaining: active ? FREE_MESSAGES : Math.max(0, FREE_MESSAGES - (used + 1)),
+    };
   });
