@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
-import { Wallet, Send, Download, Wrench, LogOut, Banknote, Sprout, Users } from "lucide-react";
+import { Wallet, Send, Download, Wrench, LogOut, Banknote, Users } from "lucide-react";
 import { NetworkToggle } from "@/components/ProGate";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
@@ -79,9 +79,6 @@ function TopNav({ email }: { email: string | null }) {
     { to: "/send", label: "Send", icon: Send },
     { to: "/receive", label: "Receive", icon: Download },
     { to: "/buy", label: "Buy / Sell", icon: Banknote },
-    { to: "/earn", label: "Earn", icon: Sprout },
-  ] as const;
-  const secondary = [
     { to: "/multisig", label: "Multisig", icon: Users },
     { to: "/tools", label: "Tools", icon: Wrench },
   ] as const;
@@ -112,6 +109,16 @@ function TopNav({ email }: { email: string | null }) {
           })}
         </nav>
         <NetworkToggle />
+        <button
+          onClick={async () => {
+            await supabase.auth.signOut();
+            navigate({ to: "/auth" });
+          }}
+          aria-label="Sign out"
+          className="md:hidden inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <LogOut className="h-3.5 w-3.5" /> Sign out
+        </button>
         <div className="hidden md:flex flex-col items-end leading-tight">
           <button
             onClick={async () => {
@@ -123,35 +130,6 @@ function TopNav({ email }: { email: string | null }) {
             <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
           {email && <span className="text-[10px] text-muted-foreground/70 truncate max-w-[180px]">{email}</span>}
-        </div>
-      </div>
-      <div className="px-4 md:px-6 pb-2 flex items-center gap-1 flex-wrap">
-        <span className="eyebrow mr-1">Advanced</span>
-        {secondary.map(({ to, label, icon: Icon }) => {
-          const active = pathname.startsWith(to);
-          return (
-            <Link
-              key={to}
-              to={to}
-              className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] transition ${
-                active ? "text-primary bg-primary/10" : "text-muted-foreground/80 hover:text-foreground"
-              }`}
-            >
-              <Icon className="h-3 w-3" />
-              {label}
-            </Link>
-          );
-        })}
-        <div className="md:hidden ml-auto flex items-center gap-2">
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              navigate({ to: "/auth" });
-            }}
-            className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="h-3 w-3" /> Sign out
-          </button>
         </div>
       </div>
     </header>

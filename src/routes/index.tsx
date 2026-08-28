@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { EmailAuth } from "@/components/EmailAuth";
-import { Wallet, Send, ShieldCheck, Bot, Banknote, Sprout } from "lucide-react";
+import { Wallet, Send, ShieldCheck, Bot, Banknote } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: RootGate,
@@ -12,14 +12,14 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "A friendly self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
+          "A friendly self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
       },
       { property: "og:title", content: "LTCme.click — Agentic Litecoin Wallet with a built-in AI" },
       { property: "og:url", content: "https://ltcme.click/" },
       {
         property: "og:description",
         content:
-          "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
+          "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
       },
     ],
     links: [{ rel: "canonical", href: "https://ltcme.click/" }],
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
+            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
         }),
       },
     ],
@@ -75,7 +75,6 @@ function RootGate() {
                 { icon: Send, t: "Send & receive", d: "Live mainnet balances, fee estimates and address validation." },
                 { icon: Banknote, t: "Buy & cash out", d: "Card on-ramps and off-ramps to a debit card via vetted partners." },
                 { icon: ShieldCheck, t: "Self-custody", d: "Keys are generated and stored in your browser. We never see them." },
-                { icon: Sprout, t: "Earn", d: "Compare vetted third-party LTC yield. Litecoin has no native staking." },
                 { icon: Bot, t: "Agentic AI", d: "Always-on Litecoin agent. It can never see keys or move funds." },
               ].map((f) => (
                 <div key={f.t} className="rounded-xl card-glass p-3.5">
@@ -115,7 +114,7 @@ function RootGate() {
           <span className="eyebrow">Free vs Pro</span>
           <h2 className="mt-2 text-2xl font-bold">The wallet is free. Pro is unlimited AI.</h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-            Creating wallets, sending, receiving, buying, multisig and Earn research are free forever.
+            Creating wallets, sending, receiving, buying and multisig are free forever.
             Every account gets 5 free AI messages; after that, unlimited AI is $4.99/mo, $9.99/3mo or
             $19.99/yr, payable by card or with Litecoin.
           </p>

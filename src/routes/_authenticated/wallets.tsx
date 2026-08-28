@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, KeyRound, Eye, Trash2, Copy, Wallet as WalletIcon, RefreshCw, Send, Download, Bot, Sprout, Shield } from "lucide-react";
+import { Plus, KeyRound, Eye, Trash2, Copy, Wallet as WalletIcon, RefreshCw, Send, Download, Bot, Shield } from "lucide-react";
 import { formatLtc } from "@/lib/ltc/network";
 import { loadStore, upsertWallet, removeWallet, type StoredWallet } from "@/lib/ltc/storage";
 import { getBalances } from "@/lib/ltc/api";
@@ -90,7 +90,6 @@ function WalletsPage() {
           <QuickLink to="/send" icon={<Send className="h-4 w-4" />} label="Send" primary />
           <QuickLink to="/receive" icon={<Download className="h-4 w-4" />} label="Receive" />
           <QuickLink to="/ai" icon={<Bot className="h-4 w-4" />} label="Ask AI" />
-          <QuickLink to="/earn" icon={<Sprout className="h-4 w-4" />} label="Explore Earn" />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
           Next step: use a fresh receive address for each payment.

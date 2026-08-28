@@ -18,7 +18,6 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
-import { Route as AuthenticatedEarnRouteImport } from './routes/_authenticated/earn'
 import { Route as AuthenticatedMultisigRouteImport } from './routes/_authenticated/multisig'
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
@@ -71,11 +70,6 @@ const AuthenticatedBuyRoute = AuthenticatedBuyRouteImport.update({
   path: '/buy',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedEarnRoute = AuthenticatedEarnRouteImport.update({
-  id: '/earn',
-  path: '/earn',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedMultisigRoute = AuthenticatedMultisigRouteImport.update({
   id: '/multisig',
   path: '/multisig',
@@ -122,7 +116,6 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
-  '/earn': typeof AuthenticatedEarnRoute
   '/multisig': typeof AuthenticatedMultisigRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
@@ -140,7 +133,6 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
-  '/earn': typeof AuthenticatedEarnRoute
   '/multisig': typeof AuthenticatedMultisigRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
@@ -160,7 +152,6 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
-  '/_authenticated/earn': typeof AuthenticatedEarnRoute
   '/_authenticated/multisig': typeof AuthenticatedMultisigRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
   '/_authenticated/send': typeof AuthenticatedSendRoute
@@ -180,7 +171,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai'
     | '/buy'
-    | '/earn'
     | '/multisig'
     | '/receive'
     | '/send'
@@ -198,7 +188,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai'
     | '/buy'
-    | '/earn'
     | '/multisig'
     | '/receive'
     | '/send'
@@ -217,7 +206,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/ai'
     | '/_authenticated/buy'
-    | '/_authenticated/earn'
     | '/_authenticated/multisig'
     | '/_authenticated/receive'
     | '/_authenticated/send'
@@ -304,13 +292,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/earn': {
-      id: '/_authenticated/earn'
-      path: '/earn'
-      fullPath: '/earn'
-      preLoaderRoute: typeof AuthenticatedEarnRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/multisig': {
       id: '/_authenticated/multisig'
       path: '/multisig'
@@ -366,7 +347,6 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
-  AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
   AuthenticatedMultisigRoute: typeof AuthenticatedMultisigRoute
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
@@ -377,7 +357,6 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
-  AuthenticatedEarnRoute: AuthenticatedEarnRoute,
   AuthenticatedMultisigRoute: AuthenticatedMultisigRoute,
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
   AuthenticatedSendRoute: AuthenticatedSendRoute,
