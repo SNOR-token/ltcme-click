@@ -17,7 +17,7 @@ export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "https://ltcme.click/auth",
+        redirectTo: `${window.location.origin}/auth`,
       },
     });
     if (error) {

@@ -4,8 +4,6 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
 
-const SUPABASE_PROJECT_REF = "sddeayzumvkdmdgqetyz";
-
 export default defineConfig(({ mode }) => {
   const env = { ...loadEnv(mode, process.cwd(), ""), ...process.env };
   const supabaseUrl = env.VITE_SUPABASE_URL?.trim();
@@ -18,17 +16,10 @@ export default defineConfig(({ mode }) => {
     );
   }
 
-  let supabaseHost: string;
   try {
-    supabaseHost = new URL(supabaseUrl).hostname;
+    new URL(supabaseUrl);
   } catch {
     throw new Error("VITE_SUPABASE_URL must be a valid HTTPS URL.");
-  }
-
-  if (supabaseHost !== `${SUPABASE_PROJECT_REF}.supabase.co`) {
-    throw new Error(
-      `VITE_SUPABASE_URL must point to the LTCme production project ${SUPABASE_PROJECT_REF}.`,
-    );
   }
 
   return {
