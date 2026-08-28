@@ -36,3 +36,7 @@ supabase/.temp/
 *.njsproj
 *.sln
 *.sw?
+
+# Local AI coding-agent tools
+.agents/
+skills-lock.json
