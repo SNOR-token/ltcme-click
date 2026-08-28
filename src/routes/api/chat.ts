@@ -73,9 +73,9 @@ export const Route = createFileRoute("/api/chat")({
           return new Response(SECRET_REFUSAL, { status: 422 });
         }
 
-        // AuthZ / quota: 3-day free trial, then an active subscription is
+        // AuthZ / quota: 5 free messages, then an active subscription is
         // required. Enforced server-side before streaming a paid response.
-        const TRIAL_MS = 3 * 24 * 60 * 60 * 1000;
+        const FREE_MESSAGES = 5;
         const { supabaseAdmin } =
           await import("@/integrations/supabase/client.server");
         const nowIso = new Date().toISOString();
@@ -97,23 +97,24 @@ export const Route = createFileRoute("/api/chat")({
           );
         const { data: usage } = await supabaseAdmin
           .from("ai_usage")
-          .select("total_messages,trial_started_at")
+          .select("total_messages,free_messages_used")
           .eq("user_id", userId)
           .maybeSingle();
         const total = usage?.total_messages ?? 0;
-        const trialStart = usage?.trial_started_at
-          ? new Date(usage.trial_started_at).getTime()
-          : Date.now();
-        const inTrial = Date.now() < trialStart + TRIAL_MS;
-        if (!hasActiveSub && !inTrial) {
+        const freeUsed = usage?.free_messages_used ?? 0;
+        if (!hasActiveSub && freeUsed >= FREE_MESSAGES) {
           return new Response(
-            "Your 3-day free trial has ended. Subscribe to continue.",
+            "You've used your 5 free AI messages. Subscribe to continue.",
             { status: 402 },
           );
         }
         const { error: upsertErr } = await supabaseAdmin
           .from("ai_usage")
-          .update({ total_messages: total + 1, updated_at: nowIso })
+          .update({
+            total_messages: total + 1,
+            free_messages_used: hasActiveSub ? freeUsed : freeUsed + 1,
+            updated_at: nowIso,
+          })
           .eq("user_id", userId);
         if (upsertErr) {
           return new Response("Could not record usage", { status: 500 });

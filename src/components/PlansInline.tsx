@@ -38,12 +38,11 @@ export function PlansInline({ compact = false }: { compact?: boolean }) {
       )}
       <div className="flex items-center gap-2 text-xs text-primary">
         <Sparkles className="h-3.5 w-3.5" />
-        <span className="font-medium">Unlock Quantum Guard Pro</span>
+        <span className="font-medium">Unlock unlimited LTCme AI</span>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Pro adds four things: unlimited wallet-aware AI, continuous monitoring &amp; alerts, quantum migration
-        planning, and Earn intelligence + reports. Your free wallet never stops working. 3 days free.
-        Pay by card or with Litecoin.
+        Every account gets 5 free AI messages. Pro removes the limit — unlimited wallet-aware Litecoin AI on
+        every page. Your free wallet never stops working. Pay by card or with Litecoin.
       </p>
       <div className={compact ? "grid grid-cols-3 gap-1.5" : "grid grid-cols-1 sm:grid-cols-3 gap-2"}>
         {PLANS.map((p) => {

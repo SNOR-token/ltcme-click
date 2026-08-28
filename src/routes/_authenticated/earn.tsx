@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Sprout, AlertTriangle, ExternalLink, Bot, Info } from "lucide-react";
-import { useProAccess } from "@/lib/pro";
-import { ProLock, ProExpiredNotice, NetworkToggle } from "@/components/ProGate";
+import { NetworkToggle } from "@/components/ProGate";
 import {
   OPPORTUNITIES,
   RISK_PREFERENCES,
@@ -27,7 +26,6 @@ export const Route = createFileRoute("/_authenticated/earn")({
 });
 
 function EarnPage() {
-  const pro = useProAccess();
   const [pref, setPref] = useState<RiskPreference>("balanced");
   const list = useMemo(
     () => filterByRisk(OPPORTUNITIES, pref).slice().sort((a, b) => netYield(b) - netYield(a)),
@@ -53,8 +51,6 @@ function EarnPage() {
         <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
         <p className="text-sm text-muted-foreground">{EARN_DISCLAIMER}</p>
       </div>
-
-      <ProExpiredNotice state={pro} />
 
       <section className="rounded-2xl border border-border bg-card/50 p-5 space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -145,25 +141,6 @@ function EarnPage() {
         </p>
       </section>
 
-      <ProLock
-        state={pro}
-        title="Agentic Earn assistant"
-        purpose="A read-only assistant that searches approved providers, filters out anything outside your risk preference, explains the best fits in plain language, estimates net earnings, prepares a deposit or withdrawal plan and monitors positions you already hold."
-        unlocks={[
-          "Automatic comparison across approved providers",
-          "Filtering by your risk preference",
-          "Estimated net earnings after all known fees",
-          "Deposit and withdrawal plans you review and approve",
-          "Monitoring and alerts when rates, risks or withdrawal terms change",
-        ]}
-        preview={
-          <div>
-            Sample: “At Balanced risk, two options clear your bar. Nexo pays ~4% with no bridging but takes custody;
-            THORChain pays more but adds impermanent-loss risk. On 2 LTC over 12 months, Nexo nets roughly 0.075 LTC
-            after fees.”
-          </div>
-        }
-      >
         <section className="rounded-2xl border border-border bg-card/50 p-5 space-y-3">
           <div className="flex items-center gap-2">
             <Bot className="h-4 w-4 text-primary" />
@@ -186,7 +163,6 @@ function EarnPage() {
             The assistant compares, explains and prepares — you always review and approve every transaction yourself.
           </p>
         </section>
-      </ProLock>
     </div>
   );
 }

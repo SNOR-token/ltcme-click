@@ -10,8 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function AiSidebar() {
   const [entitlement, setEntitlement] = useState<{
     hasActiveSub: boolean;
-    inTrial: boolean;
-    trialDaysLeft: number;
+    freeRemaining: number;
     canSend: boolean;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,8 +45,7 @@ export function AiSidebar() {
         if (!cancelled)
           setEntitlement({
             hasActiveSub: r.hasActiveSub,
-            inTrial: r.inTrial,
-            trialDaysLeft: r.trialDaysLeft,
+            freeRemaining: r.freeRemaining,
             canSend: r.canSend,
           });
       } catch {
@@ -73,7 +71,7 @@ export function AiSidebar() {
     setError(null);
     const r = await consume();
     if (!r.ok) {
-      setEntitlement((e) => e && { ...e, canSend: false, inTrial: false });
+      setEntitlement((e) => e && { ...e, canSend: false, freeRemaining: 0 });
       return;
     }
     setInput("");
@@ -117,9 +115,9 @@ export function AiSidebar() {
           </div>
 
           <div className="border-t border-border p-3 space-y-2">
-            {entitlement && !entitlement.hasActiveSub && entitlement.inTrial && (
+            {entitlement && !entitlement.hasActiveSub && entitlement.freeRemaining > 0 && (
               <div className="text-[11px] text-muted-foreground">
-                Free trial — {entitlement.trialDaysLeft} {entitlement.trialDaysLeft === 1 ? "day" : "days"} left
+                {entitlement.freeRemaining} free {entitlement.freeRemaining === 1 ? "message" : "messages"} left
               </div>
             )}
             {error && (
@@ -153,10 +151,10 @@ export function AiSidebar() {
             )}
             {entitlement && !entitlement.canSend && (
               <div className="text-[11px] text-muted-foreground">
-                Your 3-day free trial has ended. Subscribe to keep the AI column.
+You've used your 5 free messages. Subscribe for unlimited AI.
               </div>
             )}
-            {entitlement && !entitlement.hasActiveSub && !entitlement.inTrial && <PlansInline compact />}
+            {entitlement && !entitlement.hasActiveSub && entitlement.freeRemaining === 0 && <PlansInline compact />}
             <p className="text-[10px] text-muted-foreground text-center">Never share your seed phrase with anyone.</p>
           </div>
     </aside>

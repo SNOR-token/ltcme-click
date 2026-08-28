@@ -19,15 +19,10 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
 import { Route as AuthenticatedEarnRouteImport } from './routes/_authenticated/earn'
-import { Route as AuthenticatedGuardRouteImport } from './routes/_authenticated/guard'
 import { Route as AuthenticatedMultisigRouteImport } from './routes/_authenticated/multisig'
-import { Route as AuthenticatedPqLabRouteImport } from './routes/_authenticated/pq-lab'
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
-import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
 import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated/tools'
-import { Route as AuthenticatedTxBuilderRouteImport } from './routes/_authenticated/tx-builder'
-import { Route as AuthenticatedVaultsRouteImport } from './routes/_authenticated/vaults'
 import { Route as AuthenticatedWalletsRouteImport } from './routes/_authenticated/wallets'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -81,29 +76,14 @@ const AuthenticatedEarnRoute = AuthenticatedEarnRouteImport.update({
   path: '/earn',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedGuardRoute = AuthenticatedGuardRouteImport.update({
-  id: '/guard',
-  path: '/guard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedMultisigRoute = AuthenticatedMultisigRouteImport.update({
   id: '/multisig',
   path: '/multisig',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedPqLabRoute = AuthenticatedPqLabRouteImport.update({
-  id: '/pq-lab',
-  path: '/pq-lab',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedReceiveRoute = AuthenticatedReceiveRouteImport.update({
   id: '/receive',
   path: '/receive',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSendRoute = AuthenticatedSendRouteImport.update({
@@ -114,16 +94,6 @@ const AuthenticatedSendRoute = AuthenticatedSendRouteImport.update({
 const AuthenticatedToolsRoute = AuthenticatedToolsRouteImport.update({
   id: '/tools',
   path: '/tools',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedTxBuilderRoute = AuthenticatedTxBuilderRouteImport.update({
-  id: '/tx-builder',
-  path: '/tx-builder',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedVaultsRoute = AuthenticatedVaultsRouteImport.update({
-  id: '/vaults',
-  path: '/vaults',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedWalletsRoute = AuthenticatedWalletsRouteImport.update({
@@ -153,15 +123,10 @@ export interface FileRoutesByFullPath {
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
   '/earn': typeof AuthenticatedEarnRoute
-  '/guard': typeof AuthenticatedGuardRoute
   '/multisig': typeof AuthenticatedMultisigRoute
-  '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
-  '/reports': typeof AuthenticatedReportsRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
-  '/tx-builder': typeof AuthenticatedTxBuilderRoute
-  '/vaults': typeof AuthenticatedVaultsRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -176,15 +141,10 @@ export interface FileRoutesByTo {
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
   '/earn': typeof AuthenticatedEarnRoute
-  '/guard': typeof AuthenticatedGuardRoute
   '/multisig': typeof AuthenticatedMultisigRoute
-  '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
-  '/reports': typeof AuthenticatedReportsRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
-  '/tx-builder': typeof AuthenticatedTxBuilderRoute
-  '/vaults': typeof AuthenticatedVaultsRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -201,15 +161,10 @@ export interface FileRoutesById {
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
   '/_authenticated/earn': typeof AuthenticatedEarnRoute
-  '/_authenticated/guard': typeof AuthenticatedGuardRoute
   '/_authenticated/multisig': typeof AuthenticatedMultisigRoute
-  '/_authenticated/pq-lab': typeof AuthenticatedPqLabRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
-  '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/send': typeof AuthenticatedSendRoute
   '/_authenticated/tools': typeof AuthenticatedToolsRoute
-  '/_authenticated/tx-builder': typeof AuthenticatedTxBuilderRoute
-  '/_authenticated/vaults': typeof AuthenticatedVaultsRoute
   '/_authenticated/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -226,15 +181,10 @@ export interface FileRouteTypes {
     | '/ai'
     | '/buy'
     | '/earn'
-    | '/guard'
     | '/multisig'
-    | '/pq-lab'
     | '/receive'
-    | '/reports'
     | '/send'
     | '/tools'
-    | '/tx-builder'
-    | '/vaults'
     | '/wallets'
     | '/api/chat'
     | '/api/public/payments/webhook'
@@ -249,15 +199,10 @@ export interface FileRouteTypes {
     | '/ai'
     | '/buy'
     | '/earn'
-    | '/guard'
     | '/multisig'
-    | '/pq-lab'
     | '/receive'
-    | '/reports'
     | '/send'
     | '/tools'
-    | '/tx-builder'
-    | '/vaults'
     | '/wallets'
     | '/api/chat'
     | '/api/public/payments/webhook'
@@ -273,15 +218,10 @@ export interface FileRouteTypes {
     | '/_authenticated/ai'
     | '/_authenticated/buy'
     | '/_authenticated/earn'
-    | '/_authenticated/guard'
     | '/_authenticated/multisig'
-    | '/_authenticated/pq-lab'
     | '/_authenticated/receive'
-    | '/_authenticated/reports'
     | '/_authenticated/send'
     | '/_authenticated/tools'
-    | '/_authenticated/tx-builder'
-    | '/_authenticated/vaults'
     | '/_authenticated/wallets'
     | '/api/chat'
     | '/api/public/payments/webhook'
@@ -371,13 +311,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEarnRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/guard': {
-      id: '/_authenticated/guard'
-      path: '/guard'
-      fullPath: '/guard'
-      preLoaderRoute: typeof AuthenticatedGuardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/multisig': {
       id: '/_authenticated/multisig'
       path: '/multisig'
@@ -385,25 +318,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMultisigRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/pq-lab': {
-      id: '/_authenticated/pq-lab'
-      path: '/pq-lab'
-      fullPath: '/pq-lab'
-      preLoaderRoute: typeof AuthenticatedPqLabRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/receive': {
       id: '/_authenticated/receive'
       path: '/receive'
       fullPath: '/receive'
       preLoaderRoute: typeof AuthenticatedReceiveRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/reports': {
-      id: '/_authenticated/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/send': {
@@ -418,20 +337,6 @@ declare module '@tanstack/react-router' {
       path: '/tools'
       fullPath: '/tools'
       preLoaderRoute: typeof AuthenticatedToolsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/tx-builder': {
-      id: '/_authenticated/tx-builder'
-      path: '/tx-builder'
-      fullPath: '/tx-builder'
-      preLoaderRoute: typeof AuthenticatedTxBuilderRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/vaults': {
-      id: '/_authenticated/vaults'
-      path: '/vaults'
-      fullPath: '/vaults'
-      preLoaderRoute: typeof AuthenticatedVaultsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/wallets': {
@@ -462,15 +367,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
   AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
-  AuthenticatedGuardRoute: typeof AuthenticatedGuardRoute
   AuthenticatedMultisigRoute: typeof AuthenticatedMultisigRoute
-  AuthenticatedPqLabRoute: typeof AuthenticatedPqLabRoute
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
-  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
   AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
-  AuthenticatedTxBuilderRoute: typeof AuthenticatedTxBuilderRoute
-  AuthenticatedVaultsRoute: typeof AuthenticatedVaultsRoute
   AuthenticatedWalletsRoute: typeof AuthenticatedWalletsRoute
 }
 
@@ -478,15 +378,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
   AuthenticatedEarnRoute: AuthenticatedEarnRoute,
-  AuthenticatedGuardRoute: AuthenticatedGuardRoute,
   AuthenticatedMultisigRoute: AuthenticatedMultisigRoute,
-  AuthenticatedPqLabRoute: AuthenticatedPqLabRoute,
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
-  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSendRoute: AuthenticatedSendRoute,
   AuthenticatedToolsRoute: AuthenticatedToolsRoute,
-  AuthenticatedTxBuilderRoute: AuthenticatedTxBuilderRoute,
-  AuthenticatedVaultsRoute: AuthenticatedVaultsRoute,
   AuthenticatedWalletsRoute: AuthenticatedWalletsRoute,
 }
 

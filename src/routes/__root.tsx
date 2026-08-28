@@ -84,35 +84,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
           title:
-            "LTCme.click — The Agentic Litecoin & Post-Quantum-Ready Wallet",
+            "LTCme.click — The Agentic Litecoin Wallet",
         },
         {
           name: "description",
           content:
-            "Securing your financial future. Self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
+            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
         },
         { name: "author", content: "LTCme.click" },
         {
           property: "og:title",
           content:
-            "LTCme.click — The Agentic Litecoin & Post-Quantum-Ready Wallet",
+            "LTCme.click — The Agentic Litecoin Wallet",
         },
         {
           property: "og:description",
           content:
-            "Securing your financial future. Self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
+            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
         },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
         {
           name: "twitter:title",
           content:
-            "LTCme.click — The Agentic Litecoin & Post-Quantum-Ready Wallet",
+            "LTCme.click — The Agentic Litecoin Wallet",
         },
         {
           name: "twitter:description",
           content:
-            "Securing your financial future. Self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
+            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
         },
         {
           property: "og:image",
