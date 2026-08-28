@@ -91,11 +91,9 @@ function WalletsPage() {
           <QuickLink to="/receive" icon={<Download className="h-4 w-4" />} label="Receive" />
           <QuickLink to="/ai" icon={<Bot className="h-4 w-4" />} label="Ask AI" />
           <QuickLink to="/earn" icon={<Sprout className="h-4 w-4" />} label="Explore Earn" />
-          <QuickLink to="/guard" icon={<Shield className="h-4 w-4" />} label="Wallet health" />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Next step: use a fresh receive address for each payment.{" "}
-          <Link to="/guard" className="text-primary hover:underline">Learn more</Link>
+          Next step: use a fresh receive address for each payment.
         </p>
       </section>
 

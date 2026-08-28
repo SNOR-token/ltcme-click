@@ -28,7 +28,7 @@ function AiPage() {
     onError: (e) => setError(e.message || "The assistant could not respond. Please try again."),
   });
   const [input, setInput] = useState("");
-  const [entitlement, setEntitlement] = useState<{ hasActiveSub: boolean; inTrial: boolean; trialDaysLeft: number; canSend: boolean } | null>(null);
+  const [entitlement, setEntitlement] = useState<{ hasActiveSub: boolean; freeRemaining: number; canSend: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const refresh = useServerFn(getAiEntitlement);
   const consume = useServerFn(consumeAiMessage);
@@ -37,7 +37,7 @@ function AiPage() {
 
   useEffect(() => {
     refresh()
-      .then((r) => setEntitlement({ hasActiveSub: r.hasActiveSub, inTrial: r.inTrial, trialDaysLeft: r.trialDaysLeft, canSend: r.canSend }))
+      .then((r) => setEntitlement({ hasActiveSub: r.hasActiveSub, freeRemaining: r.freeRemaining, canSend: r.canSend }))
       .catch(() => {});
   }, [refresh]);
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }); }, [messages]);
@@ -47,7 +47,7 @@ function AiPage() {
     if (!text || busy) return;
     setError(null);
     const r = await consume();
-    if (!r.ok) { setEntitlement((e) => e && { ...e, canSend: false, inTrial: false }); return; }
+    if (!r.ok) { setEntitlement((e) => e && { ...e, canSend: false, freeRemaining: 0 }); return; }
     setInput("");
     sendMessage({ text });
   }
@@ -68,10 +68,10 @@ function AiPage() {
           <div className="text-xs text-muted-foreground">
             {entitlement.hasActiveSub ? (
               <span className="text-primary">Unlimited</span>
-            ) : entitlement.inTrial ? (
-              <span>Free trial — {entitlement.trialDaysLeft} {entitlement.trialDaysLeft === 1 ? "day" : "days"} left</span>
+            ) : entitlement.freeRemaining > 0 ? (
+              <span>{entitlement.freeRemaining} free {entitlement.freeRemaining === 1 ? "message" : "messages"} left</span>
             ) : (
-              <span>Trial ended</span>
+              <span>Free messages used</span>
             )}
           </div>
         )}
@@ -106,7 +106,7 @@ function AiPage() {
             </button>
           </form>
         )}
-        {entitlement && !entitlement.hasActiveSub && !entitlement.inTrial && <PlansInline />}
+        {entitlement && !entitlement.hasActiveSub && entitlement.freeRemaining === 0 && <PlansInline />}
       </div>
     </div>
   );

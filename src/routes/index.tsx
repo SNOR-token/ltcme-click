@@ -3,25 +3,24 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { EmailAuth } from "@/components/EmailAuth";
 import { PacmanBanner } from "@/components/Pacman";
-import { ProValueGrid } from "@/components/ProValue";
 import { Wallet, Send, ShieldCheck, Bot, Banknote, Sprout } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: RootGate,
   head: () => ({
     meta: [
-      { title: "LTCme.click — Agentic Litecoin & Post-Quantum-Ready Wallet" },
+      { title: "LTCme.click — Agentic Litecoin Wallet with a built-in AI" },
       {
         name: "description",
         content:
-          "Securing your financial future. A friendly self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
+          "A friendly self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
       },
-      { property: "og:title", content: "LTCme.click — Agentic Litecoin & Post-Quantum-Ready Wallet" },
+      { property: "og:title", content: "LTCme.click — Agentic Litecoin Wallet with a built-in AI" },
       { property: "og:url", content: "https://ltcme.click/" },
       {
         property: "og:description",
         content:
-          "Securing your financial future. Self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
+          "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
       },
     ],
     links: [{ rel: "canonical", href: "https://ltcme.click/" }],
@@ -36,7 +35,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "Securing your financial future. Self-custody Litecoin wallet with an AI security partner, Quantum Guard and Earn tools.",
+            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and Earn tools.",
         }),
       },
     ],
@@ -63,9 +62,9 @@ function RootGate() {
             </div>
             <span className="eyebrow">Self-custody · Litecoin only</span>
             <h1 className="mt-3 text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]">
-              The Agentic Litecoin &amp;<br className="hidden md:block" /> Post-Quantum-Ready Wallet
+              The Agentic<br className="hidden md:block" /> Litecoin Wallet
             </h1>
-            <p className="mt-3 text-lg font-medium gradient-text">Securing your financial future.</p>
+            <p className="mt-3 text-lg font-medium gradient-text">Your Litecoin, your keys, with an AI beside you.</p>
             <p className="mt-5 text-base text-muted-foreground leading-relaxed">
               LTCme.click is a real Litecoin wallet you fully control. Keys are generated and stored
               in your browser — never on our servers. An always-on AI agent sits beside every screen
@@ -77,7 +76,7 @@ function RootGate() {
                 { icon: Wallet, t: "Unlimited wallets", d: "Create or import BIP39 seeds and WIF keys. BIP44, BIP49 and BIP84 addresses." },
                 { icon: Send, t: "Send & receive", d: "Live mainnet balances, fee estimates and address validation." },
                 { icon: Banknote, t: "Buy & cash out", d: "Card on-ramps and off-ramps to a debit card via vetted partners." },
-                { icon: ShieldCheck, t: "Quantum Guard", d: "Plain-language wallet health: Protected, Needs Attention or Higher Exposure." },
+                { icon: ShieldCheck, t: "Self-custody", d: "Keys are generated and stored in your browser. We never see them." },
                 { icon: Sprout, t: "Earn", d: "Compare vetted third-party LTC yield. Litecoin has no native staking." },
                 { icon: Bot, t: "Agentic AI", d: "Always-on Litecoin agent. It can never see keys or move funds." },
               ].map((f) => (
@@ -115,19 +114,12 @@ function RootGate() {
         </div>
 
         <section className="mt-16">
-          <span className="eyebrow">Free vs Quantum Guard Pro</span>
-          <h2 className="mt-2 text-2xl font-bold">The wallet is free. Pro is the intelligence layer.</h2>
+          <span className="eyebrow">Free vs Pro</span>
+          <h2 className="mt-2 text-2xl font-bold">The wallet is free. Pro is unlimited AI.</h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-            Creating wallets, sending, receiving, buying and checking your wallet status are free forever, and
-            never expire. Quantum Guard Pro ($4.99/mo, $9.99/3mo, $19.99/yr) adds the agent and the monitoring
-            around it. Every new account starts with a 3-day free trial of everything Pro does.
-          </p>
-          <div className="mt-5">
-            <ProValueGrid />
-          </div>
-          <p className="mt-4 text-[11px] text-muted-foreground max-w-2xl">
-            Post-quantum-ready means LTCme helps you reduce key-exposure today and experiment with post-quantum
-            signatures in the PQ Lab. Litecoin mainnet transactions themselves are not post-quantum protected yet.
+            Creating wallets, sending, receiving, buying, multisig and Earn research are free forever.
+            Every account gets 5 free AI messages; after that, unlimited AI is $4.99/mo, $9.99/3mo or
+            $19.99/yr, payable by card or with Litecoin.
           </p>
         </section>
       </main>
