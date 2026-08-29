@@ -2,8 +2,16 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
-import { Wallet, Send, Download, Wrench, LogOut, Banknote, Users } from "lucide-react";
+import { Wallet, Send, Download, Wrench, LogOut, Banknote, Users, ChevronDown, MoreHorizontal } from "lucide-react";
 import { NetworkToggle } from "@/components/ProGate";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
 });
@@ -74,14 +82,24 @@ function LegalFooter() {
 function TopNav({ email }: { email: string | null }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const tabs = [
-    { to: "/wallets", label: "Wallet", icon: Wallet },
+
+  // Wallet stays as the primary visible tab; everything else folds into "More".
+  const moreTabs = [
     { to: "/send", label: "Send", icon: Send },
     { to: "/receive", label: "Receive", icon: Download },
     { to: "/buy", label: "Buy / Sell", icon: Banknote },
     { to: "/multisig", label: "Multisig", icon: Users },
     { to: "/tools", label: "Tools", icon: Wrench },
   ] as const;
+
+  const walletActive = pathname.startsWith("/wallets");
+  const moreActive = moreTabs.some((t) => pathname.startsWith(t.to));
+  const activeMore = moreTabs.find((t) => pathname.startsWith(t.to));
+
+  function signOut() {
+    supabase.auth.signOut().then(() => navigate({ to: "/auth" }));
+  }
+
   return (
     <header className="sticky top-0 z-20 hairline bg-background/80 backdrop-blur-xl">
       <div className="px-4 md:px-6 py-2.5 flex items-center gap-3">
@@ -89,31 +107,60 @@ function TopNav({ email }: { email: string | null }) {
           <LogoMark />
           <span className="font-semibold tracking-tight hidden sm:inline">LTCme<span className="text-primary">.click</span></span>
         </Link>
-        <nav className="flex-1 flex items-center gap-1 flex-wrap min-w-0">
-          {tabs.map(({ to, label, icon: Icon }) => {
-            const active = pathname.startsWith(to);
-            return (
-              <Link
-                key={to}
-                to={to}
+        <nav className="flex-1 flex items-center gap-1.5 min-w-0">
+          <Link
+            to="/wallets"
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap ${
+              walletActive
+                ? "bg-primary/15 text-primary neon-edge"
+                : "text-muted-foreground hover:text-foreground hover:bg-card/60"
+            }`}
+          >
+            <Wallet className="h-4 w-4" />
+            Wallet
+          </Link>
+
+          {/* "More" dropdown: collapses the remaining tabs */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap ${
-                  active
+                  moreActive
                     ? "bg-primary/15 text-primary neon-edge"
                     : "text-muted-foreground hover:text-foreground hover:bg-card/60"
                 }`}
               >
-                <Icon className="h-4 w-4" />
-                {label}
-              </Link>
-            );
-          })}
+                {activeMore ? <activeMore.icon className="h-4 w-4" /> : <MoreHorizontal className="h-4 w-4" />}
+                <span>{activeMore ? activeMore.label : "More"}</span>
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuLabel>Wallet tools</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {moreTabs.map(({ to, label, icon: Icon }) => {
+                const active = pathname.startsWith(to);
+                return (
+                  <DropdownMenuItem key={to} asChild>
+                    <Link
+                      to={to}
+                      className={`flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer ${
+                        active ? "text-primary" : "text-foreground"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {label}
+                    </Link>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
+
         <NetworkToggle />
         <button
-          onClick={async () => {
-            await supabase.auth.signOut();
-            navigate({ to: "/auth" });
-          }}
+          onClick={signOut}
           aria-label="Sign out"
           className="md:hidden inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
         >
@@ -121,10 +168,7 @@ function TopNav({ email }: { email: string | null }) {
         </button>
         <div className="hidden md:flex flex-col items-end leading-tight">
           <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              navigate({ to: "/auth" });
-            }}
+            onClick={signOut}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <LogOut className="h-3.5 w-3.5" /> Sign out

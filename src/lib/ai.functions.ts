@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /** Free AI messages every account gets before a subscription is required. */
-export const FREE_MESSAGES = 5;
+export const FREE_MESSAGES = 10;
 
 /** Creates the usage row exactly once. */
 async function ensureUsageRow(userId: string) {
@@ -46,6 +46,7 @@ export const getAiEntitlement = createServerFn({ method: "GET" })
       hasActiveSub: active,
       everSubscribed,
       freeRemaining,
+      freeLimit: FREE_MESSAGES,
       canSend: active || freeRemaining > 0,
     };
   });
@@ -58,7 +59,7 @@ export const consumeAiMessage = createServerFn({ method: "POST" })
     const { active } = await hasActiveSubscription(supabase, userId);
     const used = usage?.free_messages_used ?? 0;
     if (!active && used >= FREE_MESSAGES) {
-      return { ok: false as const, reason: "free_limit" as const, freeRemaining: 0 };
+      return { ok: false as const, reason: "free_limit" as const, freeRemaining: 0, freeLimit: FREE_MESSAGES };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin
@@ -73,5 +74,6 @@ export const consumeAiMessage = createServerFn({ method: "POST" })
       ok: true as const,
       hasActiveSub: active,
       freeRemaining: active ? FREE_MESSAGES : Math.max(0, FREE_MESSAGES - (used + 1)),
+      freeLimit: FREE_MESSAGES,
     };
   });

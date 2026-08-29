@@ -1,18 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { Sparkles, Send, Loader2, ShieldCheck } from "lucide-react";
+import { Sparkles, Send, Loader2, ShieldCheck, Lock } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getAiEntitlement, consumeAiMessage } from "@/lib/ai.functions";
 import { PlansInline } from "@/components/PlansInline";
 import { supabase } from "@/integrations/supabase/client";
 
+type Entitlement = {
+  hasActiveSub: boolean;
+  freeRemaining: number;
+  freeLimit: number;
+  canSend: boolean;
+};
+
 export function AiSidebar() {
-  const [entitlement, setEntitlement] = useState<{
-    hasActiveSub: boolean;
-    freeRemaining: number;
-    canSend: boolean;
-  } | null>(null);
+  const [entitlement, setEntitlement] = useState<Entitlement | null>(null);
   const [error, setError] = useState<string | null>(null);
   const refresh = useServerFn(getAiEntitlement);
   const consume = useServerFn(consumeAiMessage);
@@ -47,6 +50,7 @@ export function AiSidebar() {
           setEntitlement({
             hasActiveSub: r.hasActiveSub,
             freeRemaining: r.freeRemaining,
+            freeLimit: r.freeLimit ?? 10,
             canSend: r.canSend,
           });
       } catch {
@@ -70,6 +74,9 @@ export function AiSidebar() {
   }, [messages]);
 
   const busy = status === "submitted" || status === "streaming";
+  const limit = entitlement?.freeLimit ?? 10;
+  const used = limit - (entitlement?.freeRemaining ?? limit);
+  const locked = entitlement && !entitlement.canSend;
 
   async function submit() {
     const text = input.trim();
@@ -102,9 +109,9 @@ export function AiSidebar() {
             {entitlement.hasActiveSub ? (
               <span className="text-primary">Unlimited</span>
             ) : entitlement.freeRemaining > 0 ? (
-              <span>{entitlement.freeRemaining} free {entitlement.freeRemaining === 1 ? "message" : "messages"} left</span>
+              <span>{used} / {limit} free used</span>
             ) : (
-              <span>Free messages used</span>
+              <span className="inline-flex items-center gap-1 text-primary"><Lock className="h-3 w-3" /> Locked</span>
             )}
           </div>
         )}
@@ -141,14 +148,22 @@ export function AiSidebar() {
         )}
       </div>
 
-      {/* Prompt + plan controls */}
+      {/* Prompt + paywall */}
       <div className="border-t border-border/70 p-4 space-y-3">
         {error && (
           <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-[11px] text-destructive">
             {error}
           </div>
         )}
-        {!(entitlement && !entitlement.canSend) && (
+
+        {entitlement && !entitlement.hasActiveSub && entitlement.freeRemaining > 0 && (
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>{entitlement.freeRemaining} free {entitlement.freeRemaining === 1 ? "message" : "messages"} left</span>
+            <span>{used} / {limit} used</span>
+          </div>
+        )}
+
+        {!locked && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -172,13 +187,15 @@ export function AiSidebar() {
             </button>
           </form>
         )}
-        {entitlement && !entitlement.canSend && (
-          <div className="text-[11px] text-muted-foreground">
-            You've used your 5 free messages. Subscribe for unlimited AI.
-          </div>
-        )}
-        {entitlement && !entitlement.hasActiveSub && entitlement.freeRemaining === 0 && <PlansInline compact />}
-        <p className="text-[10px] text-muted-foreground text-center">Never share your seed phrase with anyone.</p>
+
+        {/* Paywall: full pricing panel shown when free messages are used up */}
+        {locked && <PlansInline />}
+
+        <p className="text-[10px] text-muted-foreground text-center">
+          {entitlement?.hasActiveSub
+            ? "Never share your seed phrase with anyone."
+            : "Pro unlocks unlimited AI + advanced wallet tools."}
+        </p>
       </div>
     </aside>
   );

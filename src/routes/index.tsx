@@ -52,7 +52,8 @@ function RootGate() {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 px-6 py-12 max-w-6xl w-full mx-auto">
-        <div className="grid gap-10 md:grid-cols-2 md:items-center">
+        <div className="grid 
+gap-10 md:grid-cols-2 md:items-center">
           <section className="text-foreground">
             <div className="flex items-center gap-3 mb-6">
               <LogoMark size={44} />
@@ -78,7 +79,8 @@ function RootGate() {
                 { icon: Bot, t: "Agentic AI", d: "Always-on Litecoin agent. It can never see keys or move funds." },
               ].map((f) => (
                 <div key={f.t} className="rounded-xl card-glass p-3.5">
-                  <div className="flex items-center gap-2">
+                  <div className="flex
+ items-center gap-2">
                     <f.icon className="h-4 w-4 text-primary" />
                     <span className="text-sm font-medium">{f.t}</span>
                   </div>
@@ -115,8 +117,8 @@ function RootGate() {
           <h2 className="mt-2 text-2xl font-bold">The wallet is free. Pro is unlimited AI.</h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
             Creating wallets, sending, receiving, buying and multisig are free forever.
-            Every account gets 5 free AI messages; after that, unlimited AI is $4.99/mo, $9.99/3mo or
-            $19.99/yr, payable by card or with Litecoin.
+            Every account gets 10 free AI messages; after that, Pro (unlimited AI + advanced tools)
+            is $4.99/mo, $9.99/3mo or $19.99/yr, payable by card or with Litecoin.
           </p>
           <div className="mt-6 neon-rule" />
         </section>
