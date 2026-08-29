@@ -179,7 +179,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <div className="md:pr-[30%]">
+      <div className="md:pr-[40%]">
         <Outlet />
       </div>
       <AiSidebar />
