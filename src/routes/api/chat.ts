@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
-import { createAiProvider, getAiModelName } from "@/lib/ai-provider.server";
+import { getAiModel, getAiFallbackModel } from "@/lib/ai-provider.server";
 import { createClient } from "@supabase/supabase-js";
 import {
   AGENT_SAFETY_PROMPT,
@@ -31,6 +31,14 @@ function messageText(m: UIMessage): string {
   return (m.parts ?? [])
     .map((p: any) => (p?.type === "text" ? String(p.text ?? "") : ""))
     .join(" ");
+}
+
+/** Keep only the most recent N turns to conserve the free Workers AI Neuron allocation. */
+const MAX_CONTEXT_MESSAGES = 6;
+
+function trimContext(messages: UIMessage[]): UIMessage[] {
+  if (messages.length <= MAX_CONTEXT_MESSAGES) return messages;
+  return messages.slice(messages.length - MAX_CONTEXT_MESSAGES);
 }
 
 export const Route = createFileRoute("/api/chat")({
@@ -73,9 +81,9 @@ export const Route = createFileRoute("/api/chat")({
           return new Response(SECRET_REFUSAL, { status: 422 });
         }
 
-        // AuthZ / quota: 5 free messages, then an active subscription is
+        // AuthZ / quota: 10 free messages, then an active subscription is
         // required. Enforced server-side before streaming a paid response.
-        const FREE_MESSAGES = 5;
+        const FREE_MESSAGES = 10;
         const { supabaseAdmin } =
           await import("@/integrations/supabase/client.server");
         const nowIso = new Date().toISOString();
@@ -104,7 +112,7 @@ export const Route = createFileRoute("/api/chat")({
         const freeUsed = usage?.free_messages_used ?? 0;
         if (!hasActiveSub && freeUsed >= FREE_MESSAGES) {
           return new Response(
-            "You've used your 5 free AI messages. Subscribe to continue.",
+            "You've used your " + FREE_MESSAGES + " free AI messages. Subscribe to continue.",
             { status: 402 },
           );
         }
@@ -120,15 +128,31 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Could not record usage", { status: 500 });
         }
 
-        const key = process.env.AI_API_KEY;
-        if (!key) return new Response("Missing AI_API_KEY", { status: 500 });
-        const provider = createAiProvider(key);
-        const model = provider(getAiModelName());
-        const result = streamText({
-          model,
-          system: FULL_SYSTEM,
-          messages: await convertToModelMessages(body.messages),
-        });
+        // Trim context to conserve the daily Neuron allocation.
+        const trimmed = trimContext(body.messages);
+        let model;
+        try {
+          model = await getAiModel();
+        } catch {
+          // Primary model unavailable — fall back to the lighter model.
+          model = await getAiFallbackModel();
+        }
+
+        let result;
+        try {
+          result = streamText({
+            model,
+            system: FULL_SYSTEM,
+            messages: await convertToModelMessages(trimmed),
+          });
+        } catch {
+          // If the primary model errors mid-stream setup, retry with fallback.
+          result = streamText({
+            model: await getAiFallbackModel(),
+            system: FULL_SYSTEM,
+            messages: await convertToModelMessages(trimmed),
+          });
+        }
         return result.toUIMessageStreamResponse({
           originalMessages: body.messages,
         });

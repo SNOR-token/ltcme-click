@@ -12,6 +12,13 @@ const PLANS = [
   { id: "yearly",    name: "Yearly",   price: "$19.99", usd: 19.99, period: "/yr",   save: "Save 67%",   stripePriceId: "ltcme_ai_yearly" },
 ];
 
+const PRO_FEATURES = [
+  "Unlimited LTCme AI on every page",
+  "Advanced wallet tools & multisig",
+  "Address exposure analysis",
+  "UTXO consolidation guidance",
+];
+
 export function PlansInline({ compact = false }: { compact?: boolean }) {
   const [ltcUsd, setLtcUsd] = useState(0);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -38,12 +45,20 @@ export function PlansInline({ compact = false }: { compact?: boolean }) {
       )}
       <div className="flex items-center gap-2 text-xs text-primary">
         <Sparkles className="h-3.5 w-3.5" />
-        <span className="font-medium">Unlock unlimited LTCme AI</span>
+        <span className="font-medium">Unlock LTCme Pro</span>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Every account gets 5 free AI messages. Pro removes the limit — unlimited wallet-aware Litecoin AI on
-        every page. Your free wallet never stops working. Pay by card or with Litecoin.
+        Every account gets 10 free AI messages. Pro unlocks unlimited wallet-aware Litecoin AI plus the
+        advanced wallet tools. Your free wallet never stops working. Pay by card or with Litecoin.
       </p>
+      <ul className="space-y-1">
+        {PRO_FEATURES.map((f) => (
+          <li key={f} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Check className="h-3 w-3 text-primary flex-shrink-0" />
+            {f}
+          </li>
+        ))}
+      </ul>
       <div className={compact ? "grid grid-cols-3 gap-1.5" : "grid grid-cols-1 sm:grid-cols-3 gap-2"}>
         {PLANS.map((p) => {
           const ltc = ltcUsd > 0 ? p.usd / ltcUsd : 0;
