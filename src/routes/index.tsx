@@ -118,9 +118,10 @@ function RootGate() {
             Every account gets 5 free AI messages; after that, unlimited AI is $4.99/mo, $9.99/3mo or
             $19.99/yr, payable by card or with Litecoin.
           </p>
+          <div className="mt-6 neon-rule" />
         </section>
       </main>
-      <footer className="px-6 py-4 text-[11px] text-muted-foreground flex items-center justify-between flex-wrap gap-2 border-t border-border/40">
+      <footer className="px-6 py-4 text-[11px] text-muted-foreground flex items-center justify-between flex-wrap gap-2 border-t border-border/40 neon-footer">
         <span>© 2026 LTCme.click</span>
         <span className="flex items-center gap-4">
           <Link to="/support" className="hover:text-foreground">Support</Link>

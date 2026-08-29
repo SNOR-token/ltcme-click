@@ -52,7 +52,8 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-foreground: va
+r(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
@@ -99,7 +100,8 @@
   --sidebar-border: oklch(0.33 0.05 250);
   --sidebar-ring: oklch(0.78 0.15 240);
 
-  --gradient-primary: linear-gradient(135deg, oklch(0.78 0.15 240), oklch(0.89 0.19 100));
+  --gradient-primary: linear-gradient(135deg, oklch(0.78 0.15 240), o
+klch(0.89 0.19 100));
   --gradient-hero:
     radial-gradient(900px 600px at 12% -10%, oklch(0.70 0.16 240 / 0.26), transparent 70%),
     radial-gradient(700px 500px at 95% 8%, oklch(0.65 0.18 220 / 0.20), transparent 70%),
@@ -148,7 +150,8 @@
      rays and a fine dot constellation layered under all page content. */
   body::after {
     content: "";
-    position: fixed;
+    position: 
+fixed;
     inset: -20%;
     pointer-events: none;
     z-index: 0;
@@ -221,7 +224,8 @@
   }
 
   body > * {
-    position: relative;
+    posit
+ion: relative;
     z-index: 1;
   }
 
@@ -295,7 +299,94 @@
   border-radius: inherit;
   background:
     radial-gradient(60% 80% at 10% 0%, oklch(0.70 0.16 240 / 0.22), transparent 70%),
-    radial-gradient(50% 70% at 95% 10%, oklch(0.65 0.18 220 / 0.18), transparent 70%),
+    radial-grad
+ient(50% 70% at 95% 10%, oklch(0.65 0.18 220 / 0.18), transparent 70%),
     radial-gradient(50% 60% at 85% 95%, oklch(0.89 0.19 100 / 0.10), transparent 70%);
   pointer-events: none;
+}
+
+
+/* ============================================================
+ * Neon AI sidebar + page art (added for larger AI box & site art)
+ * ============================================================ */
+
+/* Glow behind the AI sidebar so the chat panel reads as "lit" */
+@utility ai-sidebar-glow {
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--card) 96%, transparent), color-mix(in oklab, var(--background) 92%, transparent)),
+    radial-gradient(120% 40% at 100% 0%, oklch(0.70 0.16 240 / 0.18), transparent 60%),
+    radial-gradient(120% 50% at 100% 100%, oklch(0.89 0.19 100 / 0.10), transparent 60%);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    -1px 0 0 0 color-mix(in oklab, var(--primary) 22%, var(--border)),
+    -10px 0 40px -18px oklch(0.70 0.16 240 / 0.34),
+    -10px 0 40px -18px oklch(0.89 0.19 100 / 0.12);
+}
+
+@utility ai-sidebar-header {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 12%, transparent), transparent);
+}
+
+/* Subtle scanline shimmer inside the conversation window */
+@utility ai-conversation {
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      oklch(0.80 0.14 235 / 0.018) 0px,
+      oklch(0.80 0.14 235 / 0.018) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+}
+
+/* Neon page frame: thin glowing border + corner accents for legal/info pages */
+@utility neon-page {
+  position: relative;
+}
+@utility neon-page-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid color-mix(in oklab, var(--primary) 30%, transparent);
+  border-radius: 1.25rem;
+  box-shadow:
+    inset 0 0 0 1px oklch(0.70 0.16 240 / 0.10),
+    0 0 40px -16px oklch(0.70 0.16 240 / 0.30),
+    0 0 60px -30px oklch(0.89 0.19 100 / 0.18);
+}
+@utility neon-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: var(--primary);
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px oklch(0.70 0.16 240 / 0.55));
+}
+
+/* Animated neon divider used on hero / section breaks */
+@utility neon-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary), oklch(0.89 0.19 100), transparent);
+  box-shadow: 0 0 12px -2px oklch(0.70 0.16 240 / 0.5);
+}
+
+/* Soft neon halo behind large headings on info pages */
+@utility neon-halo {
+  position: relative;
+}
+@utility neon-halo-glow {
+  position: absolute;
+  inset: -40% -10% auto -10%;
+  z-index: -1;
+  height: 160%;
+  background:
+    radial-gradient(50% 50% at 20% 0%, oklch(0.70 0.16 240 / 0.20), transparent 70%),
+    radial-gradient(40% 50% at 90% 10%, oklch(0.89 0.19 100 / 0.12), transparent 70%);
+  pointer-events: none;
+  filter: blur(8px);
+}
+
+/* Neon glow line above the homepage footer */
+@utility neon-footer {
+  box-shadow: 0 -1px 0 0 color-mix(in oklab, var(--primary) 25%, transparent), 0 -10px 30px -18px oklch(0.70 0.16 240 / 0.30);
 }
