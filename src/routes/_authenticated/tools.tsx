@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, X, Copy } from "lucide-react";
+import { QuantumReadiness } from "@/components/security/QuantumReadiness";
+import { SecurityHealth } from "@/components/security/SecurityHealth";
+import { HeightenedSecurityGate } from "@/components/ProGate";
 import { toast } from "sonner";
 import { estimateFeeRate, broadcastTx, getAddressInfo } from "@/lib/ltc/api";
 import { formatLtc } from "@/lib/ltc/network";
@@ -22,6 +25,21 @@ function ToolsPage() {
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto space-y-4">
       <h1 className="text-3xl font-bold mb-2">Tools</h1>
+
+      <div className="mt-6 mb-8 space-y-6">
+        <section className="card-glass rounded-3xl p-5">
+          <h2 className="text-lg font-semibold mb-3">Security health</h2>
+          <HeightenedSecurityGate featureLabel="the security health dashboard">
+            <SecurityHealth />
+          </HeightenedSecurityGate>
+        </section>
+        <section className="card-glass rounded-3xl p-5">
+          <h2 className="text-lg font-semibold mb-3">Quantum readiness</h2>
+          <HeightenedSecurityGate featureLabel="quantum readiness education">
+            <QuantumReadiness />
+          </HeightenedSecurityGate>
+        </section>
+      </div>
       <p className="text-muted-foreground text-sm mb-6">
         Client-side Litecoin utilities. Everything except explicit lookups runs entirely in your browser.
       </p>

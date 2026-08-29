@@ -25,7 +25,7 @@ function PrivacyPage() {
         <div className="mt-8 space-y-5 text-sm leading-relaxed text-muted-foreground">
           <h2 className="text-foreground text-lg font-semibold">Your keys never leave your browser.</h2>
           <p>
-            Your seed phrase and private keys are generated on your device and stored in this browser's local storage. They are not encrypted at rest by the app — anyone with access to this browser profile can read them, so use a device you trust and back up your seed phrase yourself. You may optionally add a BIP39 passphrase (25th word) as an extra secret. LTCme.click does not receive, store, or have the ability to recover your keys.
+            Your seed phrase and private keys are generated on your device and stored encrypted at rest in this browser using a vault password you choose (PBKDF2 + AES-GCM). LTCme.click never receives, stores, or can recover your keys or vault password. Anyone with both access to this browser profile and your vault password could unlock the vault, so use a device you trust and always keep an offline backup of your seed phrase. You may optionally also use a BIP39 passphrase (25th word); that passphrase is stored inside the encrypted vault, not in plaintext.
           </p>
 
           <h2 className="text-foreground text-lg font-semibold">Account data.</h2>
@@ -50,7 +50,7 @@ function PrivacyPage() {
 
           <h2 className="text-foreground text-lg font-semibold">Payments.</h2>
           <p>
-            If you subscribe with a card, payments are processed by Stripe. We do not store full card numbers. Refer to Stripe's privacy policy for their handling of payment data.
+            If you subscribe with a card, payments are processed by our Litecoin payment verification. We do not store full card numbers. Refer to our Litecoin payment verification's privacy policy for their handling of payment data.
           </p>
 
           <h2 className="text-foreground text-lg font-semibold">Data requests.</h2>

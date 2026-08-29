@@ -64,7 +64,7 @@ function TermsPage() {
 
           <h2 className="text-foreground text-lg font-semibold">Subscriptions & payments.</h2>
           <p>
-            Card payments, where offered, are processed by Stripe. Crypto payments are non-refundable once confirmed. Card subscriptions can be managed or canceled from the billing page. We do not store full card numbers.
+            Card payments, where offered, are processed by our Litecoin payment verification. Crypto payments are non-refundable once confirmed. Card subscriptions can be managed or canceled from the billing page. We do not store full card numbers.
           </p>
 
           <h2 className="text-foreground text-lg font-semibold">Open networks.</h2>

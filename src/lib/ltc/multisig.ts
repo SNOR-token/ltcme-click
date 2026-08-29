@@ -350,3 +350,14 @@ export function accountXpubFromMnemonic(mnemonic: string, accountPath = DEFAULT_
   const root = HDKey.fromMasterSeed(seed, { private: network.bip32.private, public: network.bip32.public });
   return root.derive(accountPath).publicExtendedKey;
 }
+
+// Policy fingerprinting & PSBT verification (Heightened Security)
+export {
+  buildPolicy,
+  policyFingerprint,
+  validatePolicyShape,
+  verifyPsbtMatchesPolicy,
+  uniquePartialSigners,
+  formatFingerprint,
+  type MultisigPolicy,
+} from "./multisig-policy";

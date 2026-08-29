@@ -1,8 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, KeyRound, Eye, Trash2, Copy, Wallet as WalletIcon, RefreshCw, Send, Download, Bot, Sprout, Shield } from "lucide-react";
+import { Plus, KeyRound, Eye, Trash2, Copy, Wallet as WalletIcon, RefreshCw, Send, Download, Bot, Shield } from "lucide-react";
 import { formatLtc } from "@/lib/ltc/network";
-import { loadStore, upsertWallet, removeWallet, type StoredWallet } from "@/lib/ltc/storage";
+import {
+  loadStore,
+  upsertWallet,
+  removeWallet,
+  storeEncryptedSecret,
+  needsVaultMigration,
+  migrateWalletToVault,
+  type StoredWallet,
+} from "@/lib/ltc/storage";
 import { getBalances } from "@/lib/ltc/api";
 import { toast } from "sonner";
 
@@ -90,12 +98,9 @@ function WalletsPage() {
           <QuickLink to="/send" icon={<Send className="h-4 w-4" />} label="Send" primary />
           <QuickLink to="/receive" icon={<Download className="h-4 w-4" />} label="Receive" />
           <QuickLink to="/ai" icon={<Bot className="h-4 w-4" />} label="Ask AI" />
-          <QuickLink to="/earn" icon={<Sprout className="h-4 w-4" />} label="Explore Earn" />
-          <QuickLink to="/guard" icon={<Shield className="h-4 w-4" />} label="Wallet health" />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Next step: check your wallet health in Quantum Guard, and use a fresh receive address for each payment.{" "}
-          <Link to="/guard" className="text-primary hover:underline">Learn more</Link>
+          Next step: use a fresh receive address for each payment.
         </p>
       </section>
 
@@ -193,6 +198,8 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
   const [mnemonic, setMnemonic] = useState<string>("");
   const [bip39Passphrase, setBip39Passphrase] = useState("");
   const [showBipPass, setShowBipPass] = useState(false);
+  const [vaultPassword, setVaultPassword] = useState("");
+  const [vaultPassword2, setVaultPassword2] = useState("");
   const [saving, setSaving] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
 
@@ -219,23 +226,30 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
 
   async function save() {
     if (!name.trim()) return toast.error("Name required");
+    if (vaultPassword.length < 8) return toast.error("Vault password must be at least 8 characters");
+    if (vaultPassword !== vaultPassword2) return toast.error("Vault passwords do not match");
     setSaving(true);
     try {
       const { deriveAllStandards, newId } = await loadWalletHelpers();
       const derived = deriveAllStandards(mnemonic, 3, 0, bip39Passphrase);
-      const secret = JSON.stringify({ mnemonic, passphrase: bip39Passphrase || "" });
-      upsertWallet({
-        meta: {
-          id: newId(),
-          name: name.trim(),
-          kind: "hd",
-          addressType: "bech32",
-          createdAt: Date.now(),
-        },
-        secret,
+      const id = newId();
+      const meta = {
+        id,
+        name: name.trim(),
+        kind: "hd" as const,
+        addressType: "bech32" as const,
+        createdAt: Date.now(),
+      };
+      const draft: StoredWallet = {
+        meta,
         addresses: derived.map((d) => ({ address: d.address, path: d.path, index: d.index })),
-      });
-      toast.success("Wallet created");
+      };
+      const payload = {
+        secret: JSON.stringify({ mnemonic, passphrase: bip39Passphrase || "" }),
+        kind: "hd" as const,
+      };
+      await storeEncryptedSecret(draft, vaultPassword, payload);
+      toast.success("Wallet created and encrypted");
       onClose();
     } catch (e) {
       toast.error("Failed to create wallet", { description: String((e as Error).message) });
@@ -303,6 +317,21 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
       ) : (
         <div className="space-y-3">
           <Field label="Wallet name" value={name} onChange={setName} />
+          <Field
+            label="Vault password (encrypts seed on this device)"
+            type="password"
+            value={vaultPassword}
+            onChange={setVaultPassword}
+          />
+          <Field
+            label="Confirm vault password"
+            type="password"
+            value={vaultPassword2}
+            onChange={setVaultPassword2}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            This password encrypts your seed in this browser. It is not your BIP39 passphrase and is never sent to LTCme servers. If you lose it, you must restore from your written seed phrase.
+          </p>
           <button
             type="button"
             onClick={() => setShowBipPass((v) => !v)}
@@ -335,10 +364,14 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
   const [phrase, setPhrase] = useState("");
   const [bip39Passphrase, setBip39Passphrase] = useState("");
   const [showBipPass, setShowBipPass] = useState(false);
+  const [vaultPassword, setVaultPassword] = useState("");
+  const [vaultPassword2, setVaultPassword2] = useState("");
   const [saving, setSaving] = useState(false);
 
   async function save() {
     if (!name.trim()) return toast.error("Name required");
+    if (vaultPassword.length < 8) return toast.error("Vault password must be at least 8 characters");
+    if (vaultPassword !== vaultPassword2) return toast.error("Vault passwords do not match");
     const raw = phrase.trim();
     if (!raw) return toast.error("Enter a seed phrase or WIF");
     if (raw.length > 2000) {
@@ -356,29 +389,28 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
       const looksLikeMnemonic = wordCount === 12 || wordCount === 15 || wordCount === 18 || wordCount === 21 || wordCount === 24;
       if (looksLikeMnemonic) {
         if (!validateMnemonic(trimmed)) throw new Error("Invalid mnemonic (checksum failed).");
-        // Derive BIP44 (L…), BIP49 (M…), BIP84 (ltc1…) so an imported seed
-        // surfaces every standard address the user might already have funds on.
         const derived = deriveAllStandards(trimmed, 3, 0, bip39Passphrase);
-        const secret = JSON.stringify({ mnemonic: trimmed, passphrase: bip39Passphrase || "" });
-        upsertWallet({
+        const draft: StoredWallet = {
           meta: { id: newId(), name: name.trim(), kind: "hd", addressType: "bech32", createdAt: Date.now() },
-          secret,
           addresses: derived.map((d) => ({ address: d.address, path: d.path, index: d.index })),
+        };
+        await storeEncryptedSecret(draft, vaultPassword, {
+          secret: JSON.stringify({ mnemonic: trimmed, passphrase: bip39Passphrase || "" }),
+          kind: "hd",
         });
       } else {
-        // Treat as WIF — validate length/charset early so bs58 doesn't try to allocate a giant buffer.
         const wif = raw.replace(/\s+/g, "");
         if (wif.length < 50 || wif.length > 55 || !/^[1-9A-HJ-NP-Za-km-z]+$/.test(wif)) {
           throw new Error("That doesn't look like a seed phrase (12/24 words) or a WIF key.");
         }
         const { address } = addressFromWif(wif, "bech32");
-        upsertWallet({
+        const draft: StoredWallet = {
           meta: { id: newId(), name: name.trim(), kind: "single", addressType: "bech32", createdAt: Date.now() },
-          secret: wif,
           addresses: [{ address }],
-        });
+        };
+        await storeEncryptedSecret(draft, vaultPassword, { secret: wif, kind: "single" });
       }
-      toast.success("Wallet imported");
+      toast.success("Wallet imported and encrypted");
       onClose();
     } catch (e) {
       toast.error("Import failed", { description: String((e as Error).message) });
@@ -389,7 +421,9 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <ModalShell title="Import wallet" onClose={onClose}>
-      <p className="text-xs text-muted-foreground mb-3">Paste a 12/24-word seed phrase OR a WIF private key. Stored locally in this browser only — never sent anywhere.</p>
+      <p className="text-xs text-muted-foreground mb-3">
+        Paste a 12/24-word seed phrase OR a WIF private key. Secrets are encrypted with your vault password in this browser only — never sent to LTCme servers.
+      </p>
       <Field label="Wallet name" value={name} onChange={setName} />
       <label className="text-xs text-muted-foreground mt-3 block">Seed phrase or WIF</label>
       <textarea
@@ -398,6 +432,18 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
         rows={3}
         placeholder="12 or 24 words separated by spaces, or a WIF starting with T…"
         className="w-full mt-1 rounded-xl bg-input border border-border px-3 py-2 text-sm font-mono"
+      />
+      <Field
+        label="Vault password (encrypts keys on this device)"
+        type="password"
+        value={vaultPassword}
+        onChange={setVaultPassword}
+      />
+      <Field
+        label="Confirm vault password"
+        type="password"
+        value={vaultPassword2}
+        onChange={setVaultPassword2}
       />
       <div className="mt-3">
         <button
@@ -416,7 +462,7 @@ function ImportDialog({ onClose }: { onClose: () => void }) {
               onChange={setBip39Passphrase}
             />
             <p className="mt-1 text-[11px] text-muted-foreground">
-              Only fill this if your original wallet was created with a BIP39 passphrase.
+              Only fill this if your original wallet was created with a BIP39 passphrase. This is separate from the vault password.
             </p>
           </div>
         )}

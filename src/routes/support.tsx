@@ -74,6 +74,14 @@ function SupportPage() {
             <p>Make sure the input contains only your 12/24-word seed phrase (separated by single spaces) or a single WIF key. If your original wallet used a BIP39 passphrase, click "Add optional BIP39 passphrase" during import.</p>
           </div>
           <div>
+            <p className="text-foreground font-medium">How do I pay for Heightened Security?</p>
+            <p>
+              Send the listed LTC amount to the official address shown on the paywall, wait for at least one
+              confirmation, then paste the transaction id into "Verify payment &amp; activate". Each txid can only
+              activate one account. We do not use card processors.
+            </p>
+          </div>
+          <div>
             <p className="text-foreground font-medium">A transaction is stuck.</p>
             <p>Wait for network confirmation. If fees are too low, you may need to wait for congestion to clear. We cannot cancel broadcast transactions.</p>
           </div>

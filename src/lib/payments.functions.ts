@@ -1,106 +1,199 @@
+/**
+ * Litecoin-only Heightened Security payments.
+ * User sends LTC to the official address, then submits the txid for on-chain verification.
+ */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  type StripeEnv,
-  createStripeClient,
-  getStripeErrorMessage,
-} from "@/lib/stripe.server";
+import { getUserEntitlements } from "@/lib/entitlements.server";
 
-type CheckoutResult = { clientSecret: string } | { error: string };
-type PortalResult = { url: string } | { error: string };
+/** Official subscription payment address (same as project receive address). */
+export const LTC_PAY_ADDRESS = "MLaCqgY8ZQUXn9hThwZoU5ohFxGuwfCug8";
 
-async function resolveOrCreateCustomer(
-  stripe: ReturnType<typeof createStripeClient>,
-  options: { email?: string; userId: string },
-): Promise<string> {
-  if (!/^[a-zA-Z0-9_-]+$/.test(options.userId)) throw new Error("Invalid userId");
-  const bySearch = await stripe.customers.search({
-    query: `metadata['userId']:'${options.userId}'`,
-    limit: 1,
-  });
-  if (bySearch.data.length) return bySearch.data[0].id;
-  if (options.email) {
-    const byEmail = await stripe.customers.list({ email: options.email, limit: 1 });
-    if (byEmail.data.length) {
-      const c = byEmail.data[0];
-      if (c.metadata?.userId !== options.userId) {
-        await stripe.customers.update(c.id, {
-          metadata: { ...c.metadata, userId: options.userId },
-        });
-      }
-      return c.id;
-    }
-  }
-  const created = await stripe.customers.create({
-    ...(options.email && { email: options.email }),
-    metadata: { userId: options.userId },
-  });
-  return created.id;
+/** USD list prices — converted to LTC at claim time using live spot. */
+export const PLAN_USD: Record<"monthly" | "yearly", number> = {
+  monthly: 5.99,
+  yearly: 49.99,
+};
+
+const PERIOD_DAYS: Record<"monthly" | "yearly", number> = {
+  monthly: 31,
+  yearly: 366,
+};
+
+/** Accept payments within 8% of expected LTC amount (price volatility buffer). */
+const AMOUNT_TOLERANCE = 0.08;
+
+/** Require at least this many confirmations before activating. */
+const MIN_CONFIRMATIONS = 1;
+
+const TXID_RE = /^[0-9a-fA-F]{64}$/;
+
+async function fetchTx(txid: string): Promise<any> {
+  const res = await fetch(`https://litecoinspace.org/api/tx/${txid}`);
+  if (!res.ok) throw new Error(`Could not fetch transaction (${res.status}). Check the txid.`);
+  return res.json();
 }
 
-export const createCheckoutSession = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: { priceId: string; returnUrl: string; environment: StripeEnv }) => {
-      if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
-      return data;
-    },
-  )
-  .handler(async ({ data, context }): Promise<CheckoutResult> => {
-    try {
-      const { supabase, userId } = context;
-      const { data: userRes } = await supabase.auth.getUser();
-      const email = userRes.user?.email ?? undefined;
+async function fetchLtcUsd(): Promise<number> {
+  try {
+    const res = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=usd",
+    );
+    if (!res.ok) return 0;
+    const j = (await res.json()) as { litecoin?: { usd?: number } };
+    return j?.litecoin?.usd && j.litecoin.usd > 0 ? j.litecoin.usd : 0;
+  } catch {
+    return 0;
+  }
+}
 
-      const stripe = createStripeClient(data.environment);
-      const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
-      if (!prices.data.length) throw new Error("Price not found");
-      const price = prices.data[0];
-      const isRecurring = price.type === "recurring";
-
-      const customerId = await resolveOrCreateCustomer(stripe, { email, userId });
-
-      const session = await stripe.checkout.sessions.create({
-        line_items: [{ price: price.id, quantity: 1 }],
-        mode: isRecurring ? "subscription" : "payment",
-        ui_mode: "embedded_page",
-        return_url: data.returnUrl,
-        customer: customerId,
-        metadata: { userId },
-        ...(isRecurring && { subscription_data: { metadata: { userId } } }),
-        managed_payments: { enabled: true },
-      } as any);
-
-      return { clientSecret: session.client_secret ?? "" };
-    } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+function paymentToAddressSats(tx: any, address: string): number {
+  let sum = 0;
+  for (const vout of tx?.vout ?? []) {
+    const addrs: string[] = vout?.scriptpubkey_address
+      ? [vout.scriptpubkey_address]
+      : vout?.scriptpubkey_addresses ?? [];
+    // mempool.space style
+    const spk = vout?.scriptpubkey_address ?? vout?.scriptpubkey_addresses?.[0];
+    const candidates = [spk, ...(vout?.scriptpubkey_addresses ?? [])].filter(Boolean);
+    if (candidates.includes(address) || addrs.includes(address)) {
+      sum += Number(vout.value ?? 0);
     }
+  }
+  return sum;
+}
+
+function confirmationsOf(tx: any): number {
+  if (!tx?.status?.confirmed) return 0;
+  // litecoinspace may not return absolute height delta; treat confirmed as 1+
+  return 1;
+}
+
+export const getPaymentInfo = createServerFn({ method: "GET" }).handler(async () => {
+  const ltcUsd = await fetchLtcUsd();
+  return {
+    address: LTC_PAY_ADDRESS,
+    plans: {
+      monthly: {
+        usd: PLAN_USD.monthly,
+        ltc: ltcUsd > 0 ? PLAN_USD.monthly / ltcUsd : null,
+        days: PERIOD_DAYS.monthly,
+      },
+      yearly: {
+        usd: PLAN_USD.yearly,
+        ltc: ltcUsd > 0 ? PLAN_USD.yearly / ltcUsd : null,
+        days: PERIOD_DAYS.yearly,
+      },
+    },
+    ltcUsd,
+    minConfirmations: MIN_CONFIRMATIONS,
+  };
+});
+
+export const getMyEntitlement = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    return getUserEntitlements(supabase, userId);
   });
 
-export const createPortalSession = createServerFn({ method: "POST" })
+/**
+ * Submit a Litecoin txid as payment for Heightened Security.
+ * Verifies on-chain that funds were sent to LTC_PAY_ADDRESS in sufficient amount.
+ */
+export const claimLtcPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => data)
-  .handler(async ({ data, context }): Promise<PortalResult> => {
+  .validator((data: { txid: string; tier: "monthly" | "yearly" }) => {
+    if (!TXID_RE.test(data.txid.trim())) throw new Error("Invalid transaction id (expect 64 hex chars).");
+    if (data.tier !== "monthly" && data.tier !== "yearly") throw new Error("Invalid plan tier.");
+    return { txid: data.txid.trim().toLowerCase(), tier: data.tier };
+  })
+  .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: sub } = await supabase
-      .from("subscriptions")
-      .select("stripe_customer_id")
-      .eq("user_id", userId)
-      .eq("environment", data.environment)
-      .not("stripe_customer_id", "is", null)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (!sub?.stripe_customer_id) return { error: "No subscription found" };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    try {
-      const stripe = createStripeClient(data.environment);
-      const portal = await stripe.billingPortal.sessions.create({
-        customer: sub.stripe_customer_id,
-        ...(data.returnUrl && { return_url: data.returnUrl }),
-      });
-      return { url: portal.url };
-    } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+    // Idempotency: if this txid already activated someone, reject reuse
+    const { data: existingClaim } = await (supabaseAdmin as any)
+      .from("ltc_payment_claims")
+      .select("id, user_id, status")
+      .eq("txid", data.txid)
+      .maybeSingle();
+
+    if (existingClaim) {
+      if (existingClaim.user_id === userId && existingClaim.status === "confirmed") {
+        const ent = await getUserEntitlements(supabase, userId);
+        return { ok: true as const, alreadyProcessed: true, entitlement: ent };
+      }
+      throw new Error("This transaction has already been used for a subscription claim.");
     }
+
+    const ltcUsd = await fetchLtcUsd();
+    if (!(ltcUsd > 0)) throw new Error("Could not fetch LTC/USD price. Try again shortly.");
+
+    const expectedLtc = PLAN_USD[data.tier] / ltcUsd;
+    const expectedSats = Math.floor(expectedLtc * 1e8);
+    const minSats = Math.floor(expectedSats * (1 - AMOUNT_TOLERANCE));
+
+    const tx = await fetchTx(data.txid);
+    const paidSats = paymentToAddressSats(tx, LTC_PAY_ADDRESS);
+    if (paidSats < minSats) {
+      await (supabaseAdmin as any).from("ltc_payment_claims").insert({
+        user_id: userId,
+        txid: data.txid,
+        tier: data.tier,
+        amount_sats: paidSats,
+        status: "rejected",
+        notes: `Insufficient amount: got ${paidSats} sats, need >= ${minSats}`,
+      });
+      throw new Error(
+        `Payment to ${LTC_PAY_ADDRESS} is insufficient (got ${paidSats} sats, need about ${expectedSats} sats ≈ ${expectedLtc.toFixed(6)} LTC).`,
+      );
+    }
+
+    const confs = confirmationsOf(tx);
+    if (confs < MIN_CONFIRMATIONS) {
+      await (supabaseAdmin as any).from("ltc_payment_claims").insert({
+        user_id: userId,
+        txid: data.txid,
+        tier: data.tier,
+        amount_sats: paidSats,
+        status: "pending",
+        confirmations: confs,
+        notes: "Waiting for confirmation",
+      });
+      throw new Error("Transaction is unconfirmed. Wait for at least 1 confirmation, then submit again.");
+    }
+
+    const periodEnd = new Date();
+    periodEnd.setUTCDate(periodEnd.getUTCDate() + PERIOD_DAYS[data.tier]);
+
+    await (supabaseAdmin as any).from("ltc_payment_claims").insert({
+      user_id: userId,
+      txid: data.txid,
+      tier: data.tier,
+      amount_sats: paidSats,
+      status: "confirmed",
+      confirmations: confs,
+      confirmed_at: new Date().toISOString(),
+    });
+
+    // Upsert active subscription row (service role)
+    await supabaseAdmin.from("subscriptions").insert({
+      user_id: userId,
+      tier: data.tier,
+      status: "active",
+      provider: "litecoin",
+      provider_subscription_id: data.txid,
+      current_period_end: periodEnd.toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    const entitlement = await getUserEntitlements(supabaseAdmin as any, userId);
+    return {
+      ok: true as const,
+      alreadyProcessed: false,
+      paidSats,
+      periodEnd: periodEnd.toISOString(),
+      entitlement,
+    };
   });

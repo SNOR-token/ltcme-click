@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { AlertTriangle, ArrowRight, Loader2 } from "lucide-react";
-import { loadStore } from "@/lib/ltc/storage";
+import { loadStore, unlockWalletSecret, needsVaultMigration } from "@/lib/ltc/storage";
 import { getUtxos, estimateFeeRate, broadcastTx, getLtcUsdPrice } from "@/lib/ltc/api";
 import { formatLtc, toSatoshis, fromSatoshis } from "@/lib/ltc/network";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ function SendPage() {
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
   const [feeRate, setFeeRate] = useState<number>(10);
+  const [vaultPassword, setVaultPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [ltcUsd, setLtcUsd] = useState<number>(0);
   const [preview, setPreview] = useState<{ txid: string; feeSats: number; vbytes: number; rawHex: string; devFeeSats: number } | null>(null);
@@ -48,7 +49,8 @@ function SendPage() {
   async function build() {
     if (!wallet) return;
     if (wallet.meta.kind === "watch") return toast.error("Watch-only wallet — no keys to sign with.");
-    if (!wallet.secret) return toast.error("Wallet has no stored secret.");
+    if (!wallet.vault && !wallet.secret) return toast.error("Wallet has no stored keys.");
+    if (!vaultPassword) return toast.error("Enter your vault password to unlock keys for signing.");
     if (!to.trim()) return toast.error("Recipient required");
     if (!(amt > 0)) return toast.error("Amount required");
     if (devFeeSats <= 0) return toast.error("Couldn't compute developer fee — LTC price unavailable, try again.");
@@ -58,19 +60,11 @@ function SendPage() {
       const { validateAddress } = await import("@/lib/ltc/wallet");
       const v = validateAddress(to);
       if (!v.valid) throw new Error("Invalid Litecoin address");
-      // Secret is plaintext: either JSON {mnemonic, passphrase} for HD wallets
-      // or a raw WIF string for single-key imports.
-      let secret = wallet.secret;
-      let passphrase = "";
-      try {
-        const parsed = JSON.parse(wallet.secret);
-        if (parsed && typeof parsed.mnemonic === "string") {
-          secret = parsed.mnemonic;
-          if (typeof parsed.passphrase === "string") passphrase = parsed.passphrase;
-        }
-      } catch {
-        // Not JSON — treat wallet.secret as the raw mnemonic/WIF.
-      }
+
+      // Unlock encrypted vault (or migrate legacy plaintext) in memory only.
+      const unlocked = await unlockWalletSecret(wallet, vaultPassword);
+      const secret = unlocked.mnemonicOrWif;
+      const passphrase = unlocked.passphrase;
 
       // Fetch UTXOs for all wallet addresses
       const utxosByAddress: Record<string, Awaited<ReturnType<typeof getUtxos>>> = {};
@@ -92,7 +86,12 @@ function SendPage() {
       });
       setPreview({ ...result, devFeeSats });
     } catch (e) {
-      toast.error("Couldn't build tx", { description: String((e as Error).message) });
+      const msg = String((e as Error).message || e);
+      if (/decrypt|password|OperationError|vault/i.test(msg)) {
+        toast.error("Wrong vault password or corrupted vault");
+      } else {
+        toast.error("Couldn't build tx", { description: msg });
+      }
     } finally {
       setBusy(false);
     }
@@ -151,6 +150,23 @@ function SendPage() {
             <input value={feeRate} onChange={(e) => setFeeRate(Number(e.target.value) || 1)} type="number" min={1} className="w-full mt-1 rounded-xl bg-input border border-border px-3 py-2 text-sm" />
           </label>
         </div>
+
+        <label className="block">
+          <span className="text-xs text-muted-foreground">Vault password</span>
+          <input
+            type="password"
+            value={vaultPassword}
+            onChange={(e) => setVaultPassword(e.target.value)}
+            placeholder="Unlock encrypted keys for this send"
+            autoComplete="current-password"
+            className="w-full mt-1 rounded-xl bg-input border border-border px-3 py-2 text-sm"
+          />
+          {wallet && needsVaultMigration(wallet) && (
+            <p className="mt-1 text-[11px] text-amber-500">
+              This wallet still uses a legacy format. Enter a new vault password (8+ characters) to encrypt it on first successful unlock.
+            </p>
+          )}
+        </label>
 
         <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground space-y-1">
           <div className="font-medium text-foreground">Developer fee — 1% (min $0.50)</div>

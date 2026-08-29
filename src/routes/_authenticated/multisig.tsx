@@ -7,6 +7,7 @@ import { NetworkToggle } from "@/components/ProGate";
 import { getBalances, broadcastTx } from "@/lib/ltc/api";
 import { formatLtc } from "@/lib/ltc/network";
 import { validateAddress } from "@/lib/ltc/wallet";
+import { HeightenedSecurityGate } from "@/components/ProGate";
 import {
   DEFAULT_ACCOUNT_PATH,
   accountXpubFromMnemonic,
@@ -24,6 +25,10 @@ import {
   type Cosigner,
   type MultisigScript,
   type MultisigWallet,
+  buildPolicy,
+  formatFingerprint,
+  verifyPsbtMatchesPolicy,
+  validatePolicyShape,
 } from "@/lib/ltc/multisig";
 
 export const Route = createFileRoute("/_authenticated/multisig")({
@@ -36,12 +41,20 @@ export const Route = createFileRoute("/_authenticated/multisig")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: MultisigPage,
+  component: MultisigRoute,
 });
 
 function copy(text: string, label = "Copied") {
   navigator.clipboard.writeText(text);
   toast.success(label);
+}
+
+function MultisigRoute() {
+  return (
+    <HeightenedSecurityGate featureLabel="advanced multisig and PSBT workflows">
+      <MultisigPage />
+    </HeightenedSecurityGate>
+  );
 }
 
 function MultisigPage() {
@@ -126,10 +139,12 @@ function WalletsTab({ wallets, network }: { wallets: MultisigWallet[]; network: 
       createdAt: Date.now(),
     };
     try {
+      validatePolicyShape(wallet);
+      const policy = buildPolicy(wallet);
       saveMultisig(wallet);
       setName("");
       setCosigners(cosigners.map((c) => ({ ...c, key: "" })));
-      toast.success("Multisig wallet created.");
+      toast.success(`Multisig created · policy ${formatFingerprint(policy.fingerprint)}`);
     } catch (e: any) {
       toast.error(e?.message ?? "Could not create wallet.");
     }
@@ -280,6 +295,9 @@ function WalletCard({ wallet }: { wallet: MultisigWallet }) {
           <div className="eyebrow">
             {wallet.m}-of-{wallet.cosigners.length} · {wallet.script}
           </div>
+          <div className="text-[11px] font-mono text-muted-foreground mt-0.5">
+            Policy {formatFingerprint(buildPolicy(wallet).fingerprint)}
+          </div>
         </div>
         <div className="ml-auto text-right">
           <div className="text-lg font-semibold">{formatLtc(total)} LTC</div>
@@ -371,6 +389,10 @@ function SpendTab({ wallets }: { wallets: MultisigWallet[] }) {
 
   function sign() {
     try {
+      if (wallet) {
+        const check = verifyPsbtMatchesPolicy(psbt.trim(), wallet);
+        if (!check.ok) throw new Error(check.error);
+      }
       const res = signMultisigPsbt(psbt.trim(), seed, { accountPath: path, passphrase });
       setPsbt(res.psbtBase64);
       setSeed("");
