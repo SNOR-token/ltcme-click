@@ -74,12 +74,13 @@ gap-10 md:grid-cols-2 md:items-center">
               {[
                 { icon: Wallet, t: "Unlimited wallets", d: "Create or import BIP39 seeds and WIF keys. BIP44, BIP49 and BIP84 addresses." },
                 { icon: Send, t: "Send & receive", d: "Live mainnet balances, fee estimates and address validation." },
-                { icon: Banknote, t: "Buy & cash out", d: "Card on-ramps and off-ramps to a debit card via vetted partners." },
+                { icon: Banknote, t: "Buy & cash out", d: "Litecoin on-ramps and off-ramps via vetted crypto partners." },
                 { icon: ShieldCheck, t: "Self-custody", d: "Keys are generated and stored in your browser. We never see them." },
                 { icon: Bot, t: "Agentic AI", d: "Always-on Litecoin agent. It can never see keys or move funds." },
               ].map((f) => (
                 <div key={f.t} className="rounded-xl card-glass p-3.5">
-                  <div className="flex
+                  <div className="fle
+x
  items-center gap-2">
                     <f.icon className="h-4 w-4 text-primary" />
                     <span className="text-sm font-medium">{f.t}</span>
@@ -117,8 +118,9 @@ gap-10 md:grid-cols-2 md:items-center">
           <h2 className="mt-2 text-2xl font-bold">The wallet is free. Pro is unlimited AI.</h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
             Creating wallets, sending, receiving, buying and multisig are free forever.
-            Every account gets 10 free AI messages; after that, Pro (unlimited AI + advanced tools)
-            is $4.99/mo, $9.99/3mo or $19.99/yr, payable by card or with Litecoin.
+            Every account gets 10 free AI messages; after that, Pro (unl
+imited AI + advanced tools)
+            is $4.99/mo, $9.99/3mo or $19.99/yr, payable with Litecoin only.
           </p>
           <div className="mt-6 neon-rule" />
         </section>
