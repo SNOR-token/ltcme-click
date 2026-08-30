@@ -122,7 +122,7 @@ function TopNav({ email }: { email: string | null }) {
               <button
                 className={"flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap " + (moreActive ? "bg-primary/15 text-primary neon-edge" : "text-muted-foreground hover:text-foreground hover:bg-card/60")}
               >
-                {activeMore ? activeMore.icon : <MoreHorizontal className="h-4 w-4" />}
+                {activeMore ? <activeMore.icon className="h-4 w-4" /> : <MoreHorizontal className="h-4 w-4" />}
                 <span>{activeMore ? activeMore.label : "More"}</span>
                 <ChevronDown className="h-3.5 w-3.5" />
               </button>
