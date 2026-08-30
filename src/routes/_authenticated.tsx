@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+
 export const Route = createFileRoute("/_authenticated")({
   component: Shell,
 });
@@ -43,7 +44,7 @@ function Shell() {
   }, [navigate]);
 
   if (!ready) {
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Unlocking…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Unlocking...</div>;
   }
 
   return (
@@ -62,7 +63,8 @@ function LegalFooter() {
     <footer className="border-t border-border/60 bg-background/60 px-6 py-6 text-xs text-muted-foreground">
       <div className="max-w-5xl mx-auto space-y-3">
         <p>
-          <strong className="text-foreground">Disclaimer:</strong> LTCme.click is a non-custodial software tool provided "as is" without warranties of any kind. You alone control your seed phrase, private keys, and funds. LTCme.click accepts no liability for any loss, theft, damage, tax consequence, missed transaction, network failure, third-party service outage, user error, or any direct, indirect, incidental, consequential, or punitive damages arising from use of this site, the wallet, the AI assistant, or any linked service. Nothing here is financial, legal, tax, or investment advice. Litecoin transactions are irreversible. Use at your own risk. See our{" "}
+          <strong className="text-foreground">
+Disclaimer:</strong> LTCme.click is a non-custodial software tool provided as is without warranties of any kind. You alone control your seed phrase, private keys, and funds. LTCme.click accepts no liability for any loss, theft, damage, tax consequence, missed transaction, network failure, third-party service outage, user error, or any direct, indirect, incidental, consequential, or punitive damages arising from use of this site, the wallet, the AI assistant, or any linked service. Nothing here is financial, legal, tax, or investment advice. Litecoin transactions are irreversible. Use at your own risk. See our{" "}
           <Link to="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
           <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
         </p>
@@ -83,7 +85,6 @@ function TopNav({ email }: { email: string | null }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  // Wallet stays as the primary visible tab; everything else folds into "More".
   const moreTabs = [
     { to: "/send", label: "Send", icon: Send },
     { to: "/receive", label: "Receive", icon: Download },
@@ -110,27 +111,18 @@ function TopNav({ email }: { email: string | null }) {
         <nav className="flex-1 flex items-center gap-1.5 min-w-0">
           <Link
             to="/wallets"
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap ${
-              walletActive
-                ? "bg-primary/15 text-primary neon-edge"
-                : "text-muted-foreground hover:text-foreground hover:bg-card/60"
-            }`}
+            className={"flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap " + (walletActive ? "bg-primary/15 text-primary neon-edge" : "text-muted-foreground hover:text-foreground hover:bg-card/60")}
           >
             <Wallet className="h-4 w-4" />
             Wallet
           </Link>
 
-          {/* "More" dropdown: collapses the remaining tabs */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap ${
-                  moreActive
-                    ? "bg-primary/15 text-primary neon-edge"
-                    : "text-muted-foreground hover:text-foreground hover:bg-card/60"
-                }`}
+                className={"flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap " + (moreActive ? "bg-primary/15 text-primary neon-edge" : "text-muted-foreground hover:text-foreground hover:bg-card/60")}
               >
-                {activeMore ? <activeMore.icon className="h-4 w-4" /> : <MoreHorizontal className="h-4 w-4" />}
+                {activeMore ? activeMore.icon : <MoreHorizontal className="h-4 w-4" />}
                 <span>{activeMore ? activeMore.label : "More"}</span>
                 <ChevronDown className="h-3.5 w-3.5" />
               </button>
@@ -144,9 +136,7 @@ function TopNav({ email }: { email: string | null }) {
                   <DropdownMenuItem key={to} asChild>
                     <Link
                       to={to}
-                      className={`flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer ${
-                        active ? "text-primary" : "text-foreground"
-                      }`}
+                      className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer " + (active ? "text-primary" : "text-foreground")}
                     >
                       <Icon className="h-4 w-4" />
                       {label}
