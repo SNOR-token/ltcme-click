@@ -4,9 +4,9 @@ import { ShieldCheck, KeyRound, Eye, Download, RefreshCw, AlertTriangle } from "
 export const Route = createFileRoute("/support")({
   head: () => ({
     meta: [
-      { title: "Support — LTCme.click" },
+      { title: "Support - LTCme.click" },
       { name: "description", content: "Get help with LTCme.click. Read our self-custody safety guide and contact us." },
-      { property: "og:title", content: "Support — LTCme.click" },
+      { property: "og:title", content: "Support - LTCme.click" },
       { property: "og:description", content: "Get help with LTCme.click. Read our self-custody safety guide and contact us." },
       { property: "og:url", content: "https://ltcme.click/support" },
     ],
@@ -48,11 +48,11 @@ export const Route = createFileRoute("/support")({
 
 const safetyTips = [
   { icon: KeyRound, t: "Back up your seed phrase offline", d: "Write your 12/24-word seed on paper or metal and store it offline. Never save it as a photo, in email, in a password-manager cloud sync, or on a cloud drive." },
-  { icon: ShieldCheck, t: "Never share your seed or passphrase", d: "No one from LTCme.click will ever ask for it. Anyone who does is trying to steal your funds — including fake "support" agents, DMs, or calls." },
+  { icon: ShieldCheck, t: "Never share your seed or passphrase", d: "No one from LTCme.click will ever ask for it. Anyone who does is trying to steal your funds - including fake support agents, DMs, or calls." },
   { icon: Eye, t: "Verify every address character-by-character", d: "Malware can silently swap a copied address in your clipboard. Always re-check the first and last several characters before sending, especially large amounts." },
   { icon: Download, t: "Test with a small send first", d: "For a new or unverified recipient, send a tiny test transaction first and confirm it arrives before sending the full amount." },
   { icon: RefreshCw, t: "Use a BIP39 passphrase (25th word)", d: "Adding a strong passphrase adds a second secret. Store it separately from your seed phrase; losing it means losing your funds." },
-  { icon: AlertTriangle, t: "Watch for phishing & fake sites", d: "Bookmark ltcme.click. Check the URL bar before entering anything. Seed phrases entered into a fake site are drained instantly." },
+  { icon: AlertTriangle, t: "Watch for phishing and fake sites", d: "Bookmark ltcme.click. Check the URL bar before entering anything. Seed phrases entered into a fake site are drained instantly." },
 ];
 
 function SupportPage() {
@@ -83,7 +83,7 @@ function SupportPage() {
 
           <section>
             <h2 className="text-foreground text-lg font-semibold">Crypto wallet security checklist</h2>
-            <p className="mt-1 text-xs">A quick self-custody review. LTCme.click is non-custodial — your security is in your hands.</p>
+            <p className="mt-1 text-xs">A quick self-custody review. LTCme.click is non-custodial - your security is in your hands.</p>
             <div className="mt-4 grid sm:grid-cols-2 gap-3">
               {safetyTips.map((s) => (
                 <div key={s.t} className="rounded-xl border border-border/70 bg-card/50 p-3.5">

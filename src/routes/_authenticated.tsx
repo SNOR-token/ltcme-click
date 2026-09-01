@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
 import { Wallet, Send, Download, Wrench, LogOut, Banknote, Users, ChevronDown, MoreHorizontal } from "lucide-react";
 import { NetworkToggle } from "@/components/ProGate";
+import { AIChatBox } from "@/components/AIChatBox";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -21,6 +22,7 @@ function Shell() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
+  const [aiOpen, setAiOpen] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -53,28 +55,26 @@ function Shell() {
       <main className="flex-1 min-w-0">
         <Outlet />
       </main>
-      <LegalFooter />
+      <AIChatBox isOpen={aiOpen} onToggle={() => setAiOpen(!aiOpen)} />
+      <BottomBar email={email} />
     </div>
   );
 }
 
-function LegalFooter() {
+function BottomBar({ email }: { email: string | null }) {
   return (
-    <footer className="border-t border-border/60 bg-background/60 px-6 py-6 text-xs text-muted-foreground">
-      <div className="max-w-5xl mx-auto space-y-3">
-        <p>
-          <strong className="text-foreground">
-Disclaimer:</strong> LTCme.click is a non-custodial software tool provided as is without warranties of any kind. You alone control your seed phrase, private keys, and funds. LTCme.click accepts no liability for any loss, theft, damage, tax consequence, missed transaction, network failure, third-party service outage, user error, or any direct, indirect, incidental, consequential, or punitive damages arising from use of this site, the wallet, the AI assistant, or any linked service. Nothing here is financial, legal, tax, or investment advice. Litecoin transactions are irreversible. Use at your own risk. See our{" "}
-          <Link to="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
-          <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
-        </p>
-        <div className="flex items-center justify-between flex-wrap gap-3 pt-2 border-t border-border/40">
-          <div>© 2026 LTCme.click. All rights reserved.</div>
-          <div className="flex items-center gap-4">
-            <Link to="/support" className="hover:text-foreground">Support</Link>
-            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
-            <Link to="/terms" className="hover:text-foreground">Terms</Link>
+    <footer className="border-t border-border/60 bg-background/60 px-4 py-2">
+      <div className="max-w-5xl mx-auto flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-4">
+          <NetworkToggle />
+          <div className="text-xs text-muted-foreground hidden sm:block">
+            &copy; 2026 LTCme.click. All rights reserved.
           </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link to="/support" className="text-xs text-muted-foreground hover:text-foreground">Support</Link>
+          <Link to="/privacy" className="text-xs text-muted-foreground hover:text-foreground">Privacy</Link>
+          <Link to="/terms" className="text-xs text-muted-foreground hover:text-foreground">Terms</Link>
         </div>
       </div>
     </footer>
@@ -136,7 +136,7 @@ function TopNav({ email }: { email: string | null }) {
                   <DropdownMenuItem key={to} asChild>
                     <Link
                       to={to}
-                      className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer " + (active ? "text-primary" : "text-foreground")}
+                      className={`flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer ${active ? "text-primary" : "text-foreground"}`}
                     >
                       <Icon className="h-4 w-4" />
                       {label}
@@ -148,7 +148,6 @@ function TopNav({ email }: { email: string | null }) {
           </DropdownMenu>
         </nav>
 
-        <NetworkToggle />
         <button
           onClick={signOut}
           aria-label="Sign out"
