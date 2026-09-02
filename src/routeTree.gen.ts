@@ -18,7 +18,9 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
+import { Route as AuthenticatedGuardRouteImport } from './routes/_authenticated/guard'
 import { Route as AuthenticatedMultisigRouteImport } from './routes/_authenticated/multisig'
+import { Route as AuthenticatedPqLabRouteImport } from './routes/_authenticated/pq-lab'
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
 import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated/tools'
@@ -69,9 +71,19 @@ const AuthenticatedBuyRoute = AuthenticatedBuyRouteImport.update({
   path: '/buy',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedGuardRoute = AuthenticatedGuardRouteImport.update({
+  id: '/guard',
+  path: '/guard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedMultisigRoute = AuthenticatedMultisigRouteImport.update({
   id: '/multisig',
   path: '/multisig',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPqLabRoute = AuthenticatedPqLabRouteImport.update({
+  id: '/pq-lab',
+  path: '/pq-lab',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedReceiveRoute = AuthenticatedReceiveRouteImport.update({
@@ -109,7 +121,9 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
+  '/guard': typeof AuthenticatedGuardRoute
   '/multisig': typeof AuthenticatedMultisigRoute
+  '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
@@ -125,7 +139,9 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
+  '/guard': typeof AuthenticatedGuardRoute
   '/multisig': typeof AuthenticatedMultisigRoute
+  '/pq-lab': typeof AuthenticatedPqLabRoute
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
@@ -143,7 +159,9 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
+  '/_authenticated/guard': typeof AuthenticatedGuardRoute
   '/_authenticated/multisig': typeof AuthenticatedMultisigRoute
+  '/_authenticated/pq-lab': typeof AuthenticatedPqLabRoute
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
   '/_authenticated/send': typeof AuthenticatedSendRoute
   '/_authenticated/tools': typeof AuthenticatedToolsRoute
@@ -161,7 +179,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai'
     | '/buy'
+    | '/guard'
     | '/multisig'
+    | '/pq-lab'
     | '/receive'
     | '/send'
     | '/tools'
@@ -177,7 +197,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/ai'
     | '/buy'
+    | '/guard'
     | '/multisig'
+    | '/pq-lab'
     | '/receive'
     | '/send'
     | '/tools'
@@ -194,7 +216,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/ai'
     | '/_authenticated/buy'
+    | '/_authenticated/guard'
     | '/_authenticated/multisig'
+    | '/_authenticated/pq-lab'
     | '/_authenticated/receive'
     | '/_authenticated/send'
     | '/_authenticated/tools'
@@ -278,11 +302,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/guard': {
+      id: '/_authenticated/guard'
+      path: '/guard'
+      fullPath: '/guard'
+      preLoaderRoute: typeof AuthenticatedGuardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/multisig': {
       id: '/_authenticated/multisig'
       path: '/multisig'
       fullPath: '/multisig'
       preLoaderRoute: typeof AuthenticatedMultisigRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pq-lab': {
+      id: '/_authenticated/pq-lab'
+      path: '/pq-lab'
+      fullPath: '/pq-lab'
+      preLoaderRoute: typeof AuthenticatedPqLabRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/receive': {
@@ -326,7 +364,9 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
+  AuthenticatedGuardRoute: typeof AuthenticatedGuardRoute
   AuthenticatedMultisigRoute: typeof AuthenticatedMultisigRoute
+  AuthenticatedPqLabRoute: typeof AuthenticatedPqLabRoute
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
   AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
@@ -336,7 +376,9 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
+  AuthenticatedGuardRoute: AuthenticatedGuardRoute,
   AuthenticatedMultisigRoute: AuthenticatedMultisigRoute,
+  AuthenticatedPqLabRoute: AuthenticatedPqLabRoute,
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
   AuthenticatedSendRoute: AuthenticatedSendRoute,
   AuthenticatedToolsRoute: AuthenticatedToolsRoute,

@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
-import { Wallet, Send, Download, Wrench, LogOut, Banknote, Users, ChevronDown, MoreHorizontal } from "lucide-react";
+import { Wallet, Send, Download, Wrench, LogOut, Banknote, Users, ChevronDown, MoreHorizontal, Shield, FlaskConical } from "lucide-react";
 import { NetworkToggle } from "@/components/ProGate";
 import { AIChatBox } from "@/components/AIChatBox";
 import {
@@ -91,6 +91,7 @@ function TopNav({ email }: { email: string | null }) {
     { to: "/buy", label: "Buy / Sell", icon: Banknote },
     { to: "/multisig", label: "Multisig", icon: Users },
     { to: "/tools", label: "Tools", icon: Wrench },
+    { to: "/pq-lab", label: "PQ Lab", icon: FlaskConical },
   ] as const;
 
   const walletActive = pathname.startsWith("/wallets");
@@ -115,6 +116,14 @@ function TopNav({ email }: { email: string | null }) {
           >
             <Wallet className="h-4 w-4" />
             Wallet
+          </Link>
+
+          <Link
+            to="/guard"
+            className={"flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition whitespace-nowrap " + (pathname.startsWith("/guard") ? "bg-primary/15 text-primary neon-edge" : "text-muted-foreground hover:text-foreground hover:bg-card/60")}
+          >
+            <Shield className="h-4 w-4" />
+            PRO
           </Link>
 
           <DropdownMenu>

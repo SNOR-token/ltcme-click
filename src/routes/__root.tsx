@@ -12,6 +12,7 @@ import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "sonner";
+import { AiSidebar } from "@/components/AiSidebar";
 
 ensureBuffer();
 
@@ -178,9 +179,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <div>
+      <div className="md:pr-[40%]">
         <Outlet />
       </div>
+      <AiSidebar />
       <Toaster theme="dark" position="bottom-right" richColors />
     </QueryClientProvider>
   );
