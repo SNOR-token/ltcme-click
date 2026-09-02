@@ -156,10 +156,10 @@ fixed;
     pointer-events: none;
     z-index: 0;
     background-image:
-      radial-gradient(closest-side, oklch(0.89 0.19 100 / 0.14), transparent 100%),
-      radial-gradient(closest-side, oklch(0.72 0.28 350 / 0.16), transparent 100%),
-      radial-gradient(closest-side, oklch(0.65 0.24 330 / 0.12), transparent 100%),
-      radial-gradient(closest-side, oklch(0.70 0.16 240 / 0.20), transparent 100%),
+      radial-gradient(closest-side, oklch(0.90 0.20 100 / 0.28), transparent 100%),
+      radial-gradient(closest-side, oklch(0.72 0.28 350 / 0.30), transparent 100%),
+      radial-gradient(closest-side, oklch(0.65 0.24 330 / 0.24), transparent 100%),
+      radial-gradient(closest-side, oklch(0.70 0.16 240 / 0.28), transparent 100%),
       radial-gradient(closest-side, oklch(0.65 0.18 220 / 0.15), transparent 100%),
       radial-gradient(closest-side, oklch(0.75 0.13 250 / 0.15), transparent 100%),
       repeating-linear-gradient(
@@ -275,7 +275,7 @@ fixed;
   box-shadow:
     0 0 0 1px oklch(0.78 0.15 240 / 0.10),
     0 0 28px -6px oklch(0.70 0.16 240 / 0.34),
-    0 0 28px -6px oklch(0.89 0.19 100 / 0.14),
+    0 0 28px -6px oklch(0.90 0.20 100 / 0.28),
     inset 0 1px 0 oklch(0.86 0.13 235 / 0.14);
 }
 
@@ -385,7 +385,7 @@ ient(50% 70% at 95% 10%, oklch(0.65 0.18 220 / 0.18), transparent 70%),
   z-index: -1;
   height: 160%;
   background:
-    radial-gradient(50% 50% at 20% 0%, oklch(0.70 0.16 240 / 0.20), transparent 70%),
+    radial-gradient(50% 50% at 20% 0%, oklch(0.70 0.16 240 / 0.28), transparent 70%),
     radial-gradient(40% 50% at 90% 10%, oklch(0.89 0.19 100 / 0.12), transparent 70%);
   pointer-events: none;
   filter: blur(8px);
@@ -394,4 +394,48 @@ ient(50% 70% at 95% 10%, oklch(0.65 0.18 220 / 0.18), transparent 70%),
 /* Neon glow line above the homepage footer */
 @utility neon-footer {
   box-shadow: 0 -1px 0 0 color-mix(in oklab, var(--primary) 25%, transparent), 0 -10px 30px -18px oklch(0.70 0.16 240 / 0.30);
+}
+
+@utility text-neon-yellow {
+  color: var(--accent);
+  text-shadow: 0 0 12px oklch(0.89 0.19 100 / 0.35);
+}
+
+@utility text-neon-pink {
+  color: oklch(0.78 0.22 350);
+  text-shadow: 0 0 12px oklch(0.72 0.28 350 / 0.35);
+}
+
+@utility text-neon-gradient {
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    oklch(0.78 0.22 350),
+    var(--primary)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility text-neon-yellow {
+  color: var(--accent);
+  text-shadow: 0 0 12px oklch(0.89 0.19 100 / 0.35);
+}
+
+@utility text-neon-pink {
+  color: oklch(0.78 0.22 350);
+  text-shadow: 0 0 12px oklch(0.72 0.28 350 / 0.35);
+}
+
+@utility text-neon-gradient {
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    oklch(0.78 0.22 350),
+    var(--primary)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

@@ -101,7 +101,7 @@ function GuardPage() {
           <Shield />
         </div>
         <div className="flex-1 min-w-[200px]">
-          <h1 className="text-2xl md:text-3xl font-bold">Quantum Guard</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-neon-gradient">Quantum Guard</h1>
           <p className="text-sm text-muted-foreground">
             Quantum Guard checks whether your Litecoin addresses have been reused or have exposed public keys. It then
             helps you move LTC to fresh addresses when appropriate.
@@ -145,7 +145,7 @@ function GuardPage() {
 
       {!pro.pro && (
         <div className="rounded-2xl neon-edge bg-primary/5 p-5 space-y-3">
-          <span className="eyebrow">What Pro is for</span>
+          <span className="eyebrow text-neon-yellow">What Pro is for</span>
           <h2 className="text-lg font-semibold">Your wallet is free. Pro is the intelligence around it.</h2>
           <ProValueGrid dense />
           <p className="text-xs text-muted-foreground">
