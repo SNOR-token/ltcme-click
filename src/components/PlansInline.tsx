@@ -28,18 +28,11 @@ import { PRO_FEATURES as BaseProFeatures } from "@/components/ProGate";
 import { ProValueGrid } from "@/components/ProValue";
 
 const PLANS = [
-  { id: "monthly", ...LTC_TIERS.monthly, period: "/mo", discount: null },
   {
-    id: "quarterly",
-    ...LTC_TIERS.quarterly,
-    period: "/3 mo",
-    discount: "Save 15%",
-  },
-  {
-    id: "yearly",
-    ...LTC_TIERS.yearly,
-    period: "/yr",
-    discount: "Save 30%",
+    id: "monthly",
+    ...LTC_TIERS.monthly,
+    period: "/mo",
+    discount: null,
   },
 ] as const;
 
@@ -165,9 +158,9 @@ export function PlansInline({ compact = false }: { compact?: boolean }) {
         </div>
 
         <p className="text-[11px] text-muted-foreground">
-          Every account gets 10 free AI messages. Pro unlocks unlimited
-          wallet-aware Litecoin AI plus advanced wallet tools. Litecoin only —
-          send and confirm to activate.
+          Every account gets 10 free AI messages. $1.99/month unlocks
+          unlimited LTCme AI plus Heightened Security: PRO, Multisig,
+          PQ Lab and Transaction Builder access. Litecoin payment only.
         </p>
 
         <ul className="space-y-1">
@@ -182,7 +175,7 @@ export function PlansInline({ compact = false }: { compact?: boolean }) {
           ))}
         </ul>
 
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-1 gap-1.5">
           {PLANS.map((p) => {
             const ltc = ltcUsd > 0 ? p.usd / ltcUsd : 0;
             const open = openId === p.id;

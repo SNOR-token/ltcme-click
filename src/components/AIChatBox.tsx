@@ -3,9 +3,10 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Send, Loader2, X, MessageSquare } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { getAiEntitlement, consumeAiMessage } from "@/lib/ai.functions";
+import { getAiEntitlement } from "@/lib/ai.functions";
 import { PacmanGhost } from "./PacmanGhost";
 import { PlansInline } from "./PlansInline";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface AIChatBoxProps {
   isOpen: boolean;
@@ -19,7 +20,19 @@ export interface AIChatBoxProps {
  * - Integrates with existing AI chat functionality
  */
 export function AIChatBox({ isOpen, onToggle }: AIChatBoxProps) {
-  const transport = useRef(new DefaultChatTransport({ api: "/api/chat" }));
+  const transport = useRef(
+    new DefaultChatTransport({
+      api: "/api/chat",
+      headers: async () => {
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
+
+        return token
+          ? { Authorization: `Bearer ${token}` }
+          : {};
+      },
+    }),
+  );
   const { messages, sendMessage, status, setMessages } = useChat({
     id: "floating-ai",
     transport: transport.current,
@@ -29,7 +42,6 @@ export function AIChatBox({ isOpen, onToggle }: AIChatBoxProps) {
   const [entitlement, setEntitlement] = useState<{ hasActiveSub: boolean; freeRemaining: number; canSend: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const refresh = useServerFn(getAiEntitlement);
-  const consume = useServerFn(consumeAiMessage);
   const busy = status === "submitted" || status === "streaming";
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -49,13 +61,19 @@ export function AIChatBox({ isOpen, onToggle }: AIChatBoxProps) {
     const text = input.trim();
     if (!text || busy) return;
     setError(null);
-    const r = await consume();
-    if (!r.ok) { 
-      setEntitlement((e) => e && { ...e, canSend: false, freeRemaining: 0 }); 
-      return; 
-    }
+    if (entitlement && !entitlement.canSend) return;
+
     setInput("");
-    sendMessage({ text });
+
+    if (entitlement && !entitlement.hasActiveSub) {
+      setEntitlement({
+        ...entitlement,
+        freeRemaining: Math.max(0, entitlement.freeRemaining - 1),
+        canSend: entitlement.freeRemaining - 1 > 0,
+      });
+    }
+
+    await sendMessage({ text });
   }
 
   function clearChat() {
@@ -99,7 +117,9 @@ export function AIChatBox({ isOpen, onToggle }: AIChatBoxProps) {
             <PacmanGhost size={28} />
             <div>
               <h3 className="font-semibold text-sm">LTCme AI</h3>
-              <p className="text-xs text-muted-foreground">Litecoin companion</p>
+              <p className="text-xs text-muted-foreground">
+                10 free messages · $1.99/mo unlimited
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">

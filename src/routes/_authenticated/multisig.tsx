@@ -4,6 +4,8 @@ import { Users, Plus, Trash2, Copy, PenLine, Send, KeyRound, RefreshCw } from "l
 import { toast } from "sonner";
 import { useNetworkMode } from "@/lib/ltc/network-mode";
 import { NetworkToggle } from "@/components/ProGate";
+import { useProAccess } from "@/lib/pro";
+import { HeightenedSecurityOverlay } from "@/components/HeightenedSecurityOverlay";
 import { getBalances, broadcastTx } from "@/lib/ltc/api";
 import { formatLtc } from "@/lib/ltc/network";
 import { validateAddress } from "@/lib/ltc/wallet";
@@ -45,12 +47,17 @@ function copy(text: string, label = "Copied") {
 }
 
 function MultisigPage() {
+  const pro = useProAccess();
   const [mode] = useNetworkMode();
   const wallets = useMultisigWallets(mode);
   const [tab, setTab] = useState<"create" | "spend" | "keys">("create");
 
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto space-y-6">
+      <HeightenedSecurityOverlay
+        state={pro}
+        title="Multisig"
+      />
       <div className="flex flex-wrap items-center gap-3">
         <div className="h-11 w-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center neon-edge">
           <Users />

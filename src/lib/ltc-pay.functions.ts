@@ -16,9 +16,7 @@ const LTC_API = "https://litecoinspace.org/api";
 
 /** Price tiers in USD and the access duration each grants. */
 const TIERS: Record<string, { usd: number; days: number; label: string }> = {
-  monthly: { usd: 4.99, days: 31, label: "Monthly" },
-  quarterly: { usd: 9.99, days: 92, label: "3 Months" },
-  yearly: { usd: 19.99, days: 365, label: "Yearly" },
+  monthly: { usd: 1.99, days: 31, label: "Monthly" },
 };
 
 /** tolerance for LTC/USD price movement between send and confirm. */
@@ -129,6 +127,30 @@ export const activateLtcSubscription = createServerFn({ method: "POST" })
       updated_at: new Date(now).toISOString(),
     };
 
+    let writeError;
+
+    if (existing?.id) {
+      const result = await supabaseAdmin
+        .from("subscriptions")
+        .update(row)
+        .eq("id", existing.id);
+
+      writeError = result.error;
+    } else {
+      const result = await supabaseAdmin
+        .from("subscriptions")
+        .insert(row);
+
+      writeError = result.error;
+    }
+
+    if (writeError) {
+      console.error("Litecoin subscription activation failed:", writeError);
+      return {
+        ok: false,
+        error: "Payment was verified, but access could not be activated. Please contact support with your transaction id.",
+      };
+    }
 
     return { ok: true, tier: data.tier, currentPeriodEnd: periodEnd };
   });

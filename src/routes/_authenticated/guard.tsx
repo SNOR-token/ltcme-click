@@ -9,6 +9,7 @@ import { useNetworkMode } from "@/lib/ltc/network-mode";
 import { useProAccess } from "@/lib/pro";
 import { ProLock, ProExpiredNotice, NetworkToggle } from "@/components/ProGate";
 import { PlansInline } from "@/components/PlansInline";
+import { HeightenedSecurityOverlay } from "@/components/HeightenedSecurityOverlay";
 import { ProValueGrid } from "@/components/ProValue";
 import { AGENT_CAPABILITIES, AGENT_PROHIBITIONS } from "@/lib/agent-safety";
 
@@ -96,6 +97,10 @@ function GuardPage() {
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-6">
+      <HeightenedSecurityOverlay
+        state={pro}
+        title="Quantum Guard PRO"
+      />
       <div className="flex flex-wrap items-center gap-3">
         <div className="h-11 w-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center">
           <Shield />

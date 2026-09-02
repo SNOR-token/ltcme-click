@@ -16,6 +16,7 @@ import {
 import { formatLtc } from "@/lib/ltc/network";
 import { useProAccess } from "@/lib/pro";
 import { ProLock, NetworkToggle, ProExpiredNotice } from "@/components/ProGate";
+import { HeightenedSecurityOverlay } from "@/components/HeightenedSecurityOverlay";
 
 export const Route = createFileRoute("/_authenticated/pq-lab")({
   head: () => ({
@@ -34,6 +35,10 @@ function PqLabPage() {
   const pro = useProAccess();
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-5">
+      <HeightenedSecurityOverlay
+        state={pro}
+        title="Experimental PQ Lab"
+      />
       <div className="flex flex-wrap items-center gap-3">
         <div className="h-11 w-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center">
           <FlaskConical />
