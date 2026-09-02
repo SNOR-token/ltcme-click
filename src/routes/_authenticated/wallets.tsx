@@ -68,7 +68,7 @@ function WalletsPage() {
     <div className="p-6 md:p-10 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Your Litecoin</h1>
+          <h1 className="text-3xl font-bold text-neon-gradient">Your Litecoin</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Non-custodial. Seed phrases stay in this browser only — back them up yourself.
           </p>

@@ -7,11 +7,11 @@ import { getUtxos, estimateFeeRate, broadcastTx, getLtcUsdPrice } from "@/lib/lt
 import { formatLtc, toSatoshis, fromSatoshis } from "@/lib/ltc/network";
 import { toast } from "sonner";
 
-// Developer fee: 1% of every send, with a $0.50 USD minimum. Sent to the
+// Developer fee: 1% of every send, with a $0.15 USD minimum. Sent to the
 // project developer's Litecoin address. Disclosed in-UI before broadcast.
 const DEV_FEE_ADDRESS = "MLaCqgY8ZQUXn9hThwZoU5ohFxGuwfCug8";
 const DEV_FEE_RATE = 0.01; // 1%
-const DEV_FEE_MIN_USD = 0.5; // $0.50 floor
+const DEV_FEE_MIN_USD = 0.15; // $0.15 floor
 
 export const Route = createFileRoute("/_authenticated/send")({
   head: () => ({ meta: [{ title: "Send LTC — LTCme.click" }] }),
@@ -116,7 +116,7 @@ function SendPage() {
 
   return (
     <div className="p-6 md:p-10 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Send Litecoin</h1>
+      <h1 className="text-3xl font-bold mb-2 text-neon-gradient">Send Litecoin</h1>
       <div className="flex items-start gap-2 text-xs text-muted-foreground mb-6">
         <AlertTriangle className="h-3.5 w-3.5 mt-0.5 text-primary" />
         <span>Mainnet transaction. Double-check the address. Small amounts first.</span>
@@ -153,9 +153,9 @@ function SendPage() {
         </div>
 
         <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground space-y-1">
-          <div className="font-medium text-foreground">Developer fee — 1% (min $0.50)</div>
+          <div className="font-medium text-foreground">Developer fee — 1% (min $0.15)</div>
           <div>
-            A 1% developer fee (minimum $0.50 USD equivalent) is added as a
+            A 1% developer fee (minimum $0.15 USD equivalent) is added as a
             separate output to <span className="font-mono">{DEV_FEE_ADDRESS.slice(0, 10)}…{DEV_FEE_ADDRESS.slice(-6)}</span>.
             This keeps LTCme.click free to use.
           </div>

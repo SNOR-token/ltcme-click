@@ -44,7 +44,7 @@ function PqLabPage() {
           <FlaskConical />
         </div>
         <div className="flex-1 min-w-[200px]">
-          <h1 className="text-2xl md:text-3xl font-bold">Experimental PQ Lab</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-neon-gradient">Experimental PQ Lab</h1>
           <p className="text-sm text-muted-foreground">A separated sandbox for post-quantum signature experiments.</p>
         </div>
         <NetworkToggle />

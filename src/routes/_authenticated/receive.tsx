@@ -32,7 +32,7 @@ function ReceivePage() {
 
   return (
     <div className="p-6 md:p-10 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Receive Litecoin</h1>
+      <h1 className="text-3xl font-bold mb-2 text-neon-gradient">Receive Litecoin</h1>
       <p className="text-muted-foreground text-sm mb-6">Share this address to receive LTC. It's derived from your wallet's seed.</p>
 
       <div className="card-glass rounded-3xl p-6">

@@ -25,7 +25,7 @@ function BuyPage() {
 
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Buy & Sell Litecoin</h1>
+      <h1 className="text-3xl font-bold mb-2 text-neon-gradient">Buy & Sell Litecoin</h1>
       <p className="text-sm text-muted-foreground mb-6">
         Litecoin-only on- and off-ramps via trusted third-party providers.
         LTCme.click never touches your fiat or your LTC on these routes — you

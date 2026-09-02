@@ -132,14 +132,14 @@ export const activateLtcSubscription = createServerFn({ method: "POST" })
     if (existing?.id) {
       const result = await supabaseAdmin
         .from("subscriptions")
-        .update(row)
+        .update(row as any)
         .eq("id", existing.id);
 
       writeError = result.error;
     } else {
       const result = await supabaseAdmin
         .from("subscriptions")
-        .insert(row);
+        .insert(row as any);
 
       writeError = result.error;
     }

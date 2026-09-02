@@ -87,7 +87,7 @@ function AiPage() {
           <div className="flex items-center gap-3">
             <PacmanGhost size={32} />
             <div>
-              <h1 className="text-xl font-bold">LTCme AI</h1>
+              <h1 className="text-xl font-bold text-neon-gradient">LTCme AI</h1>
               <p className="text-xs text-muted-foreground">Your Litecoin expert companion</p>
             </div>
           </div>

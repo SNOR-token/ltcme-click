@@ -352,7 +352,7 @@ export function PlansInline({ compact = false }: { compact?: boolean }) {
         {PLANS.map((p) => {
           const ltc = ltcUsd > 0 ? p.usd / ltcUsd : 0;
           const open = openId === p.id;
-          const isPopular = p.id === "yearly";
+          const isPopular = false;
 
           return (
             <button

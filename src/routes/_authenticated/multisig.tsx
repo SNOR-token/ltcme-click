@@ -63,7 +63,7 @@ function MultisigPage() {
           <Users />
         </div>
         <div className="flex-1 min-w-[220px]">
-          <h1 className="text-2xl md:text-3xl font-bold">Multisig</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-neon-gradient">Multisig</h1>
           <p className="text-sm text-muted-foreground">
             Create m-of-n Litecoin wallets that need several keys to spend. Everything — key derivation, PSBT building
             and signing — happens locally in your browser.
