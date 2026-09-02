@@ -1,6 +1,6 @@
 # LTCme.click - Agenetic Litecoin Wallet
 
-**Live app**: https://ltcme-click
+**Live app**: https://ltcme.click
 
 ## Development
 
