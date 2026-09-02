@@ -40,7 +40,4 @@ supabase/.temp/
 # Local AI coding-agent tools
 .agents/
 skills-lock.json
-bun.lock
 package-lock.json
-bun.lock
-bunfig.toml
