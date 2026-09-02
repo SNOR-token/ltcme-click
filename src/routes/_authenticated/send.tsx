@@ -152,23 +152,6 @@ function SendPage() {
           </label>
         </div>
 
-        <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground space-y-1">
-          <div className="font-medium text-foreground">Developer fee — 1% (min $0.15)</div>
-          <div>
-            A 1% developer fee (minimum $0.15 USD equivalent) is added as a
-            separate output to <span className="font-mono">{DEV_FEE_ADDRESS.slice(0, 10)}…{DEV_FEE_ADDRESS.slice(-6)}</span>.
-            This keeps LTCme.click free to use.
-          </div>
-          {amountSats > 0 && (
-            <div className="flex justify-between pt-1">
-              <span>Estimated dev fee</span>
-              <span className="text-foreground">
-                {formatLtc(devFeeSats)} LTC{ltcUsd > 0 ? ` (~$${(fromSatoshis(devFeeSats) * ltcUsd).toFixed(2)})` : ""}
-              </span>
-            </div>
-          )}
-        </div>
-
         {!preview ? (
           <button onClick={build} disabled={busy} className="w-full rounded-full bg-primary text-primary-foreground px-5 py-3 text-sm font-medium btn-glow disabled:opacity-50 inline-flex items-center justify-center gap-2">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
@@ -179,7 +162,7 @@ function SendPage() {
             <div className="text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">TXID (pre-broadcast)</span><span className="font-mono text-xs">{preview.txid.slice(0, 12)}…</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Network fee</span><span>{formatLtc(preview.feeSats)} LTC ({preview.feeSats} sats)</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Developer fee (1%)</span><span>{formatLtc(preview.devFeeSats)} LTC</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Developer fee: 1% (minimum $0.15)</span><span>{formatLtc(preview.devFeeSats)} LTC</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Size</span><span>{preview.vbytes} vB</span></div>
             </div>
             <div className="flex gap-2">
