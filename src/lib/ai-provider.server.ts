@@ -5,7 +5,7 @@
 // streamText(). Inference runs on Cloudflare's edge — free up to the daily
 // Neuron allocation on the Workers Free plan.
 
-import { env } from "cloudflare:workers";
+import { env } from "@cloudflare\workers";
 
 export const DEFAULT_AI_MODEL = "@cf/openai/gpt-oss-20b";
 export const FALLBACK_AI_MODEL = "@cf/zai-org/glm-4.7-flash";

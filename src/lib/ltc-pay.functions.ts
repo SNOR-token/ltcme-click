@@ -129,11 +129,6 @@ export const activateLtcSubscription = createServerFn({ method: "POST" })
       updated_at: new Date(now).toISOString(),
     };
 
-    if (existing?.id) {
-      await supabaseAdmin.from("subscriptions").update(row).eq("id", existing.id);
-    } else {
-      await supabaseAdmin.from("subscriptions").insert({ ...row, stripe_subscription_id: null });
-    }
 
     return { ok: true, tier: data.tier, currentPeriodEnd: periodEnd };
   });
