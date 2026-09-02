@@ -68,7 +68,7 @@ export function AIChatBox({ isOpen, onToggle }: AIChatBoxProps) {
     return (
       <button
         onClick={onToggle}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-primary/20 border border-primary/40 px-4 py-2 text-sm text-primary hover:bg-primary/30 transition-all shadow-lg hover:shadow-xl"
+        className="fixed bottom-8 right-8 z-50 flex items-center gap-2 rounded-full bg-primary/20 border border-primary/40 px-4 py-2 text-sm text-primary hover:bg-primary/30 transition-all shadow-lg hover:shadow-xl"
         aria-label="Open AI Chat"
       >
         <PacmanGhost size={20} />
