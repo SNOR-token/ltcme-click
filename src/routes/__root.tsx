@@ -13,7 +13,6 @@ import { type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { Toaster } from "sonner";
 
-
 ensureBuffer();
 
 function NotFoundComponent() {
@@ -82,8 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
-          title:
-            "LTCme.click — The Agentic Litecoin Wallet",
+          title: "LTCme.click — The Agentic Litecoin Wallet",
         },
         {
           name: "description",
@@ -93,8 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "author", content: "LTCme.click" },
         {
           property: "og:title",
-          content:
-            "LTCme.click — The Agentic Litecoin Wallet",
+          content: "LTCme.click — The Agentic Litecoin Wallet",
         },
         {
           property: "og:description",
@@ -105,8 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "twitter:card", content: "summary_large_image" },
         {
           name: "twitter:title",
-          content:
-            "LTCme.click — The Agentic Litecoin Wallet",
+          content: "LTCme.click — The Agentic Litecoin Wallet",
         },
         {
           name: "twitter:description",
@@ -178,10 +174,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <div className="md:pr-[40%]">
-        <Outlet />
-      </div>
+      {/* Public routes remain full width. Authenticated routes own their AI sidebar spacing. */}
+      <Outlet />
       <Toaster theme="dark" position="bottom-right" richColors />
     </QueryClientProvider>
   );
