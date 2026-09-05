@@ -1,5 +1,18 @@
 apply plugin: 'com.android.application'
 
+def releaseSigningValues = [
+    storeFile: System.getenv('LTCME_UPLOAD_KEYSTORE'),
+    storePassword: System.getenv('LTCME_UPLOAD_KEYSTORE_PASSWORD'),
+    keyAlias: System.getenv('LTCME_UPLOAD_KEY_ALIAS'),
+    keyPassword: System.getenv('LTCME_UPLOAD_KEY_PASSWORD')
+]
+def releaseSigningConfigured = releaseSigningValues.values().every { it }
+def partialReleaseSigning = releaseSigningValues.values().any { it } && !releaseSigningConfigured
+
+if (partialReleaseSigning) {
+    throw new GradleException('Set all four LTCME upload-signing environment variables or none of them.')
+}
+
 android {
     namespace = "click.ltcme"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,8 +29,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            release {
+                storeFile file(releaseSigningValues.storeFile)
+                storePassword releaseSigningValues.storePassword
+                keyAlias releaseSigningValues.keyAlias
+                keyPassword releaseSigningValues.keyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            if (releaseSigningConfigured) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

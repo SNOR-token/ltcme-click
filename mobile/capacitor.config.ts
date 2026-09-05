@@ -7,6 +7,7 @@ const config: CapacitorConfig = {
   server: {
     url: "https://ltcme.click",
     cleartext: false,
+    androidScheme: "https",
   },
 };
 
