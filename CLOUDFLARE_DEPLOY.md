@@ -2,6 +2,25 @@
 
 This repository is configured as a TanStack Start application on Cloudflare Workers.
 
+## Quick manual deploy
+
+From a clean checkout of this repository:
+
+```bash
+npm install
+npx wrangler whoami
+npm run build
+npx wrangler deploy
+```
+
+`npm run deploy` combines the final two commands. If Cloudflare is already connected
+to the GitHub repository, pushing to the production branch will also deploy; use one
+method for a release so that the same commit is not deployed twice.
+
+Before committing from the uploaded working copy, stage exact files rather than
+running `git add .` because that copy also contains an untracked nested presale
+repository.
+
 ## 1. Connect the repository
 
 For an existing Worker:
@@ -60,6 +79,7 @@ In Supabase **Authentication**:
 
 - Set the Site URL to `https://ltcme.click`.
 - Allow `https://ltcme.click/**` and `https://www.ltcme.click/**` as redirect URLs.
+- Allow `click.ltcme://auth/callback` for the Android Google sign-in return.
 - Keep Email sign-in and new-user signup enabled.
 - Include `{{ .Token }}` in the Magic Link email template because the app verifies a six-digit email OTP.
 
@@ -67,11 +87,30 @@ In Supabase **Authentication**:
 
 After the Worker preview succeeds, open **Settings > Domains & Routes** and attach **ltcme.click** as a custom domain. Verify the Worker URL first, then replace any older origin route or DNS record that still sends traffic to the previous host.
 
-## 7. Verify the app and APK
+## 7. Verify the app and Android download page
 
 Run:
 
     curl -I https://ltcme.click/
-    curl -I https://ltcme.click/downloads/LTCme.apk
+    curl -I https://ltcme.click/auth
+    curl -I https://ltcme.click/wallets
+    curl -I https://ltcme.click/download
 
-The APK is already tracked at **public/downloads/LTCme.apk**, so the second URL should return **200** after this repository is the active deployment.
+The QR code should point to `https://ltcme.click/download`, not directly to an APK.
+Only add `public/downloads/LTCme.apk` after producing and verifying a release-signed
+APK. Never publish the earlier debug-signed test build.
+
+## 8. Push the prepared release
+
+Review the staged paths carefully, then commit and push:
+
+```bash
+git status --short
+git add CLOUDFLARE_DEPLOY.md ANDROID_RELEASE.md mobile src
+git add -u public/downloads
+git commit -m "Connect web auth and Android release flow"
+git push origin main
+```
+
+If the signed APK is not ready, omit `public/downloads/LTCme.apk` from `git add`.
+The Android App Bundle is uploaded to Google Play and should not be committed.
