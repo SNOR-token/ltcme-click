@@ -174,10 +174,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Public routes remain full width. Authenticated routes own their AI sidebar spacing. */}
       <Outlet />
       <Toaster theme="dark" position="bottom-right" richColors />
     </QueryClientProvider>
   );
 }
-

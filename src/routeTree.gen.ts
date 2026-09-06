@@ -25,6 +25,7 @@ import { Route as AuthenticatedPqLabRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedReceiveRouteImport } from './routes/_authenticated/receive'
 import { Route as AuthenticatedSendRouteImport } from './routes/_authenticated/send'
 import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated/tools'
+import { Route as AuthenticatedTxRiskAnalysisRouteImport } from './routes/_authenticated/tx-risk-analysis'
 import { Route as AuthenticatedWalletsRouteImport } from './routes/_authenticated/wallets'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
@@ -107,6 +108,12 @@ const AuthenticatedToolsRoute = AuthenticatedToolsRouteImport.update({
   path: '/tools',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTxRiskAnalysisRoute =
+  AuthenticatedTxRiskAnalysisRouteImport.update({
+    id: '/tx-risk-analysis',
+    path: '/tx-risk-analysis',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedWalletsRoute = AuthenticatedWalletsRouteImport.update({
   id: '/wallets',
   path: '/wallets',
@@ -134,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
+  '/tx-risk-analysis': typeof AuthenticatedTxRiskAnalysisRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -153,6 +161,7 @@ export interface FileRoutesByTo {
   '/receive': typeof AuthenticatedReceiveRoute
   '/send': typeof AuthenticatedSendRoute
   '/tools': typeof AuthenticatedToolsRoute
+  '/tx-risk-analysis': typeof AuthenticatedTxRiskAnalysisRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/_authenticated/receive': typeof AuthenticatedReceiveRoute
   '/_authenticated/send': typeof AuthenticatedSendRoute
   '/_authenticated/tools': typeof AuthenticatedToolsRoute
+  '/_authenticated/tx-risk-analysis': typeof AuthenticatedTxRiskAnalysisRoute
   '/_authenticated/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/receive'
     | '/send'
     | '/tools'
+    | '/tx-risk-analysis'
     | '/wallets'
     | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/receive'
     | '/send'
     | '/tools'
+    | '/tx-risk-analysis'
     | '/wallets'
     | '/api/chat'
   id:
@@ -234,6 +246,7 @@ export interface FileRouteTypes {
     | '/_authenticated/receive'
     | '/_authenticated/send'
     | '/_authenticated/tools'
+    | '/_authenticated/tx-risk-analysis'
     | '/_authenticated/wallets'
     | '/api/chat'
   fileRoutesById: FileRoutesById
@@ -364,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedToolsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/tx-risk-analysis': {
+      id: '/_authenticated/tx-risk-analysis'
+      path: '/tx-risk-analysis'
+      fullPath: '/tx-risk-analysis'
+      preLoaderRoute: typeof AuthenticatedTxRiskAnalysisRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/wallets': {
       id: '/_authenticated/wallets'
       path: '/wallets'
@@ -390,6 +410,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedReceiveRoute: typeof AuthenticatedReceiveRoute
   AuthenticatedSendRoute: typeof AuthenticatedSendRoute
   AuthenticatedToolsRoute: typeof AuthenticatedToolsRoute
+  AuthenticatedTxRiskAnalysisRoute: typeof AuthenticatedTxRiskAnalysisRoute
   AuthenticatedWalletsRoute: typeof AuthenticatedWalletsRoute
 }
 
@@ -402,6 +423,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedReceiveRoute: AuthenticatedReceiveRoute,
   AuthenticatedSendRoute: AuthenticatedSendRoute,
   AuthenticatedToolsRoute: AuthenticatedToolsRoute,
+  AuthenticatedTxRiskAnalysisRoute: AuthenticatedTxRiskAnalysisRoute,
   AuthenticatedWalletsRoute: AuthenticatedWalletsRoute,
 }
 
