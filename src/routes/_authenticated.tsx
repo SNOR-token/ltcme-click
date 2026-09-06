@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LogoMark } from "./index";
-import { Wallet, Send, Download, Wrench, LogOut, Banknote, Users, ChevronDown, MoreHorizontal, Shield, FlaskConical } from "lucide-react";
+import { Wallet, Send, Download, Wrench, LogOut, Banknote, Users, ChevronDown, MoreHorizontal, Shield, FlaskConical, ShieldCheck } from "lucide-react";
 import { NetworkToggle } from "@/components/ProGate";
 import { AIChatBox } from "@/components/AIChatBox";
 import {
@@ -92,6 +92,7 @@ function TopNav({ email }: { email: string | null }) {
     { to: "/multisig", label: "Multisig", icon: Users },
     { to: "/tools", label: "Tools", icon: Wrench },
     { to: "/pq-lab", label: "PQ Lab", icon: FlaskConical },
+    { to: "/tx-risk-analysis", label: "Risk Analysis", icon: ShieldCheck },
   ] as const;
 
   const walletActive = pathname.startsWith("/wallets");
