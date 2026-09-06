@@ -122,14 +122,14 @@ function SupportPage() {
           <section>
             <h2 className="text-foreground text-lg font-semibold">Contact</h2>
             <p className="mb-4">
-              For non-urgent questions, email <a className="text-primary hover:underline" href="mailto:support@ltcme.click">support@ltcme.click</a>.
+              For non-urgent questions, email <a className="text-primary hover:underline" href="mailto:chad78500@gmail.com">chad78500@gmail.com</a>.
             </p>
             
             {/* Contact Form */}
             <div className="rounded-2xl border border-border bg-card/50 p-6 neon-edge">
               <h3 className="text-lg font-semibold text-neon-yellow mb-4">Send us a message</h3>
               <form 
-                action="https://formsubmit.co/support@ltcme.click" 
+                action="https://formsubmit.co/chad78500@gmail.com" 
                 method="POST"
                 className="space-y-4"
               >
@@ -181,6 +181,10 @@ function SupportPage() {
             
             <p className="mt-4 text-xs text-muted-foreground">
               Response time: Typically 24-48 hours. For urgent issues, check our <Link to="/" className="text-primary hover:underline">homepage</Link> for status updates.
+            </p>
+            
+            <p className="mt-4 text-xs text-muted-foreground/70">
+              ⚠️ This form sends directly to chad78500@gmail.com. We never share your email with third parties.
             </p>
           </section>
 

@@ -81,7 +81,7 @@ Add this DNS TXT record:
 ```
 Type: TXT
 Name: _dmarc.ltcme.click
-Value: "v=DMARC1; p=none; rua=mailto:you@your-email.com; ruf=mailto:you@your-email.com; pct=100"
+Value: "v=DMARC1; p=none; rua=mailto:chad78500@gmail.com; ruf=mailto:chad78500@gmail.com; pct=100"
 ```
 
 Start with `p=none` (monitor only), then change to `p=quarantine` after testing.
@@ -136,7 +136,7 @@ The support page already links to `mailto:support@ltcme.click`. I've also added 
 
 The contact form on `/support` uses:
 ```html
-<form action="https://formsubmit.co/support@ltcme.click" method="POST">
+<form action="https://formsubmit.co/chad78500@gmail.com" method="POST">
   <input type="hidden" name="_subject" value="LTCme.click Support Request">
   <input type="hidden" name="_next" value="https://ltcme.click/support/thank-you">
   <input type="hidden" name="_captcha" value="false">
@@ -145,7 +145,7 @@ The contact form on `/support` uses:
 ```
 
 This will:
-- Send submissions to `support@ltcme.click`
+- Send submissions to `chad78500@gmail.com`
 - Redirect users to a thank-you page
 - Skip CAPTCHA (since you're a real site)
 
