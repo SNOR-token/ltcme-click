@@ -1,137 +1,206 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { EmailAuth } from "@/components/EmailAuth";
-import { Wallet, Send, ShieldCheck, Bot, Banknote } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { QRCodeSVG } from "qrcode.react";
+import {
+  ArrowRight,
+  Bot,
+  Download,
+  ExternalLink,
+  LockKeyhole,
+  Newspaper,
+  ShieldCheck,
+  Smartphone,
+  Wallet,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
-  component: RootGate,
+  component: JournalLanding,
   head: () => ({
     meta: [
-      { title: "LTCme.click — Agentic Litecoin Wallet with a built-in AI" },
+      { title: "LTCme.click Journal — Litecoin wallet, AI & security" },
       {
         name: "description",
         content:
-          "A friendly self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
+          "The public home of LTCme.click: product journal, Android download, Litecoin wallet access, security notes and project updates.",
       },
-      { property: "og:title", content: "LTCme.click — Agentic Litecoin Wallet with a built-in AI" },
+      { property: "og:title", content: "LTCme.click Journal" },
       { property: "og:url", content: "https://ltcme.click/" },
       {
         property: "og:description",
         content:
-          "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
+          "Follow LTCme.click development, install the Android app, or open the self-custody Litecoin wallet.",
       },
     ],
     links: [{ rel: "canonical", href: "https://ltcme.click/" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: "LTCme.click",
-          url: "https://ltcme.click/",
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web",
-          description:
-            "Self-custody Litecoin wallet with an always-on AI companion, live mainnet balances, buy/sell and wallet tools.",
-        }),
-      },
-    ],
   }),
 });
 
-function RootGate() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/wallets", replace: true });
-    });
-  }, [navigate]);
-
+function JournalLanding() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 px-6 py-12 max-w-6xl w-full mx-auto">
-        <div className="grid 
-gap-10 md:grid-cols-2 md:items-center">
-          <section className="text-foreground">
-            <div className="flex items-center gap-3 mb-6">
-              <LogoMark size={44} />
-              <span className="text-xl font-semibold">LTCme<span className="text-primary">.click</span></span>
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <header className="border-b border-border/50 bg-background/90 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-3" aria-label="LTCme.click home">
+            <LogoMark size={40} />
+            <div>
+              <div className="text-lg font-semibold leading-none">
+                LTCme<span className="text-primary">.click</span>
+              </div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+                The Journal
+              </div>
             </div>
-            <span className="eyebrow">Self-custody · Litecoin only</span>
-            <h1 className="mt-3 text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]">
-              The Agentic<br className="hidden md:block" /> Litecoin Wallet
-            </h1>
-            <p className="mt-3 text-lg font-medium gradient-text">Your Litecoin, your keys, with an AI beside you.</p>
-            <p className="mt-5 text-base text-muted-foreground leading-relaxed">
-              LTCme.click is a real Litecoin wallet you fully control. Keys are generated and stored
-              in your browser — never on our servers. An always-on AI agent sits beside every screen
-              to explain what you're doing, watch your addresses for exposure, and prepare
-              transactions you approve and sign yourself.
-            </p>
-            <div className="mt-7 grid sm:grid-cols-2 gap-2.5">
-              {[
-                { icon: Wallet, t: "Unlimited wallets", d: "Create or import BIP39 seeds and WIF keys. BIP44, BIP49 and BIP84 addresses." },
-                { icon: Send, t: "Send & receive", d: "Live mainnet balances, fee estimates and address validation." },
-                { icon: Banknote, t: "Buy & cash out", d: "Litecoin on-ramps and off-ramps via vetted crypto partners." },
-                { icon: ShieldCheck, t: "Self-custody", d: "Keys are generated and stored in your browser. We never see them." },
-                { icon: Bot, t: "Agentic AI", d: "Always-on Litecoin agent. It can never see keys or move funds." },
-              ].map((f) => (
-                <div key={f.t} className="rounded-xl card-glass p-3.5">
-                  <div className="fle
-x
- items-center gap-2">
-                    <f.icon className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">{f.t}</span>
-                  </div>
-                  <p className="mt-1.5 text-xs text-muted-foreground">{f.d}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+          </Link>
 
-          <section className="card-glass neon-edge rounded-3xl p-8 md:p-10 text-center">
-            <div className="flex justify-center mb-5">
-              <LogoMark size={56} />
-            </div>
-            <h2 className="text-2xl font-bold">
-              <span className="gradient-text">Sign in</span>
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Email code only. No password, no wallet connect, no tracking pixels.
-            </p>
-            <EmailAuth onSignedIn={() => navigate({ to: "/wallets" })} />
-            <p className="mt-5 text-xs text-muted-foreground">
-              Your Litecoin keys are generated in your browser and stored locally on this device only. LTCme never sees them — back up your seed phrase yourself. Optionally protect your seed with a BIP39 passphrase (25th word).
-            </p>
-            <p className="mt-3 text-[11px] text-muted-foreground">
-              By continuing you agree to our{" "}
-              <Link to="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
-              <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
-            </p>
-          </section>
+          <nav className="flex items-center gap-2 sm:gap-3">
+            <a
+              href="https://presale.ltcme.click"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm hover:border-primary/60 transition"
+            >
+              Presale <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+            <Link
+              to="/auth"
+              className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition"
+            >
+              Open Wallet <ArrowRight className="h-4 w-4" />
+            </Link>
+          </nav>
         </div>
+      </header>
 
-        <section className="mt-16">
-          <span className="eyebrow">Free vs Pro</span>
-          <h2 className="mt-2 text-2xl font-bold">The wallet is free. Pro is unlimited AI.</h2>
-          <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-            Creating wallets, sending, receiving, buying and multisig are free forever.
-            Every account gets 10 free AI messages; after that, Pro (unl
-imited AI + advanced tools)
-            is $4.99/mo, $9.99/3mo or $19.99/yr, payable with Litecoin only.
-          </p>
-          <div className="mt-6 neon-rule" />
+      <main className="flex-1">
+        <section className="max-w-6xl mx-auto px-6 py-12 md:py-16">
+          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-10 lg:gap-14 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary">
+                <Newspaper className="h-3.5 w-3.5" />
+                LTCme.click Journal
+              </div>
+              <h1 className="mt-5 text-4xl md:text-6xl font-bold tracking-tight leading-[1.02]">
+                Litecoin, self-custody,
+                <span className="block gradient-text">and the software behind it.</span>
+              </h1>
+              <p className="mt-5 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
+                This is the public front door to LTCme.click. Read project updates, install the Android app,
+                review how the wallet is designed, or continue into the authenticated wallet when you are ready.
+              </p>
+
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  to="/auth"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-3 font-medium hover:opacity-90 transition"
+                >
+                  <Wallet className="h-4 w-4" />
+                  Open Web Wallet
+                </Link>
+                <Link
+                  to="/download"
+                  className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-3 font-medium hover:border-primary/60 transition"
+                >
+                  <Download className="h-4 w-4" />
+                  Android Download
+                </Link>
+              </div>
+
+              <div className="mt-8 grid sm:grid-cols-3 gap-3">
+                {[
+                  { icon: LockKeyhole, title: "Self-custody", text: "Wallet keys stay on your device." },
+                  { icon: Bot, title: "AI assisted", text: "AI can explain and prepare; you approve and sign." },
+                  { icon: ShieldCheck, title: "Litecoin focused", text: "Built around Litecoin mainnet workflows." },
+                ].map((item) => (
+                  <div key={item.title} className="card-glass rounded-2xl p-4">
+                    <item.icon className="h-5 w-5 text-primary" />
+                    <div className="mt-3 text-sm font-semibold">{item.title}</div>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <aside className="card-glass neon-edge rounded-3xl p-7 md:p-8">
+              <div className="flex items-center gap-3">
+                <Smartphone className="h-5 w-5 text-primary" />
+                <div>
+                  <h2 className="font-semibold">Take LTCme with you</h2>
+                  <p className="text-xs text-muted-foreground">Scan to open the official download page.</p>
+                </div>
+              </div>
+
+              <div className="mt-6 mx-auto w-fit rounded-3xl bg-white p-4 shadow-sm">
+                <QRCodeSVG
+                  value="https://ltcme.click/download"
+                  size={220}
+                  level="M"
+                  includeMargin={false}
+                  aria-label="QR code for the LTCme Android download page"
+                />
+              </div>
+
+              <p className="mt-5 text-center text-sm text-muted-foreground">
+                QR destination: <span className="text-foreground">ltcme.click/download</span>
+              </p>
+              <Link
+                to="/download"
+                className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-full border border-primary/40 px-5 py-3 text-sm font-medium hover:bg-primary/5 transition"
+              >
+                View Android Download <ArrowRight className="h-4 w-4" />
+              </Link>
+            </aside>
+          </div>
+        </section>
+
+        <section className="border-y border-border/50 bg-muted/20">
+          <div className="max-w-6xl mx-auto px-6 py-10">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <div>
+                <span className="eyebrow">Journal notes</span>
+                <h2 className="mt-2 text-2xl md:text-3xl font-bold">What LTCme is building</h2>
+              </div>
+              <p className="max-w-xl text-sm text-muted-foreground leading-relaxed">
+                The wallet is the product; this page stays public so visitors can understand the project before signing in.
+              </p>
+            </div>
+
+            <div className="mt-7 grid md:grid-cols-3 gap-4">
+              <article className="card-glass rounded-2xl p-5">
+                <span className="text-xs uppercase tracking-[0.18em] text-primary">Wallet</span>
+                <h3 className="mt-2 font-semibold">A deliberate public-to-private flow</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  Visiting LTCme.click no longer drops you into authentication. The Journal comes first; wallet access is an explicit action.
+                </p>
+              </article>
+              <article className="card-glass rounded-2xl p-5">
+                <span className="text-xs uppercase tracking-[0.18em] text-primary">Mobile</span>
+                <h3 className="mt-2 font-semibold">One stable Android entry point</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  The QR always points to the LTCme download page, so the underlying APK can change later without replacing printed QR codes.
+                </p>
+              </article>
+              <article className="card-glass rounded-2xl p-5">
+                <span className="text-xs uppercase tracking-[0.18em] text-primary">Access</span>
+                <h3 className="mt-2 font-semibold">Google or email, then wallet</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  The Open Wallet button goes to authentication. Successful sign-in then continues to the wallet dashboard.
+                </p>
+              </article>
+            </div>
+          </div>
         </section>
       </main>
-      <footer className="px-6 py-4 text-[11px] text-muted-foreground flex items-center justify-between flex-wrap gap-2 border-t border-border/40 neon-footer">
-        <span>© 2026 LTCme.click</span>
-        <span className="flex items-center gap-4">
-          <Link to="/support" className="hover:text-foreground">Support</Link>
-          <Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link>
-          <Link to="/terms" className="hover:text-foreground">Terms of Service</Link>
-        </span>
+
+      <footer className="px-6 py-5 text-[11px] text-muted-foreground border-t border-border/40 neon-footer">
+        <div className="max-w-6xl mx-auto flex items-center justify-between flex-wrap gap-3">
+          <span>© 2026 LTCme.click</span>
+          <span className="flex items-center gap-4 flex-wrap">
+            <Link to="/download" className="hover:text-foreground">Download</Link>
+            <a href="https://presale.ltcme.click" target="_blank" rel="noreferrer" className="hover:text-foreground">Presale</a>
+            <Link to="/support" className="hover:text-foreground">Support</Link>
+            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+            <Link to="/terms" className="hover:text-foreground">Terms</Link>
+          </span>
+        </div>
       </footer>
     </div>
   );

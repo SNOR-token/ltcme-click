@@ -92,6 +92,7 @@ function TopNav({ email }: { email: string | null }) {
     { to: "/multisig", label: "Multisig", icon: Users },
     { to: "/tools", label: "Tools", icon: Wrench },
     { to: "/pq-lab", label: "PQ Lab", icon: FlaskConical },
+{ to: "/tx-risk-analysis", label: "Risk Analysis", icon: ShieldCheck },
   ] as const;
 
   const walletActive = pathname.startsWith("/wallets");
