@@ -2,11 +2,12 @@
 
 > A non-custodial Litecoin web wallet with an AI assistant, wallet tools, and a transaction builder.
 
-LTCme.click lets users import or generate Litecoin wallets, view balances, send and receive LTC, and chat with a Litecoin-focused AI. The app requires Google sign-in to access wallet features. Most tools are free; the AI assistant offers 5 free messages, then paid plans.
+LTCme.click lets users import or generate Litecoin wallets, view balances, send and receive LTC, and chat with a Litecoin-focused AI. Users sign in with Google or a one-time email code before accessing wallet features. Most tools are free; paid plans add unlimited AI and advanced tools.
 
 ## Pages
 
-- [Pricing](/pricing): Subscription plans for the Litecoin AI assistant.
+- [Sign in](/auth): Continue to the wallet with Google or a one-time email code.
+- [Android app](/download): Official Google Play and release-download information.
 
 ## Optional
 

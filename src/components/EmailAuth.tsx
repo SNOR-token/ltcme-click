@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { startGoogleSignIn, takeNativeAuthError } from "@/lib/native-auth";
 
 export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
   const [email, setEmail] = useState("");
@@ -10,19 +11,23 @@ export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
   const [err, setErr] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
 
+  useEffect(() => {
+    const nativeError = takeNativeAuthError();
+    if (nativeError) setErr(nativeError);
+  }, []);
+
   async function signInWithGoogle() {
     setErr(null);
     setNote(null);
     setGoogleLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth`,
-      },
-    });
-    if (error) {
+    try {
+      const { openedNativeBrowser } = await startGoogleSignIn();
+      if (openedNativeBrowser) {
+        setNote("Finish signing in with Google, then you’ll return here automatically.");
+      }
+    } catch (error) {
       setGoogleLoading(false);
-      setErr(error.message);
+      setErr(error instanceof Error ? error.message : "Google sign-in failed.");
     }
   }
 
@@ -81,11 +86,7 @@ export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
             disabled={loading || googleLoading}
             className="w-full rounded-full bg-white text-slate-900 border border-slate-300 px-6 py-3 font-medium hover:bg-slate-100 transition disabled:opacity-50 flex items-center justify-center gap-3"
           >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              className="h-5 w-5"
-            >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
               <path
                 fill="#4285F4"
                 d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.41Z"
