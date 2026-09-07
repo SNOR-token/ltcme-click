@@ -158,13 +158,13 @@ function SupportPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-muted-foreground mb-1">Message *</label>
+                  <label className="block text-sm text-foreground mb-2 font-medium">Your Message *</label>
                   <textarea 
                     name="message" 
                     required
-                    rows={4}
-                    placeholder="Describe your issue... (Never share seed phrases or private keys)"
-                    className="w-full rounded-xl border border-border bg-background/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                    rows={8}
+                    placeholder="Type your message here... (Never share seed phrases, private keys, or passwords)"
+                    className="w-full rounded-xl border-2 border-primary/30 bg-background/40 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   />
                 </div>
                 <p className="text-[10px] text-muted-foreground/70">
