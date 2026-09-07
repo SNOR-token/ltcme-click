@@ -121,8 +121,70 @@ function SupportPage() {
 
           <section>
             <h2 className="text-foreground text-lg font-semibold">Contact</h2>
-            <p>
-              For non-urgent questions, email <a className="text-primary hover:underline" href="mailto:support@ltcme.click">support@ltcme.click</a>. Please include your account email and a description of the issue. Never include your seed phrase or private keys.
+            <p className="mb-4">
+              For non-urgent questions, email <a className="text-primary hover:underline" href="mailto:chad78500@gmail.com">chad78500@gmail.com</a>.
+            </p>
+            
+            {/* Contact Form */}
+            <div className="rounded-2xl border border-border bg-card/50 p-6 neon-edge">
+              <h3 className="text-lg font-semibold text-neon-yellow mb-4">Send us a message</h3>
+              <form 
+                action="https://formsubmit.co/chad78500@gmail.com" 
+                method="POST"
+                className="space-y-4"
+              >
+                <input type="hidden" name="_subject" value="LTCme.click Support Request" />
+                <input type="hidden" name="_next" value="https://ltcme.click/support/thank-you" />
+                <input type="hidden" name="_captcha" value="false" />
+                
+                <div>
+                  <label className="block text-xs text-muted-foreground mb-1">Your Email *</label>
+                  <input 
+                    type="email" 
+                    name="email" 
+                    required
+                    placeholder="your@email.com"
+                    className="w-full rounded-xl border border-border bg-background/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-muted-foreground mb-1">Subject *</label>
+                  <input 
+                    type="text" 
+                    name="subject" 
+                    required
+                    placeholder="Help with my wallet"
+                    className="w-full rounded-xl border border-border bg-background/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-foreground mb-2 font-medium">Your Message *</label>
+                  <textarea 
+                    name="message" 
+                    required
+                    rows={8}
+                    placeholder="Type your message here... (Never share seed phrases, private keys, or passwords)"
+                    className="w-full rounded-xl border-2 border-primary/30 bg-background/40 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground/70">
+                  ⚠️ Never include your seed phrase, private keys, or passwords. We cannot recover lost seeds.
+                </p>
+                <button 
+                  type="submit"
+                  className="rounded-xl bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 btn-glow w-full sm:w-auto"
+                >
+                  Send Message
+                </button>
+              </form>
+            </div>
+            
+            <p className="mt-4 text-xs text-muted-foreground">
+              Response time: Typically 24-48 hours. For urgent issues, check our <Link to="/" className="text-primary hover:underline">homepage</Link> for status updates.
+            </p>
+            
+            <p className="mt-4 text-xs text-muted-foreground/70">
+              ⚠️ This form sends directly to chad78500@gmail.com. We never share your email with third parties.
             </p>
           </section>
 

@@ -28,6 +28,7 @@ import { Route as AuthenticatedToolsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedTxRiskAnalysisRouteImport } from './routes/_authenticated/tx-risk-analysis'
 import { Route as AuthenticatedWalletsRouteImport } from './routes/_authenticated/wallets'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as SupportThankYouRouteImport } from './routes/support/thank-you'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -124,6 +125,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SupportThankYouRoute = SupportThankYouRouteImport.update({
+  id: '/thank-you',
+  path: '/thank-you',
+  getParentRoute: () => SupportRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -131,7 +137,7 @@ export interface FileRoutesByFullPath {
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/tx-risk-analysis': typeof AuthenticatedTxRiskAnalysisRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
+  '/support/thank-you': typeof SupportThankYouRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -151,7 +158,7 @@ export interface FileRoutesByTo {
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
   '/ai': typeof AuthenticatedAiRoute
   '/buy': typeof AuthenticatedBuyRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/tx-risk-analysis': typeof AuthenticatedTxRiskAnalysisRoute
   '/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
+  '/support/thank-you': typeof SupportThankYouRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -173,7 +181,7 @@ export interface FileRoutesById {
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/_authenticated/tx-risk-analysis': typeof AuthenticatedTxRiskAnalysisRoute
   '/_authenticated/wallets': typeof AuthenticatedWalletsRoute
   '/api/chat': typeof ApiChatRoute
+  '/support/thank-you': typeof SupportThankYouRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/tx-risk-analysis'
     | '/wallets'
     | '/api/chat'
+    | '/support/thank-you'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/tx-risk-analysis'
     | '/wallets'
     | '/api/chat'
+    | '/support/thank-you'
   id:
     | '__root__'
     | '/'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tx-risk-analysis'
     | '/_authenticated/wallets'
     | '/api/chat'
+    | '/support/thank-you'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -258,7 +270,7 @@ export interface RootRouteChildren {
   DownloadRoute: typeof DownloadRoute
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SupportRoute: typeof SupportRoute
+  SupportRoute: typeof SupportRouteWithChildren
   TermsRoute: typeof TermsRoute
   ApiChatRoute: typeof ApiChatRoute
 }
@@ -398,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/support/thank-you': {
+      id: '/support/thank-you'
+      path: '/thank-you'
+      fullPath: '/support/thank-you'
+      preLoaderRoute: typeof SupportThankYouRouteImport
+      parentRoute: typeof SupportRoute
+    }
   }
 }
 
@@ -431,6 +450,17 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface SupportRouteChildren {
+  SupportThankYouRoute: typeof SupportThankYouRoute
+}
+
+const SupportRouteChildren: SupportRouteChildren = {
+  SupportThankYouRoute: SupportThankYouRoute,
+}
+
+const SupportRouteWithChildren =
+  SupportRoute._addFileChildren(SupportRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -438,7 +468,7 @@ const rootRouteChildren: RootRouteChildren = {
   DownloadRoute: DownloadRoute,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SupportRoute: SupportRoute,
+  SupportRoute: SupportRouteWithChildren,
   TermsRoute: TermsRoute,
   ApiChatRoute: ApiChatRoute,
 }
