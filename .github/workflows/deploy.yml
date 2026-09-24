@@ -2,7 +2,7 @@ name: Build and deploy to Cloudflare
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix-email-auth-e2e-20260924]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Cloudflare Workers
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
