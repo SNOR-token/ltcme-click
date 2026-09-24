@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { EmailAuth } from "@/components/EmailAuth";
 import { LogoMark } from "./index";
@@ -20,10 +20,44 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const [authError, setAuthError] = useState<string | null>(null);
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/wallets" });
-    });
+    let mounted = true;
+    let unsubscribe: (() => void) | undefined;
+
+    const openWallet = () => {
+      if (mounted) navigate({ to: "/wallets", replace: true });
+    };
+
+    try {
+      const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session) openWallet();
+      });
+      unsubscribe = () => authListener.subscription.unsubscribe();
+
+      supabase.auth
+        .getSession()
+        .then(({ data, error }) => {
+          if (!mounted) return;
+          if (error) {
+            setAuthError(error.message);
+            return;
+          }
+          if (data.session) openWallet();
+        })
+        .catch((error: unknown) => {
+          if (!mounted) return;
+          setAuthError(error instanceof Error ? error.message : "Unable to check your login session.");
+        });
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Authentication is not configured.");
+    }
+
+    return () => {
+      mounted = false;
+      unsubscribe?.();
+    };
   }, [navigate]);
 
   return (
@@ -39,7 +73,12 @@ function AuthPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Litecoin's AI-powered self-custody wallet.
           </p>
-          <EmailAuth onSignedIn={() => navigate({ to: "/wallets" })} />
+          {authError && (
+            <p className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-left text-sm text-destructive">
+              {authError}
+            </p>
+          )}
+          <EmailAuth onSignedIn={openWallet} />
           <p className="mt-6 text-xs text-muted-foreground">
             Your Litecoin keys are generated in your browser and stored locally on this device only. LTCme never sees them — back up your seed phrase yourself. Optionally protect your seed with a BIP39 passphrase (25th word).
           </p>
