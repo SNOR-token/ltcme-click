@@ -3,9 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 import { brokeredPreviewStorage } from "./previewAuthStorage";
 
-const FALLBACK_SUPABASE_URL = "https://fhmxhrmtzjazcbctahrv.supabase.co";
-const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_5HMo9vH-vMxtvJN-t0RU5w_0etOrcyP";
+const PRODUCTION_SUPABASE_URL = "https://sddeayzumvkdmdgqetyz.supabase.co";
+const PRODUCTION_SUPABASE_HOST = "sddeayzumvkdmdgqetyz.supabase.co";
 
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
@@ -38,17 +37,40 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
+function serverEnv(name: "SUPABASE_URL" | "SUPABASE_PUBLISHABLE_KEY") {
+  if (typeof process === "undefined" || !process.env) return undefined;
+  return process.env[name]?.trim();
+}
+
 function createSupabaseClient() {
-  // Prefer build/runtime environment values, but keep a production-safe public
-  // fallback so a missing local .env can never blank the entire application.
+  // Browser builds must receive the publishable key at build time. SSR/Worker
+  // execution may also read the corresponding runtime binding.
   const SUPABASE_URL =
-    import.meta.env.VITE_SUPABASE_URL ||
-    process.env.SUPABASE_URL ||
-    FALLBACK_SUPABASE_URL;
+    import.meta.env.VITE_SUPABASE_URL?.trim() ||
+    serverEnv("SUPABASE_URL") ||
+    PRODUCTION_SUPABASE_URL;
   const SUPABASE_PUBLISHABLE_KEY =
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_PUBLISHABLE_KEY ||
-    FALLBACK_SUPABASE_PUBLISHABLE_KEY;
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    serverEnv("SUPABASE_PUBLISHABLE_KEY");
+
+  if (!SUPABASE_PUBLISHABLE_KEY) {
+    throw new Error(
+      "LTCme authentication is not configured: missing Supabase publishable key.",
+    );
+  }
+
+  let host: string;
+  try {
+    host = new URL(SUPABASE_URL).hostname;
+  } catch {
+    throw new Error("LTCme authentication is not configured: invalid Supabase URL.");
+  }
+
+  if (host !== PRODUCTION_SUPABASE_HOST) {
+    throw new Error(
+      `LTCme authentication must use the production Supabase project (${PRODUCTION_SUPABASE_HOST}).`,
+    );
+  }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {
@@ -58,6 +80,7 @@ function createSupabaseClient() {
       storage: brokeredPreviewStorage(),
       persistSession: true,
       autoRefreshToken: true,
+      detectSessionInUrl: true,
     },
   });
 }

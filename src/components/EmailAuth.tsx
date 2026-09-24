@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Authentication failed. Please try again.";
+}
+
 export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
   const [email, setEmail] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
   const [code, setCode] = useState("");
   const [stage, setStage] = useState<"email" | "code">("email");
   const [loading, setLoading] = useState(false);
@@ -14,16 +19,30 @@ export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
     setErr(null);
     setNote(null);
     setGoogleLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth`,
+        },
+      });
+      if (error) setErr(error.message);
+    } catch (error) {
+      setErr(errorMessage(error));
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
+  async function requestCode(targetEmail: string) {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: targetEmail,
       options: {
-        redirectTo: `${window.location.origin}/auth`,
+        shouldCreateUser: true,
+        emailRedirectTo: `${window.location.origin}/auth`,
       },
     });
-    if (error) {
-      setGoogleLoading(false);
-      setErr(error.message);
-    }
+    if (error) throw error;
   }
 
   async function sendCode(e?: React.FormEvent) {
@@ -35,40 +54,72 @@ export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
       setErr("Enter a valid email address.");
       return;
     }
+
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: clean,
-      options: { shouldCreateUser: true },
-    });
-    setLoading(false);
-    if (error) {
-      setErr(error.message);
-      return;
+    try {
+      await requestCode(clean);
+      setPendingEmail(clean);
+      setEmail(clean);
+      setCode("");
+      setStage("code");
+      setNote(`We sent a 6-digit confirmation code to ${clean}.`);
+    } catch (error) {
+      setErr(errorMessage(error));
+    } finally {
+      setLoading(false);
     }
-    setStage("code");
-    setNote(`We sent a 6-digit confirmation code to ${clean}.`);
+  }
+
+  async function resendCode() {
+    if (!pendingEmail) return;
+    setErr(null);
+    setNote(null);
+    setLoading(true);
+    try {
+      await requestCode(pendingEmail);
+      setNote(`A new 6-digit code was sent to ${pendingEmail}.`);
+    } catch (error) {
+      setErr(errorMessage(error));
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function verify(e?: React.FormEvent) {
     e?.preventDefault();
     setErr(null);
+    setNote(null);
     const token = code.trim();
-    if (token.length < 6) {
+    if (!/^\d{6}$/.test(token)) {
       setErr("Enter the 6-digit code from your email.");
       return;
     }
-    setLoading(true);
-    const { error } = await supabase.auth.verifyOtp({
-      email: email.trim().toLowerCase(),
-      token,
-      type: "email",
-    });
-    setLoading(false);
-    if (error) {
-      setErr(error.message);
+    if (!pendingEmail) {
+      setErr("Your sign-in request expired. Enter your email again.");
+      setStage("email");
       return;
     }
-    onSignedIn();
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: pendingEmail,
+        token,
+        type: "email",
+      });
+      if (error) throw error;
+
+      const session = data.session ?? (await supabase.auth.getSession()).data.session;
+      if (!session) {
+        throw new Error("The code was accepted, but no login session was created. Please request a new code.");
+      }
+
+      onSignedIn();
+    } catch (error) {
+      setErr(errorMessage(error));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -81,27 +132,11 @@ export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
             disabled={loading || googleLoading}
             className="w-full rounded-full bg-white text-slate-900 border border-slate-300 px-6 py-3 font-medium hover:bg-slate-100 transition disabled:opacity-50 flex items-center justify-center gap-3"
           >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              className="h-5 w-5"
-            >
-              <path
-                fill="#4285F4"
-                d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.41Z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 22c2.7 0 4.98-.9 6.63-2.36l-3.24-2.54c-.9.6-2.05.96-3.39.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.62A10 10 0 0 0 12 22Z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M6.39 13.93A6.02 6.02 0 0 1 6.07 12c0-.67.12-1.32.32-1.93V7.45H3.04A10 10 0 0 0 2 12c0 1.61.38 3.14 1.04 4.55l3.35-2.62Z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.94c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.64 9.64 0 0 0 12 2a10 10 0 0 0-8.96 5.45l3.35 2.62C7.18 7.7 9.39 5.94 12 5.94Z"
-              />
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
+              <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.41Z" />
+              <path fill="#34A853" d="M12 22c2.7 0 4.98-.9 6.63-2.36l-3.24-2.54c-.9.6-2.05.96-3.39.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.62A10 10 0 0 0 12 22Z" />
+              <path fill="#FBBC05" d="M6.39 13.93A6.02 6.02 0 0 1 6.07 12c0-.67.12-1.32.32-1.93V7.45H3.04A10 10 0 0 0 2 12c0 1.61.38 3.14 1.04 4.55l3.35-2.62Z" />
+              <path fill="#EA4335" d="M12 5.94c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.64 9.64 0 0 0 12 2a10 10 0 0 0-8.96 5.45l3.35 2.62C7.18 7.7 9.39 5.94 12 5.94Z" />
             </svg>
             {googleLoading ? "Opening Google…" : "Continue with Google"}
           </button>
@@ -150,15 +185,24 @@ export function EmailAuth({ onSignedIn }: { onSignedIn: () => void }) {
           />
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || code.length !== 6}
             className="w-full rounded-full bg-primary text-primary-foreground px-6 py-3 font-medium hover:opacity-90 transition disabled:opacity-50"
           >
             {loading ? "Verifying…" : "Confirm & sign in"}
           </button>
           <button
             type="button"
+            onClick={resendCode}
+            disabled={loading}
+            className="w-full text-xs text-primary hover:underline disabled:opacity-50"
+          >
+            Resend code
+          </button>
+          <button
+            type="button"
             onClick={() => {
               setStage("email");
+              setPendingEmail("");
               setCode("");
               setNote(null);
               setErr(null);
